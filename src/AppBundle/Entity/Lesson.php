@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: huynguyen
- * Date: 4/13/17
- * Time: 10:03 PM
+ * Date: 4/14/17
+ * Time: 11:55 AM
  */
 
 namespace AppBundle\Entity;
@@ -12,9 +12,9 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="category")
+ * @ORM\Table(name="lesson")
  */
-class Category
+class Lesson
 {
     /**
      * @ORM\Column(type="integer")
@@ -24,27 +24,27 @@ class Category
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\ManyToOne(targetEntity="Category", inversedBy="lessons")
+     */
+    private $category;
+
+    /**
+     * @ORM\Column(type="string")
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @ORM\Column(type="string")
      */
     private $slug;
 
     /**
-     * @ORM\OneToMany(targetEntity="Lesson", mappedBy="category")
+     * @@ORM\Column(type="text")
      */
-    private $lessons;
+    private $sentences;
 
     /**
-     * @ORM\Column(type="integer")
-     */
-    private $totalLessons;
-
-    /**
-     * @ORM\Column(type="integer")
+     * @var@ORM\Column(type="integer")
      */
     private $order;
 
@@ -62,6 +62,22 @@ class Category
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param mixed $category
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
     }
 
     /**
@@ -99,33 +115,17 @@ class Category
     /**
      * @return mixed
      */
-    public function getLessons()
+    public function getSentences()
     {
-        return $this->lessons;
+        return $this->sentences;
     }
 
     /**
-     * @param mixed $lessons
+     * @param mixed $sentences
      */
-    public function setLessons($lessons)
+    public function setSentences($sentences)
     {
-        $this->lessons = $lessons;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getTotalLessons()
-    {
-        return $this->totalLessons;
-    }
-
-    /**
-     * @param mixed $totalLessons
-     */
-    public function setTotalLessons($totalLessons)
-    {
-        $this->totalLessons = $totalLessons;
+        $this->sentences = $sentences;
     }
 
     /**
