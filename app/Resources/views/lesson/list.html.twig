@@ -1,1 +1,13 @@
 {% extends 'layout.html.twig' %}
+
+{% block content %}
+    {% for category in categories %}
+
+        <h3>{{ category.name }}</h3>
+
+        {% for lesson in category.lessons %}
+            <a href="{{ path('lesson_show', {'categorySlug': category.slug ,'position': lesson.position}) }}" title="{{ lesson.name }}">{{ lesson.id }}</a>
+        {% endfor %}
+
+    {% endfor %}
+{% endblock %}

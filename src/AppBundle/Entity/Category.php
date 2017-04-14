@@ -143,4 +143,9 @@ class Category
     {
         $this->position = $position;
     }
+
+    public function __toString()
+    {
+        return $this->getSlug();
+    }
 }
