@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        {% block head %}
+            {% include 'block/head.html.twig' %}
+        {% endblock %}
+    </head>
+    <body>
+        {% block nav %}
+            {% include 'block/nav.html.twig' %}
+        {% endblock %}
+
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
+
+        {% block javascripts %}
+            {% include 'block/js.html.twig' %}
+        {% endblock %}
+    </body>
+</html>

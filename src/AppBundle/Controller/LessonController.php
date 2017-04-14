@@ -8,10 +8,10 @@ use Symfony\Component\HttpFoundation\Response;
 class LessonController extends BaseController
 {
     /**
-     * @Route("/lessons")
+     * @Route("/lessons", name="lesson_list")
      */
     public function listAction()
     {
-        return $this->render('AppBundle:lesson:list.html.twig', ['a' => 'aaaa']);
+        return $this->render('lesson/list.html.twig', ['a' => 'aaaa']);
     }
 }

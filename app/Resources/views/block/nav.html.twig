@@ -1,0 +1,40 @@
+<nav class="navbar navbar-default">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="{{ path('lesson_list') }}" class="navbar-brand">
+                <b>huynguyen</b>
+            </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class=""><a href="">Học</a></li>
+                <li class=""><a href="">Hướng dẫn</a></li>
+                <li class=""><a href="">Xếp hạng</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="{{ path('fos_user_security_login') }}">Đăng nhập</a></li>
+                <li><a href="{{ path('fos_user_registration_register') }}">Đăng kí</a></li>
+                {#<li class="">
+                    <p class="user-info">Chào <b></b>, hôm nay bạn đã gõ <b></b> chữ!</p>
+                </li>
+                <li class="">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tài khoản<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="">Thống kê</a></li>
+                        <li><a href="">Đổi mật khẩu</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="">Thoát</a></li>
+                    </ul>
+                </li>#}
+            </ul>
+        </div>
+    </div>
+</nav>
