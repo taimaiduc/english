@@ -41,12 +41,12 @@ class Category
     /**
      * @ORM\Column(type="integer")
      */
-    private $totalLessons;
+    private $totalLessons = 0;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $order;
+    private $position = 0;
 
     /**
      * @return mixed
@@ -131,16 +131,16 @@ class Category
     /**
      * @return mixed
      */
-    public function getOrder()
+    public function getPosition()
     {
-        return $this->order;
+        return $this->position;
     }
 
     /**
-     * @param mixed $order
+     * @param mixed $position
      */
-    public function setOrder($order)
+    public function setPosition($position)
     {
-        $this->order = $order;
+        $this->position = $position;
     }
 }

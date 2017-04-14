@@ -34,19 +34,14 @@ class Lesson
     private $name;
 
     /**
-     * @ORM\Column(type="string")
-     */
-    private $slug;
-
-    /**
-     * @@ORM\Column(type="text")
+     * @ORM\Column(type="text")
      */
     private $sentences;
 
     /**
-     * @var@ORM\Column(type="integer")
+     * @ORM\Column(type="integer")
      */
-    private $order;
+    private $position = 0;
 
     /**
      * @return mixed
@@ -97,50 +92,34 @@ class Lesson
     }
 
     /**
-     * @return mixed
-     */
-    public function getSlug()
-    {
-        return $this->slug;
-    }
-
-    /**
-     * @param mixed $slug
-     */
-    public function setSlug($slug)
-    {
-        $this->slug = $slug;
-    }
-
-    /**
-     * @return mixed
+     * @return array
      */
     public function getSentences()
     {
-        return $this->sentences;
+        return json_decode($this->sentences, true);
     }
 
     /**
-     * @param mixed $sentences
+     * @param array $sentences
      */
-    public function setSentences($sentences)
+    public function setSentences(array $sentences)
     {
-        $this->sentences = $sentences;
+        $this->sentences = json_encode($sentences);
     }
 
     /**
      * @return mixed
      */
-    public function getOrder()
+    public function getPosition()
     {
-        return $this->order;
+        return $this->position;
     }
 
     /**
-     * @param mixed $order
+     * @param mixed $position
      */
-    public function setOrder($order)
+    public function setPosition($position)
     {
-        $this->order = $order;
+        $this->position = $position;
     }
 }
