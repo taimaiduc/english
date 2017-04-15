@@ -1,8 +1,8 @@
 {% extends 'layout.html.twig' %}
-{% import 'macros/breadcrum.html.twig' as breadCrum %}
+{% import 'macros/breadcrumb.html.twig' as breadCrumb %}
 
 {% block content %}
-    {{ breadCrum.create(category, lesson) }}
+    {{ breadCrumb.create(category, lesson) }}
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-9 text-center">
             <form>
