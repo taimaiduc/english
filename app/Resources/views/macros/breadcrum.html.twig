@@ -1,0 +1,15 @@
+{% macro create(category, lesson) %}
+    <div class="row">
+        <div class="col-xs-12">
+            <ul class="breadcrumb">
+                <li class="active"><b>Lesson {{ lesson.position }} - {{ lesson.name }}</b></li>
+                {% if lesson.position > 1 %}
+                    <li><a href="{{ path('lessons_show', {'categorySlug': category.slug, 'position': lesson.position - 1}) }}">Previous</a></li>
+                {% endif %}
+                {% if lesson.position < category.totalLessons %}
+                    <li><a href="{{ path('lessons_show', {'categorySlug': category.slug, 'position': lesson.position + 1}) }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+{% endmacro %}

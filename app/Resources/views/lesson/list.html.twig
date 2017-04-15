@@ -6,7 +6,9 @@
         <h3>{{ category.name }}</h3>
 
         {% for lesson in category.lessons %}
-            <a href="{{ path('lesson_show', {'categorySlug': category.slug ,'position': lesson.position}) }}" title="{{ lesson.name }}">{{ lesson.id }}</a>
+            <a href="{{ path('lessons_show', {'categorySlug': category.slug ,'position': lesson.position}) }}" title="{{ lesson.name }}">
+                {{ lesson.position }}
+            </a>
         {% endfor %}
 
     {% endfor %}

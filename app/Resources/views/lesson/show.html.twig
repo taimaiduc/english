@@ -1,5 +1,58 @@
 {% extends 'layout.html.twig' %}
+{% import 'macros/breadcrum.html.twig' as breadCrum %}
 
 {% block content %}
+    {{ breadCrum.create(category, lesson) }}
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-9 text-center">
+            <form>
+                {% for sentence in lesson.sentences %} {# loop.index starts from 1 #}
+                    <div class="row">
+                        <div class="col-xs-3 col-sm-2 col-md-1">
+                            <button class="btn btn-default js-btn-play" data-audio-index="{{ loop.index }}">{{ loop.index }}.<i class="glyphicon glyphicon-play"></i></button>
+                            <audio class="hidden" id="audio{{ loop.index }}">
+                                <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~loop.index~'.mp3') }}">
+                            </audio>
+                        </div>
 
+                        <div class="col-xs-6 col-sm-8 col-md-10">
+                            <div class="form-group">
+                                <input class="form-control" id="input{{ loop.index }}" tabindex="{{ loop.index }}">
+                                <p class="text-left hidden answer" id="answer{{ loop.index }}">asd</p>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-3 col-sm-2 col-md-1">
+                            <button class="btn btn-default js-btn-check-answer" data-answer-index="{{ loop.index }}"><i class="glyphicon glyphicon-question-sign text-mute"></i></button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </form>
+        </div>
+    </div>
+    {{ breadCrum.create(category, lesson) }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $(document).ready(function(){
+            $("input").focus(function(){
+                $('html, body').animate({scrollTop: $(this).offset().top - 100});
+            });
+
+            $(".js-btn-play").on('click', function (e) {
+                e.preventDefault();
+
+                $("#audio"+$(this).data('audio-index')).get(0).play();
+            });
+
+            $(".js-btn-check-answer").on('click', function (e) {
+                e.preventDefault()
+
+                $("#answer"+$(this).data('answer-index')).toggleClass('hidden');
+            });
+        });
+    </script>
 {% endblock %}

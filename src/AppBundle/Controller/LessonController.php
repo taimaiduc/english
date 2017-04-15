@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 class LessonController extends BaseController
 {
     /**
-     * @Route("/lessons", name="lesson_list")
+     * @Route("/lessons", name="lessons_list")
      */
     public function listAction()
     {
@@ -30,10 +30,11 @@ class LessonController extends BaseController
     }
 
     /**
-     * @Route("/lessons/{categorySlug}/{position}", name="lesson_show")
+     * @Route("/lessons/{categorySlug}/{position}", name="lessons_show")
      */
     public function showAction($categorySlug, $position)
     {
+        /** @var Category $category */
         $category = $this->getDoctrine()->getRepository('AppBundle:Category')
             ->findOneBy(['slug' => $categorySlug]);
 
@@ -41,12 +42,9 @@ class LessonController extends BaseController
         $lesson = $this->getDoctrine()->getRepository('AppBundle:Lesson')
             ->findOneBy(['category' => $category, 'position' => $position]);
 
-        $previousLessonPosition = $lesson->getId() > 1 ? $lesson->getId() - 1 : null;
-
         $data = [
             'category' => $category,
-            'lesson' => $lesson,
-            'previousLessonPosition' => $previousLessonPosition
+            'lesson' => $lesson
         ];
 
         return $this->render('lesson/show.html.twig', ['category' => $category, 'lesson' => $lesson]);
