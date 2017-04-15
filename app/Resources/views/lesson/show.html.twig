@@ -2,35 +2,66 @@
 {% import 'macros/breadcrumb.html.twig' as breadCrumb %}
 
 {% block content %}
-    {{ breadCrumb.create(category, lesson) }}
-    <div class="row">
-        <div class="col-xs-12 col-sm-12 col-md-9 text-center">
-            <form>
-                {% for sentence in lesson.sentences %} {# loop.index starts from 1 #}
-                    <div class="row">
-                        <div class="col-xs-3 col-sm-2 col-md-1">
-                            <button class="btn btn-default js-btn-play" data-audio-index="{{ loop.index }}">{{ loop.index }}.<i class="glyphicon glyphicon-play"></i></button>
-                            <audio class="hidden" id="audio{{ loop.index }}">
-                                <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~loop.index~'.mp3') }}">
-                            </audio>
-                        </div>
+{{ breadCrumb.create(category, lesson) }}
+<div class="row">
+    <form class="col-md-9">
+        {% for sentence in lesson.sentences %} {# loop.index starts from 1 #}
+            <div class="row">
+                <div class="col-xs-3 col-sm-2 col-md-1">
+                    <button class="btn btn-default js-btn-play" onclick="toggleAudio({{ loop.index }})" type="button">
+                        {{ loop.index }}. <i class="glyphicon glyphicon-volume-up"></i>
+                    </button>
+                    <audio class="hidden" id="audio{{ loop.index }}">
+                        <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~loop.index~'.mp3') }}">
+                    </audio>
+                </div>
 
-                        <div class="col-xs-6 col-sm-8 col-md-10">
-                            <div class="form-group">
-                                <input class="form-control" id="input{{ loop.index }}" tabindex="{{ loop.index }}">
-                                <p class="text-left hidden answer" id="answer{{ loop.index }}">asd</p>
-                            </div>
-                        </div>
-
-                        <div class="col-xs-3 col-sm-2 col-md-1">
-                            <button class="btn btn-default js-btn-check-answer" data-answer-index="{{ loop.index }}"><i class="glyphicon glyphicon-question-sign text-mute"></i></button>
-                        </div>
+                <div class="col-xs-6 col-sm-8 col-md-10">
+                    <div class="form-group">
+                        <input class="form-control" id="input{{ loop.index }}" onkeydown="doAction({{ loop.index }}, event)" tabindex="{{ loop.index }}">
+                        <p class="text-left hidden" id="answer{{ loop.index }}">{{ sentence }}</p>
+                        <p class="text-left result" id="result{{ loop.index }}"></p>
                     </div>
-                {% endfor %}
-            </form>
+                </div>
+
+                <div class="col-xs-3 col-sm-2 col-md-1">
+                    <button class="btn btn-default" id="btn-check{{ loop.index }}" onclick="checkAnswer({{ loop.index }})" type="button">
+                        <i class="glyphicon glyphicon-question-sign text-mute"></i>
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+    </form>
+
+    <div class="col-md-3">
+        <div class="sticky-sidebar-wrapper">
+            <div class="row" data-spy="affix" data-offset-top="105">
+                <div class="col-xs-6 col-md-12">
+                    <div class="form-group">
+                        <button class="btn btn-success btn-block" title="Lưu thành tích và chuyển sang bài tiếp theo"><i class="glyphicon glyphicon-ok"></i> Hoàn thành</button>
+                    </div>
+
+                </div>
+                <div class="col-xs-6 col-md-12">
+                    <div class="form-group">
+                        <button class="btn btn-default btn-block" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)"><i class="glyphicon glyphicon-paperclip"></i> Lưu trạng thái</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>he he he he</h4>
+                <ul>
+                    <li><a href="#">Hoc tieng anh</a></li>
+                </ul>
+            </div>
         </div>
     </div>
-    {{ breadCrum.create(category, lesson) }}
+</div>
+{{ breadCrumb.create(category, lesson) }}
 {% endblock %}
 
 {% block javascripts %}
@@ -41,18 +72,101 @@
             $("input").focus(function(){
                 $('html, body').animate({scrollTop: $(this).offset().top - 100});
             });
-
-            $(".js-btn-play").on('click', function (e) {
-                e.preventDefault();
-
-                $("#audio"+$(this).data('audio-index')).get(0).play();
-            });
-
-            $(".js-btn-check-answer").on('click', function (e) {
-                e.preventDefault()
-
-                $("#answer"+$(this).data('answer-index')).toggleClass('hidden');
-            });
         });
+
+        {# toggleAudio() or checkAnswer() or focus to other input or do nothing depends on what keys user pressed #}
+        function doAction(index, event) {
+
+            {# Ctrl + Space = toggleAudio() #}
+            if (event.ctrlKey && event.keyCode == 32) {
+                toggleAudio(index);
+            }
+
+            {# Ctrl + Enter = Hide result #}
+            else if (event.ctrlKey && event.keyCode == 13) {
+                document.getElementById('result'+index).style.display = 'none';
+            }
+
+            {# Enter = Compare input & answer #}
+            else if (event.keyCode == 13) {
+                checkAnswer(index);
+            }
+
+            {# Down arrow key or Up arrow key pressed #}
+            else if (event.keyCode== 40 || event.keyCode==38) {
+                var inputs = document.querySelectorAll('[tabindex]');
+                var currentInputIndex = document.activeElement.getAttribute('tabindex');
+
+                {# Down arrow key = focus next input #}
+                if (event.keyCode == 40) {
+                    var nextInput = inputs[currentInputIndex];
+                    if(nextInput != undefined) {
+                        nextInput.focus();
+                    }
+                }
+                {# Up arrow key = focus previous input #}
+                else {
+                    var previousInputIndex = parseInt(currentInputIndex)-2;
+                    var previousInput = inputs[previousInputIndex];
+                    if (previousInput != undefined) {
+                        previousInput.focus();
+                    }
+                }
+            }
+        }
+
+        function toggleAudio(index) {
+            var audioElements = document.getElementsByTagName('audio');
+            var currentAudio = document.getElementById('audio'+index);
+
+            {# if there's any other audio playing, stop it. #}
+            for (var i = 0; i < audioElements.length; i++) {
+                if (audioElements[i] != currentAudio) {
+                    audioElements[i].pause();
+                }
+            }
+
+            {# audio cannot be paused and played continuously, instead it's stopped and will start from the beginning if played again. #}
+            currentAudio.paused ? currentAudio.play() : currentAudio.pause();
+            currentAudio.currentTime = 0;
+        }
+
+        function checkAnswer(index) {
+            var inputElement = document.getElementById('input'+index);
+            var answerElement = document.getElementById('answer'+index);
+
+            var input = inputElement.value.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
+            var answer = answerElement.innerHTML.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
+            var result = answerElement.innerHTML.split(' '); // the result after comparing input and answer
+
+            var answerIsCorrect = true;
+
+            for (var i = 0; i < result.length; i++) {
+                if(answer[i] != input[i]){
+                    result[i] = "<span class='text-danger'>"+result[i]+"</span>";
+                    answerIsCorrect = false;
+                }
+            }
+
+            if (input.length > answer.length) {
+                result[result.length - 1] = "<span class='text-danger'>"+result[result.length - 1]+"</span>";
+                answerIsCorrect = false;
+            }
+
+            result = result.join(" ");
+
+            document.getElementById("result"+index).innerHTML = result;
+            var resultElement = document.getElementById("result"+index);
+            var btnCheck = document.getElementById('btn-check'+index);
+
+            if (!answerIsCorrect) {
+                resultElement.style.display = 'block';
+                btnCheck.innerHTML = '<b class="glyphicon glyphicon-remove text-danger"></b>';
+            } else {
+                btnCheck.innerHTML = '<b class="glyphicon glyphicon-ok text-success"></b>';
+                resultElement.style.display = 'none';
+                inputElement.value = answerElement.innerHTML;
+            }
+        }
     </script>
 {% endblock %}
