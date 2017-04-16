@@ -127,8 +127,11 @@
             }
 
             {# audio cannot be paused and played continuously, instead it's stopped and will start from the beginning if played again. #}
-            currentAudio.paused ? currentAudio.play() : currentAudio.pause();
-            currentAudio.currentTime = 0;
+            {# setTimeout(150) is used to prevent this bug: http://stackoverflow.com/questions/36803176/how-to-prevent-the-play-request-was-interrupted-by-a-call-to-pause-error #}
+            setTimeout(function(){
+                currentAudio.paused ? currentAudio.play() : currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }, 150);
         }
 
         function checkAnswer(index) {
@@ -142,7 +145,7 @@
             var answerIsCorrect = true;
 
             for (var i = 0; i < result.length; i++) {
-                if(answer[i] != input[i]){
+                if (answer[i] != input[i]){
                     result[i] = "<span class='text-danger'>"+result[i]+"</span>";
                     answerIsCorrect = false;
                 }
