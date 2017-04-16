@@ -19,13 +19,6 @@ class LessonController extends BaseController
         $categories = $this->getDoctrine()->getRepository('AppBundle:Category')
             ->findAll();
 
-        foreach ($categories as $category) {
-            $lessons = $this->getDoctrine()->getRepository('AppBundle:Lesson')
-                ->findBy(['category' => $category]);
-
-            $category->setLessons($lessons);
-        }
-
         return $this->render('lesson/list.html.twig', ['categories' => $categories]);
     }
 

@@ -8,6 +8,7 @@
 
 namespace AppBundle\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -47,6 +48,11 @@ class Category
      * @ORM\Column(type="integer")
      */
     private $position = 0;
+
+    public function __construct()
+    {
+        $this->lessons = new ArrayCollection();
+    }
 
     /**
      * @return mixed
