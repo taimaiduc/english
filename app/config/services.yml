@@ -8,3 +8,9 @@ services:
         class: AppBundle\EventListener\CategoryUpdater
         tags:
             - { name: doctrine.event_listener, event: postPersist }
+
+    authentication_handler:
+            class:  AppBundle\Authentication\AuthenticationHandler
+            arguments:  ['@router']
+            tags:
+                - { channel: 'security' }
