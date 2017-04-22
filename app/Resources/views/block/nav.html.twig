@@ -22,11 +22,7 @@
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right">
-                        <li><a href="{{ path('fos_user_security_login') }}">Đăng nhập</a></li>
-                        <li><a href="{{ path('fos_user_registration_register') }}">Đăng kí</a></li>
-                        {#<li class="">
-                            <p class="user-info">Chào <b></b>, hôm nay bạn đã gõ <b></b> chữ!</p>
-                        </li>
+                        {% if app.user %}
                         <li class="">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tài khoản<span class="caret"></span></a>
                             <ul class="dropdown-menu">
@@ -35,7 +31,11 @@
                                 <li role="separator" class="divider"></li>
                                 <li><a href="">Thoát</a></li>
                             </ul>
-                        </li>#}
+                        </li>
+                        {% else %}
+                            <li><a href="{{ path('fos_user_security_login') }}">Đăng nhập</a></li>
+                            <li><a href="{{ path('fos_user_registration_register') }}">Đăng kí</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

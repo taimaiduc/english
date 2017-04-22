@@ -35,11 +35,18 @@ class LessonController extends BaseController
         $lesson = $this->getDoctrine()->getRepository('AppBundle:Lesson')
             ->findOneBy(['category' => $category, 'position' => $position]);
 
-        $data = [
-            'category' => $category,
-            'lesson' => $lesson
+        /** links for 2 submit buttons */
+        $links = [
+            'updateProgress' => $this->generateUrl("user_update_progress"),
+            'saveLesson' => $this->generateUrl("user_save_lesson")
         ];
 
-        return $this->render('lesson/show.html.twig', ['category' => $category, 'lesson' => $lesson]);
+        $data = [
+            'category' => $category,
+            'lesson' => $lesson,
+            'links' => $links
+        ];
+
+        return $this->render('lesson/show.html.twig', $data);
     }
 }

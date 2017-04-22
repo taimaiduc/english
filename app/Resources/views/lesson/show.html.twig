@@ -2,29 +2,31 @@
 {% import 'macros/breadcrumb.html.twig' as breadCrumb %}
 
 {% block content %}
+
 {{ breadCrumb.create(category, lesson) }}
+
 <div class="row">
     <form class="col-md-9">
         {% for sentence in lesson.sentences %} {# loop.index starts from 1 #}
             <div class="row">
-                <div class="col-xs-3 col-sm-2 col-md-1">
+                <div class="col-xs-2 col-sm-1 col-md-1">
                     <button class="btn btn-default js-btn-play" onclick="toggleAudio({{ loop.index }})" type="button">
-                        {{ loop.index }}. <i class="glyphicon glyphicon-volume-up"></i>
+                        <i class="glyphicon glyphicon-volume-up"></i>
                     </button>
                     <audio class="hidden" id="audio{{ loop.index }}">
                         <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~loop.index~'.mp3') }}">
                     </audio>
                 </div>
 
-                <div class="col-xs-6 col-sm-8 col-md-10">
+                <div class="col-xs-7 col-sm-9 col-md-10">
                     <div class="form-group">
-                        <input class="form-control" id="input{{ loop.index }}" onkeydown="doAction({{ loop.index }}, event)" tabindex="{{ loop.index }}">
+                        <input class="form-control" id="input{{ loop.index }}" placeholder="{{ loop.index }}." onkeydown="doAction({{ loop.index }}, event)" tabindex="{{ loop.index }}">
                         <p class="text-left hidden" id="answer{{ loop.index }}">{{ sentence }}</p>
                         <p class="text-left result" id="result{{ loop.index }}"></p>
                     </div>
                 </div>
 
-                <div class="col-xs-3 col-sm-2 col-md-1">
+                <div class="col-xs-2 col-sm-1 col-md-1">
                     <button class="btn btn-default" id="btn-check{{ loop.index }}" onclick="checkAnswer({{ loop.index }})" type="button">
                         <i class="glyphicon glyphicon-question-sign text-mute"></i>
                     </button>
@@ -38,13 +40,19 @@
             <div class="row" data-spy="affix" data-offset-top="105">
                 <div class="col-xs-6 col-md-12">
                     <div class="form-group">
-                        <button class="btn btn-success btn-block" title="Lưu thành tích và chuyển sang bài tiếp theo"><i class="glyphicon glyphicon-ok"></i> Hoàn thành</button>
+                        <button data-url="{{ links.updateProgress }}" class="btn btn-success btn-block js-btn-submit" title="Lưu thành tích và chuyển sang bài tiếp theo">
+                            <i class="glyphicon glyphicon-ok" ></i>
+                            Hoàn thành
+                        </button>
                     </div>
 
                 </div>
                 <div class="col-xs-6 col-md-12">
                     <div class="form-group">
-                        <button class="btn btn-default btn-block" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)"><i class="glyphicon glyphicon-paperclip"></i> Lưu trạng thái</button>
+                        <button data-url="{{ links.saveLesson }}" class="btn btn-default btn-block js-btn-submit" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)">
+                            <i class="glyphicon glyphicon-paperclip" ></i>
+                            Lưu trạng thái
+                        </button>
                     </div>
                 </div>
             </div>
@@ -53,26 +61,46 @@
 
         <div class="row">
             <div class="col-xs-12">
-                <h4>he he he he</h4>
+                <h4>Helpful links</h4>
                 <ul>
+                    <li><a href="#">Hoc tieng anh</a></li>
+                    <li><a href="#">Hoc tieng anh</a></li>
+                    <li><a href="#">Hoc tieng anh</a></li>
+                    <li><a href="#">Hoc tieng anh</a></li>
                     <li><a href="#">Hoc tieng anh</a></li>
                 </ul>
             </div>
         </div>
     </div>
 </div>
+
 {{ breadCrumb.create(category, lesson) }}
+
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
 
     <script>
-        $(document).ready(function(){
-            $("input").focus(function(){
-                $('html, body').animate({scrollTop: $(this).offset().top - 100});
-            });
-        });
+        {#
+            ajaxDataExplained = {
+                lessonId: someNumber,
+                correctAnswers: {
+                    answerIndex: answerWordCount,
+                    anotherAnswerIndex: anotherAnswerWordCount,
+                    anotherAnswerIndex: anotherAnswerWordCount
+                }
+            }
+        #}
+        var ajaxData = {};
+        ajaxData.lessonId = {{ lesson.id }};
+        ajaxData.correctAnswers = {};
+        {# if user logged in #}
+        {% if app.user %}
+            ajaxData.username = "{{ app.user.username }}";
+        {% endif %}
+
+        var isSubmitting = false;
 
         {# toggleAudio() or checkAnswer() or focus to other input or do nothing depends on what keys user pressed #}
         function doAction(index, event) {
@@ -121,22 +149,26 @@
 
             {# if there's any other audio playing, stop it. #}
             for (var i = 0; i < audioElements.length; i++) {
-                if (audioElements[i] != currentAudio) {
+                if (audioElements[i] != currentAudio && !audioElements[i].paused) {
                     audioElements[i].pause();
+                    break;
                 }
             }
 
-            {# audio cannot be paused and played continuously, instead it's stopped and will start from the beginning if played again. #}
-            {# setTimeout(150) is used to prevent this bug: http://stackoverflow.com/questions/36803176/how-to-prevent-the-play-request-was-interrupted-by-a-call-to-pause-error #}
-            setTimeout(function(){
-                currentAudio.paused ? currentAudio.play() : currentAudio.pause();
-                currentAudio.currentTime = 0;
-            }, 150);
+            if (currentAudio.paused) {
+                currentAudio.play();
+            } else {
+                currentAudio.pause();
+            }
         }
 
         function checkAnswer(index) {
             var inputElement = document.getElementById('input'+index);
             var answerElement = document.getElementById('answer'+index);
+            if (inputElement.hasAttribute("isChecked")) {
+                inputElement.value = answerElement.innerHTML;
+                return
+            }
 
             var input = inputElement.value.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
             var answer = answerElement.innerHTML.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
@@ -167,9 +199,39 @@
                 btnCheck.innerHTML = '<b class="glyphicon glyphicon-remove text-danger"></b>';
             } else {
                 btnCheck.innerHTML = '<b class="glyphicon glyphicon-ok text-success"></b>';
-                resultElement.style.display = 'none';
+                resultElement.innerHTML = "";
                 inputElement.value = answerElement.innerHTML;
+                inputElement.setAttribute("isChecked", "1");
+                ajaxData.correctAnswers[index-1] = answer.length; {# decrease indexes so that they match the indexes of php array #}
             }
         }
+
+        function submitData(url) {
+            {# to avoid users click submit many times #}
+            if (isSubmitting) {
+                return;
+            }
+            isSubmitting = true;
+
+            $.ajax({
+                url: url,
+                method: 'post',
+                data: ajaxData,
+            }).done(function (data) {
+                isSubmitting = false;
+                console.log(data);
+                ajaxData.correctAnswers = {};
+            });
+        }
+
+        $(document).ready(function(){
+            $("input").focus(function(){
+                $("html, body").animate({scrollTop: $(this).offset().top - 100});
+            });
+
+            $(".js-btn-submit").on('click', function () {
+                submitData($(this).data("url"));
+            });
+        });
     </script>
 {% endblock %}
