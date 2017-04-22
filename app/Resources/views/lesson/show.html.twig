@@ -203,6 +203,7 @@
                 inputElement.value = answerElement.innerHTML;
                 inputElement.setAttribute("isChecked", "1");
                 ajaxData.correctAnswers[index-1] = answer.length; {# decrease indexes so that they match the indexes of php array #}
+                console.log(ajaxData);
             }
         }
 
@@ -212,6 +213,7 @@
                 return;
             }
             isSubmitting = true;
+            console.log(ajaxData);
 
             $.ajax({
                 url: url,
