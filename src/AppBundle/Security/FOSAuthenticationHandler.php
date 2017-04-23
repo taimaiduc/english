@@ -9,6 +9,7 @@
 namespace AppBundle\Authentication;
 
 
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
@@ -38,8 +39,10 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
                 $url = $targetPath;
             } else {
                 // Otherwise, redirect him to wherever you want
-                $url = $this->router->generate("/lessons_list");
+                $url = $this->router->generate("lessons_list");
             }
+
+            return new RedirectResponse($url);
         }
     }
 
