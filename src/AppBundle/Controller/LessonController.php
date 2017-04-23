@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 class LessonController extends BaseController
 {
     /**
-     * @Route("/lessons", name="lessons_list")
+     * @Route("/", name="lessons_list")
      */
     public function listAction()
     {
@@ -35,16 +35,9 @@ class LessonController extends BaseController
         $lesson = $this->getDoctrine()->getRepository('AppBundle:Lesson')
             ->findOneBy(['category' => $category, 'position' => $position]);
 
-        /** links for 2 submit buttons */
-        $links = [
-            'updateProgress' => $this->generateUrl("user_update_progress"),
-            'saveLesson' => $this->generateUrl("user_save_lesson")
-        ];
-
         $data = [
             'category' => $category,
-            'lesson' => $lesson,
-            'links' => $links
+            'lesson' => $lesson
         ];
 
         return $this->render('lesson/show.html.twig', $data);

@@ -1,24 +1,24 @@
 .result {
     padding: 0 12px;
-    display: none;
 }
 
-.hidden {
-    display: none;
+.affix-top {
 }
 
 .affix {
+    position: fixed;
     top: 0;
     padding-top: 20px;
     background: #fff;
     z-index: 10;
+    width: inherit;
 }
 
 .sticky-sidebar-wrapper {
     min-height: 100px;
 }
 
-@media(max-width:768px){
+@media(max-width:991px){
     .affix {
         position: static;
         width: auto;

@@ -6,19 +6,21 @@
  * Time: 10:14 PM
  */
 
-namespace AppBundle\Authentication;
+namespace AppBundle\Security;
 
 
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationFailureHandlerInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerInterface;
 
-class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
+class FOSAuthenticationHandler implements AuthenticationSuccessHandlerInterface, AuthenticationFailureHandlerInterface
 {
     private $router;
 
@@ -31,7 +33,11 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     {
 
         if ($request->isXmlHttpRequest()) {
+            $data = [
+                "username" => $token->getUser()->getUsername()
+            ];
 
+            return new JsonResponse($data);
         } else {
             // If the user tried to access a protected resource and was forced to login
             // redirect him back to that resource
@@ -49,11 +55,13 @@ class AuthenticationHandler implements AuthenticationSuccessHandlerInterface, Au
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
         if ($request->isXmlHttpRequest()) {
-            // Handle XHR here
+            if ($exception) {
+                return new JsonResponse(array("error" => $exception->getMessageKey()));
+            };
         } else {
             // Create a flash message with the authentication error message
-            $request->getSession()->setFlash('error', $exception->getMessage());
-            $url = $this->router->generate('user_login');
+            $request->getSession()->getFlashBag()->add('error', $exception->getMessage());
+            $url = $this->router->generate("fos_user_security_login");
 
             return new RedirectResponse($url);
         }

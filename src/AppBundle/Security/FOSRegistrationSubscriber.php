@@ -6,18 +6,24 @@
  * Time: 10:29 AM
  */
 
-namespace AppBundle\Authentication;
+namespace AppBundle\Security;
 
 
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\FOSUserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\RouterInterface;
 
 class FOSRegistrationSubscriber implements EventSubscriberInterface
 {
     public function onRegistrationFailure(FormEvent $event)
     {
+        // if it's not an ajax call, let the fos bundle handle its work
+        if (!$event->getRequest()->isXmlHttpRequest()) {
+            return null;
+        }
+
         $form = $event->getForm();
 
         if (count($validationErrors = $form->getErrors()) == 0) {
@@ -42,6 +48,10 @@ class FOSRegistrationSubscriber implements EventSubscriberInterface
 
     public function onRegistrationSuccess(FormEvent $event)
     {
+        if (!$event->getRequest()->isXmlHttpRequest()) {
+            return;
+        }
+
         $response = new JsonResponse("success");
 
         $event->setResponse($response);

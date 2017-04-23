@@ -29,15 +29,13 @@ class User extends BaseUser
     private $lastActiveDate;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\Column(type="text", nullable=true)
      */
     private $progress;
 
     public function __construct()
     {
         parent::__construct();
-
-        $this->progress = array();
     }
 
     /**

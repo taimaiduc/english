@@ -16,6 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class UserController extends BaseController
 {
@@ -68,6 +69,21 @@ class UserController extends BaseController
     public function saveLesson()
     {
 
+    }
+
+    /**
+     * @Route("user/isLoggedIn", name="user_check_logged_in")
+     */
+    public function checkLoggedInAction(Request $request)
+    {
+        // only handle ajax requests
+        if (!$request->isXmlHttpRequest()) {
+            throw new AccessDeniedException();
+        }
+
+        if (!$this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            return new Response("You are not logged in", 403);
+        }
     }
 
     /**
