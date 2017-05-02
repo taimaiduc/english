@@ -1,12 +1,16 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
 <div class="row">
-    <div class="col-md-4">
-        {% if error %}
-            <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
+    <div class="col-xs-12">
+        <h3>Login</h3>
 
-        <form action="{{ path("fos_user_security_check") }}" method="post">
+        <form action="{{ path("fos_user_security_check") }}" class="fos_user_security_login" method="post">
+            <div class="js-modal-form-error">
+                {% for flashMessage in app.session.flashbag.get('error') %}
+                    <div class="alert alert-danger">{{ flashMessage }}</div>
+                {% endfor %}
+            </div>
+
             {% if csrf_token %}
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
             {% endif %}
@@ -31,7 +35,7 @@
                     <input type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans }}" class="btn btn-block btn-lg btn-success"/>
                 </div>
                 <div class="col-sm-6">
-                    <a href="{{ path('fos_user_registration_register') }}" class="btn btn-lg btn-link">Register</a>
+                    <a href="{{ path('fos_user_registration_register') }}" class="btn btn-lg btn-block btn-link" id="js-btn-show-register-form">Register</a>
                 </div>
             </div>
         </form>

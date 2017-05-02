@@ -14,6 +14,9 @@
             {% block content %}{% endblock %}
         </div>
 
+        {% block auth %}
+        {% endblock %}
+
         {% block javascripts %}
             {% include 'block/js.html.twig' %}
         {% endblock %}

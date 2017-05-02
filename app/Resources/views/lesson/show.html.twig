@@ -40,24 +40,24 @@
             <div class="row" data-spy="affix" data-offset-top="105">
                 <div class="col-xs-6 col-md-12">
                     <div class="form-group">
-                        <button data-url="{{ links.updateProgress }}" class="btn btn-success btn-block js-btn-submit" title="Lưu thành tích và chuyển sang bài tiếp theo">
+                        <button data-url="{{ path("user_update_progress") }}" class="btn btn-success btn-block js-btn-submit" title="Lưu thành tích và chuyển sang bài tiếp theo" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
                             <i class="glyphicon glyphicon-ok" ></i>
                             Hoàn thành
                         </button>
                     </div>
-
                 </div>
                 <div class="col-xs-6 col-md-12">
                     <div class="form-group">
-                        <button data-url="{{ links.saveLesson }}" class="btn btn-default btn-block js-btn-submit" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)">
-                            <i class="glyphicon glyphicon-paperclip" ></i>
+                        <button data-url="{{ path("user_save_lesson") }}" class="btn btn-default btn-block js-btn-submit" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
+                            <i class="glyphicon glyphicon-paperclip"></i>
                             Lưu trạng thái
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-        <hr>
+
+        {{ breadCrumb.create(category, lesson, 'hidden-md hidden-lg') }}
 
         <div class="row">
             <div class="col-xs-12">
@@ -74,7 +74,21 @@
     </div>
 </div>
 
-{{ breadCrumb.create(category, lesson) }}
+{{ breadCrumb.create(category, lesson, 'hidden-sm hidden-xs') }}
+
+{% if not app.user %}
+    <div id="authModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body" id="js-modal-body-login"></div>
+                <div class="modal-body hidden" id="js-modal-body-register"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 
 {% endblock %}
 
@@ -82,37 +96,97 @@
     {{ parent() }}
 
     <script>
-        {#
-            ajaxDataExplained = {
-                lessonId: someNumber,
-                correctAnswers: {
-                    answerIndex: answerWordCount,
-                    anotherAnswerIndex: anotherAnswerWordCount,
-                    anotherAnswerIndex: anotherAnswerWordCount
+        function submitLessonForm(url) {
+            console.log(url);
+        }
+
+        function getLoginForm() {
+            var $loginForm = $('#js-modal-body-login');
+
+            if ($loginForm.is(':empty')) {
+                $.ajax({
+                    url: "{{ path('fos_user_security_login') }}"
+                }).then(function (data) {
+                    $loginForm.html(data);
+                });
+            }
+        }
+
+        function getRegistrationForm() {
+            $.ajax({
+                url: "{{ path('fos_user_registration_register') }}",
+                method: 'get'
+            }).done(function (data) {
+                $("#js-modal-body-login").addClass("hidden");
+                $("#js-modal-body-register").removeClass("hidden").html(data);
+            });
+        }
+
+        function toggleAudio(index) {
+            var audioElements = document.getElementsByTagName('audio');
+            var currentAudio = document.getElementById('audio'+index);
+
+            {# if there's another audio playing, stop it. #}
+            for (var i = 0; i < audioElements.length; i++) {
+                if (audioElements[i] != currentAudio && !audioElements[i].paused) {
+                    audioElements[i].pause();
+                    break;
                 }
             }
-        #}
-        var ajaxData = {};
-        ajaxData.lessonId = {{ lesson.id }};
-        ajaxData.correctAnswers = {};
-        {# if user logged in #}
-        {% if app.user %}
-            ajaxData.username = "{{ app.user.username }}";
-        {% endif %}
 
-        var isSubmitting = false;
+            currentAudio.paused ? currentAudio.play() : currentAudio.pause();
+        }
+
+        function checkAnswer(index) {
+            var inputElement = document.getElementById('input'+index);
+            var answerElement = document.getElementById('answer'+index);
+
+            // if the sentence is already done
+            if (inputElement.hasAttribute("hasBeenDone")) {
+                inputElement.value = answerElement.innerHTML;
+                return;
+            }
+
+            var resultContent = compareAnswers(inputElement, answerElement);
+            var resultElement = document.getElementById("result"+index);
+
+            var btnCheck = document.getElementById('btn-check'+index);
+
+            // if user's answer is not correct
+            if (resultContent.indexOf('text-danger') !== -1) {
+                btnCheck.innerHTML = '<b class="glyphicon glyphicon-remove text-danger"></b>';
+                resultElement.innerHTML = resultContent;
+            } else {
+                btnCheck.innerHTML = '<b class="glyphicon glyphicon-ok text-success"></b>';
+                resultElement.innerHTML = "";
+                inputElement.value = answerElement.innerHTML;
+                inputElement.setAttribute("hasBeenDone", "1");
+            }
+        }
+
+        function compareAnswers(inputElement, answerElement) {
+            var input = inputElement.value.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
+            var answer = answerElement.innerHTML.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
+            var result = answerElement.innerHTML.split(' '); // the result after comparing input and answer
+
+            for (var i = 0; i < result.length; i++) {
+                if (answer[i] != input[i]){
+                    result[i] = "<span class='text-danger'>"+result[i]+"</span>";
+                }
+            }
+
+            if (input.length > answer.length) {
+                result[result.length - 1] = "<span class='text-danger'>"+result[result.length - 1]+"</span>";
+            }
+
+            return result.join(" ");
+        }
 
         {# toggleAudio() or checkAnswer() or focus to other input or do nothing depends on what keys user pressed #}
         function doAction(index, event) {
-
             {# Ctrl + Space = toggleAudio() #}
             if (event.ctrlKey && event.keyCode == 32) {
                 toggleAudio(index);
-            }
-
-            {# Ctrl + Enter = Hide result #}
-            else if (event.ctrlKey && event.keyCode == 13) {
-                document.getElementById('result'+index).style.display = 'none';
             }
 
             {# Enter = Compare input & answer #}
@@ -120,7 +194,12 @@
                 checkAnswer(index);
             }
 
-            {# Down arrow key or Up arrow key pressed #}
+            {# Ctrl + Enter = Hide result #}
+            else if (event.ctrlKey && event.keyCode == 13) {
+                document.getElementById('result'+index).style.display = 'none';
+            }
+
+           {# Down arrow key = next sentence || Up arrow key = previous sentence #}
             else if (event.keyCode== 40 || event.keyCode==38) {
                 var inputs = document.querySelectorAll('[tabindex]');
                 var currentInputIndex = document.activeElement.getAttribute('tabindex');
@@ -132,6 +211,7 @@
                         nextInput.focus();
                     }
                 }
+
                 {# Up arrow key = focus previous input #}
                 else {
                     var previousInputIndex = parseInt(currentInputIndex)-2;
@@ -142,98 +222,62 @@
                 }
             }
         }
+    </script>
 
-        function toggleAudio(index) {
-            var audioElements = document.getElementsByTagName('audio');
-            var currentAudio = document.getElementById('audio'+index);
-
-            {# if there's any other audio playing, stop it. #}
-            for (var i = 0; i < audioElements.length; i++) {
-                if (audioElements[i] != currentAudio && !audioElements[i].paused) {
-                    audioElements[i].pause();
-                    break;
-                }
-            }
-
-            if (currentAudio.paused) {
-                currentAudio.play();
-            } else {
-                currentAudio.pause();
-            }
-        }
-
-        function checkAnswer(index) {
-            var inputElement = document.getElementById('input'+index);
-            var answerElement = document.getElementById('answer'+index);
-            if (inputElement.hasAttribute("isChecked")) {
-                inputElement.value = answerElement.innerHTML;
-                return
-            }
-
-            var input = inputElement.value.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
-            var answer = answerElement.innerHTML.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
-            var result = answerElement.innerHTML.split(' '); // the result after comparing input and answer
-
-            var answerIsCorrect = true;
-
-            for (var i = 0; i < result.length; i++) {
-                if (answer[i] != input[i]){
-                    result[i] = "<span class='text-danger'>"+result[i]+"</span>";
-                    answerIsCorrect = false;
-                }
-            }
-
-            if (input.length > answer.length) {
-                result[result.length - 1] = "<span class='text-danger'>"+result[result.length - 1]+"</span>";
-                answerIsCorrect = false;
-            }
-
-            result = result.join(" ");
-
-            document.getElementById("result"+index).innerHTML = result;
-            var resultElement = document.getElementById("result"+index);
-            var btnCheck = document.getElementById('btn-check'+index);
-
-            if (!answerIsCorrect) {
-                resultElement.style.display = 'block';
-                btnCheck.innerHTML = '<b class="glyphicon glyphicon-remove text-danger"></b>';
-            } else {
-                btnCheck.innerHTML = '<b class="glyphicon glyphicon-ok text-success"></b>';
-                resultElement.innerHTML = "";
-                inputElement.value = answerElement.innerHTML;
-                inputElement.setAttribute("isChecked", "1");
-                ajaxData.correctAnswers[index-1] = answer.length; {# decrease indexes so that they match the indexes of php array #}
-                console.log(ajaxData);
-            }
-        }
-
-        function submitData(url) {
-            {# to avoid users click submit many times #}
-            if (isSubmitting) {
-                return;
-            }
-            isSubmitting = true;
-            console.log(ajaxData);
-
-            $.ajax({
-                url: url,
-                method: 'post',
-                data: ajaxData,
-            }).done(function (data) {
-                isSubmitting = false;
-                console.log(data);
-                ajaxData.correctAnswers = {};
-            });
-        }
-
+    <script>
         $(document).ready(function(){
             $("input").focus(function(){
                 $("html, body").animate({scrollTop: $(this).offset().top - 100});
             });
 
             $(".js-btn-submit").on('click', function () {
-                submitData($(this).data("url"));
+                var self = $(this);
+
+                $.ajax({
+                    url: "{{ path("user_show") }}"
+                }).then(function () {
+                    submitLessonForm(self.data('url'));
+                }).catch(function () {
+                    getLoginForm();
+                });
             });
+
+            var $authModal = $('#authModal');
+
+            $authModal.on('submit', 'form', function (e) {
+                e.preventDefault();
+                var currentForm = $(this);
+
+                $.ajax({
+                    url: $(this).attr("action"),
+                    data: $(this).serialize(),
+                    method: "post"
+                }).then(function (data) {
+                    currentForm.parent().html("<div class=\"alert alert-success\">Hello "+data.username+", you are logged in successfully</div>");
+                }).catch(function (jqXHR) {
+                    var response = JSON.parse(jqXHR.responseText);
+                    currentForm.find($(".js-modal-form-error")).html("<div class=\"alert alert-danger\">"+response.error+"</div>");
+
+                });
+            });
+
+            $authModal.on('click', '#js-btn-show-register-form', function (e) {
+                e.preventDefault();
+                if ( $("#js-modal-body-register").is(':empty') ) {
+                    getRegistrationForm();
+                } else {
+                    e.preventDefault();
+                    $("#js-modal-body-login").addClass("hidden");
+                    $("#js-modal-body-register").removeClass("hidden");
+                }
+
+            });
+
+            $authModal.on('click', '#js-btn-show-login-form', function (e) {
+                e.preventDefault();
+                $("#js-modal-body-login").removeClass("hidden");
+                $("#js-modal-body-register").addClass("hidden");
+            })
         });
     </script>
 {% endblock %}

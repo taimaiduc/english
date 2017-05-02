@@ -1,5 +1,5 @@
-{% macro create(category, lesson) %}
-    <div class="row">
+{% macro create(category, lesson, visibilityDivClass) %}
+    <div class="row {{ visibilityDivClass|default('') }}">
         <div class="col-xs-12">
             <ul class="breadcrumb">
                 <li class="active"><b>Lesson {{ lesson.position }} - {{ lesson.name }}</b></li>

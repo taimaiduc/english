@@ -16,6 +16,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class UserController extends BaseController
 {
@@ -63,11 +64,29 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("user/saveLesson", name="user_save_lesson")
+     * @Route("/user/saveLesson", name="user_save_lesson")
      */
     public function saveLesson()
     {
 
+    }
+
+    /**
+     * @Route("/user", name="user_show")
+     */
+    public function showAction(Request $request)
+    {
+        if ($request->isXmlHttpRequest()) {
+            if ($user = $this->getUser()) {
+                return new JsonResponse([
+                    'username' => $user->getUsername()
+                ]);
+            }
+
+            return new JsonResponse(null, 400);
+        }
+
+        return new Response('abc');
     }
 
     /**
