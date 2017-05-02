@@ -56,7 +56,7 @@ class FOSAuthenticationHandler implements AuthenticationSuccessHandlerInterface,
     {
         if ($request->isXmlHttpRequest()) {
             if ($exception) {
-                return new JsonResponse(array("error" => $exception->getMessageKey()));
+                return new JsonResponse(array("error" => $exception->getMessageKey()), 400);
             };
         } else {
             // Create a flash message with the authentication error message

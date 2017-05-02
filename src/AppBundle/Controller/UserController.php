@@ -64,7 +64,7 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("user/saveLesson", name="user_save_lesson")
+     * @Route("/user/saveLesson", name="user_save_lesson")
      */
     public function saveLesson()
     {
@@ -72,18 +72,21 @@ class UserController extends BaseController
     }
 
     /**
-     * @Route("user/isLoggedIn", name="user_check_logged_in")
+     * @Route("/user", name="user_show")
      */
-    public function checkLoggedInAction(Request $request)
+    public function showAction(Request $request)
     {
-        // only handle ajax requests
-        if (!$request->isXmlHttpRequest()) {
-            throw new AccessDeniedException();
+        if ($request->isXmlHttpRequest()) {
+            if ($user = $this->getUser()) {
+                return new JsonResponse([
+                    'username' => $user->getUsername()
+                ]);
+            }
+
+            return new JsonResponse(null, 400);
         }
 
-        if (!$this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
-            return new Response("You are not logged in", 403);
-        }
+        return new Response('abc');
     }
 
     /**

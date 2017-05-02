@@ -96,56 +96,31 @@
     {{ parent() }}
 
     <script>
-        var isSubmitting = false;
-
-        function submitData(url) {
-            {# to avoid users click submit many times #}
-            if (isSubmitting) {
-                return;
-            }
-            isSubmitting = true;
-            console.log(ajaxData);
-
-            $.ajax({
-                url: url,
-                method: 'post',
-                data: ajaxData,
-            }).done(function (data) {
-                isSubmitting = false;
-                console.log(data);
-                ajaxData.correctAnswers = {};
-            });
-        }
-
-        function userLoggedIn()
-        {
-
+        function submitLessonForm(url) {
+            console.log(url);
         }
 
         function getLoginForm() {
-            $.ajax({
-                url: "{{ path('fos_user_security_login') }}",
-                method: 'get'
-            }).done(function (data) {
-                $("#js-modal-body-login").html(data);
-            });
+            var $loginForm = $('#js-modal-body-login');
+
+            if ($loginForm.is(':empty')) {
+                $.ajax({
+                    url: "{{ path('fos_user_security_login') }}"
+                }).then(function (data) {
+                    $loginForm.html(data);
+                });
+            }
         }
 
-        $(document).ready(function(){
-            $("input").focus(function(){
-                $("html, body").animate({scrollTop: $(this).offset().top - 100});
+        function getRegistrationForm() {
+            $.ajax({
+                url: "{{ path('fos_user_registration_register') }}",
+                method: 'get'
+            }).done(function (data) {
+                $("#js-modal-body-login").addClass("hidden");
+                $("#js-modal-body-register").removeClass("hidden").html(data);
             });
-
-            $(".js-btn-submit").on('click', function () {
-                if (ajaxData.username) {
-                    submitData($(this).data("url"));
-                } else {
-                    if ($("#js-modal-body-login").is(':empty')){
-                        getLoginForm();
-                    }
-                }
-            });
-        });
+        }
 
         function toggleAudio(index) {
             var audioElements = document.getElementsByTagName('audio');
@@ -247,5 +222,62 @@
                 }
             }
         }
+    </script>
+
+    <script>
+        $(document).ready(function(){
+            $("input").focus(function(){
+                $("html, body").animate({scrollTop: $(this).offset().top - 100});
+            });
+
+            $(".js-btn-submit").on('click', function () {
+                var self = $(this);
+
+                $.ajax({
+                    url: "{{ path("user_show") }}"
+                }).then(function () {
+                    submitLessonForm(self.data('url'));
+                }).catch(function () {
+                    getLoginForm();
+                });
+            });
+
+            var $authModal = $('#authModal');
+
+            $authModal.on('submit', 'form', function (e) {
+                e.preventDefault();
+                var currentForm = $(this);
+
+                $.ajax({
+                    url: $(this).attr("action"),
+                    data: $(this).serialize(),
+                    method: "post"
+                }).then(function (data) {
+                    currentForm.parent().html("<div class=\"alert alert-success\">Hello "+data.username+", you are logged in successfully</div>");
+                }).catch(function (jqXHR) {
+                    var response = JSON.parse(jqXHR.responseText);
+                    currentForm.find($(".js-modal-form-error")).html("<div class=\"alert alert-danger\">"+response.error+"</div>");
+
+                });
+            });
+
+            $authModal.on('click', '#js-btn-show-register-form', function (e) {
+                e.preventDefault();
+                if ( $("#js-modal-body-register").is(':empty') ) {
+                    getRegistrationForm();
+                } else {
+                    e.preventDefault();
+                    $("#js-modal-body-login").addClass("hidden");
+                    $("#js-modal-body-register").removeClass("hidden");
+                }
+
+            });
+
+            $authModal.on('click', '#js-btn-show-login-form', function (e) {
+                e.preventDefault();
+                $("#js-modal-body-login").removeClass("hidden");
+                $("#js-modal-body-register").addClass("hidden");
+            })
+        });
     </script>
 {% endblock %}

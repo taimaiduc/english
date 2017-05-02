@@ -5,8 +5,6 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Lesson;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class LessonController extends BaseController
 {
@@ -35,11 +33,6 @@ class LessonController extends BaseController
         $lesson = $this->getDoctrine()->getRepository('AppBundle:Lesson')
             ->findOneBy(['category' => $category, 'position' => $position]);
 
-        $data = [
-            'category' => $category,
-            'lesson' => $lesson
-        ];
-
-        return $this->render('lesson/show.html.twig', $data);
+        return $this->render('lesson/show.html.twig', array('category' => $category, 'lesson' => $lesson));
     }
 }
