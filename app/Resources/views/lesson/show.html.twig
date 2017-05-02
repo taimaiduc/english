@@ -20,7 +20,7 @@
 
                 <div class="col-xs-7 col-sm-9 col-md-10">
                     <div class="form-group">
-                        <input class="form-control" id="input{{ loop.index }}" placeholder="{{ loop.index }}." onkeydown="doAction({{ loop.index }}, event)" tabindex="{{ loop.index }}">
+                        <input class="form-control input" id="input{{ loop.index }}" placeholder="{{ loop.index }}." onkeydown="doAction({{ loop.index }}, event)" tabindex="{{ loop.index }}">
                         <p class="text-left hidden" id="answer{{ loop.index }}">{{ sentence }}</p>
                         <p class="text-left result" id="result{{ loop.index }}"></p>
                     </div>
@@ -38,21 +38,17 @@
     <div class="col-md-3">
         <div class="sticky-sidebar-wrapper">
             <div class="row" data-spy="affix" data-offset-top="105">
-                <div class="col-xs-6 col-md-12">
-                    <div class="form-group">
-                        <button data-url="{{ path("user_update_progress") }}" class="btn btn-success btn-block js-btn-submit" title="Lưu thành tích và chuyển sang bài tiếp theo" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
-                            <i class="glyphicon glyphicon-ok" ></i>
-                            Hoàn thành
-                        </button>
-                    </div>
+                <div class="col-sm-6 col-md-12 hidden-lg form-group">
+                    <button data-url="{{ path("user_update_progress") }}" id="js-update-progress-btn" class="btn btn-lg btn-success btn-block js-btn-submit" title="Lưu thành tích và chuyển sang bài tiếp theo" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
+                        <i class="glyphicon glyphicon-ok" ></i>
+                        Hoàn thành
+                    </button>
                 </div>
-                <div class="col-xs-6 col-md-12">
-                    <div class="form-group">
-                        <button data-url="{{ path("user_save_lesson") }}" class="btn btn-default btn-block js-btn-submit" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
-                            <i class="glyphicon glyphicon-paperclip"></i>
-                            Lưu trạng thái
-                        </button>
-                    </div>
+                <div class="col-sm-6 col-md-12 form-group">
+                    <button data-url="{{ path("user_save_lesson") }}" id="js-save-lesson-btn" class="btn btn-lg btn-default btn-block js-btn-submit" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
+                        <i class="glyphicon glyphicon-paperclip"></i>
+                        Lưu trạng thái
+                    </button>
                 </div>
             </div>
         </div>
@@ -80,8 +76,8 @@
     <div id="authModal" class="modal fade" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-body" id="js-modal-body-login"></div>
-                <div class="modal-body hidden" id="js-modal-body-register"></div>
+                <div class="modal-body hidden" id="js-modal-body-login"></div>
+                <div class="modal-body" id="js-modal-body-register"></div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
                 </div>
@@ -100,26 +96,40 @@
             console.log(url);
         }
 
-        function getLoginForm() {
-            var $loginForm = $('#js-modal-body-login');
+        function showLoginForm() {
+            var $form = $('#js-modal-body-login');
 
-            if ($loginForm.is(':empty')) {
+            if ($form.is(':empty')) {
                 $.ajax({
                     url: "{{ path('fos_user_security_login') }}"
                 }).then(function (data) {
-                    $loginForm.html(data);
+                    $form.html(data);
                 });
             }
+
+            toggleAuthForms($form);
         }
 
-        function getRegistrationForm() {
-            $.ajax({
-                url: "{{ path('fos_user_registration_register') }}",
-                method: 'get'
-            }).done(function (data) {
-                $("#js-modal-body-login").addClass("hidden");
-                $("#js-modal-body-register").removeClass("hidden").html(data);
-            });
+        function showRegistrationForm() {
+            var $form = $('#js-modal-body-register');
+
+            if ($form.is(':empty')) {
+                $.ajax({
+                    url: "{{ path('fos_user_registration_register') }}",
+                    method: 'get'
+                }).then(function (data) {
+                    $form.html(data);
+                });
+            }
+
+            toggleAuthForms($form);
+        }
+
+        function toggleAuthForms($form) {
+            var $formWrapper = $('#authModal');
+            $formWrapper.find('.modal-body').addClass('hidden');
+
+            $form.removeClass('hidden');
         }
 
         function toggleAudio(index) {
@@ -138,36 +148,55 @@
         }
 
         function checkAnswer(index) {
-            var inputElement = document.getElementById('input'+index);
-            var answerElement = document.getElementById('answer'+index);
+            var $inputElement = $('#input'+index);
+            var $answerElement = $('#answer'+index);
 
             // if the sentence is already done
-            if (inputElement.hasAttribute("hasBeenDone")) {
-                inputElement.value = answerElement.innerHTML;
+            if ($inputElement.hasClass('done')) {
+                $inputElement.val($answerElement.html());
                 return;
             }
 
-            var resultContent = compareAnswers(inputElement, answerElement);
-            var resultElement = document.getElementById("result"+index);
+            var resultContent = compareAnswers($inputElement, $answerElement);
+            var $resultElement = $("#result"+index);
 
-            var btnCheck = document.getElementById('btn-check'+index);
+            var $btnCheck = $('#btn-check'+index);
 
             // if user's answer is not correct
             if (resultContent.indexOf('text-danger') !== -1) {
-                btnCheck.innerHTML = '<b class="glyphicon glyphicon-remove text-danger"></b>';
-                resultElement.innerHTML = resultContent;
+                $btnCheck.html('<b class="glyphicon glyphicon-remove text-danger"></b>');
+                $resultElement.html(resultContent);
             } else {
-                btnCheck.innerHTML = '<b class="glyphicon glyphicon-ok text-success"></b>';
-                resultElement.innerHTML = "";
-                inputElement.value = answerElement.innerHTML;
-                inputElement.setAttribute("hasBeenDone", "1");
+                $btnCheck.html('<b class="glyphicon glyphicon-ok text-success"></b>');
+                $resultElement.html('');
+                $inputElement.val($answerElement.html()).addClass('done');
+                updateLessonFormSubmitType();
             }
         }
+        
+        function updateLessonFormSubmitType() {
+            {# there are 2 types of submission.
+             If user has answered all sentences and they are all correct, we update user's stats (number of words)
+             Else, we save the lesson for the user to finish it later. #}
 
-        function compareAnswers(inputElement, answerElement) {
-            var input = inputElement.value.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
-            var answer = answerElement.innerHTML.trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
-            var result = answerElement.innerHTML.split(' '); // the result after comparing input and answer
+            var $userInputs = $('.input');
+
+            {# hopefully our users wont do the last sentence first :) #}
+            for (var i = $userInputs.length - 1; i >= 0; i--) {
+                console.dir($userInputs[i].className.indexOf('done'));
+                if ($userInputs[i].className.indexOf('done') === -1) {
+                    return;
+                }
+            }
+
+            $('#js-update-progress-btn').closest('.form-group').removeClass('hidden-lg');
+            $('#js-save-lesson-btn').closest('.form-group').addClass('hidden-lg');
+        }
+
+        function compareAnswers($inputElement, $answerElement) {
+            var input = $inputElement.val().trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
+            var answer = $answerElement.html().trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
+            var result = $answerElement.html().split(' '); // the result after comparing input and answer
 
             for (var i = 0; i < result.length; i++) {
                 if (answer[i] != input[i]){
@@ -226,7 +255,8 @@
 
     <script>
         $(document).ready(function(){
-            $("input").focus(function(){
+            updateLessonFormSubmitType();
+            $(".input").focus(function(){
                 $("html, body").animate({scrollTop: $(this).offset().top - 100});
             });
 
@@ -238,7 +268,7 @@
                 }).then(function () {
                     submitLessonForm(self.data('url'));
                 }).catch(function () {
-                    getLoginForm();
+                    showLoginForm();
                 });
             });
 
@@ -253,31 +283,31 @@
                     data: $(this).serialize(),
                     method: "post"
                 }).then(function (data) {
-                    currentForm.parent().html("<div class=\"alert alert-success\">Hello "+data.username+", you are logged in successfully</div>");
+                    submitLessonForm();
                 }).catch(function (jqXHR) {
                     var response = JSON.parse(jqXHR.responseText);
                     currentForm.find($(".js-modal-form-error")).html("<div class=\"alert alert-danger\">"+response.error+"</div>");
-
                 });
             });
 
             $authModal.on('click', '#js-btn-show-register-form', function (e) {
                 e.preventDefault();
-                if ( $("#js-modal-body-register").is(':empty') ) {
-                    getRegistrationForm();
-                } else {
-                    e.preventDefault();
-                    $("#js-modal-body-login").addClass("hidden");
-                    $("#js-modal-body-register").removeClass("hidden");
-                }
-
+                showRegistrationForm();
             });
 
             $authModal.on('click', '#js-btn-show-login-form', function (e) {
                 e.preventDefault();
-                $("#js-modal-body-login").removeClass("hidden");
-                $("#js-modal-body-register").addClass("hidden");
-            })
+                showLoginForm();
+            });
+
+//            for (var i = 0; i <22; i++) {
+//                var $inputElement = $('#input'+i);
+//                var $answerElement = $('#answer'+i);
+//                var $btnCheck = $('#btn-check'+i);
+//
+//                $inputElement.val($answerElement.html());
+//                $btnCheck.click();
+//            }
         });
     </script>
 {% endblock %}
