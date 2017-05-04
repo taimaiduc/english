@@ -2,11 +2,15 @@
 {% import 'macros/breadcrumb.html.twig' as breadCrumb %}
 
 {% block content %}
-
+    {% for flash_message in app.session.flashBag.get('success') %}
+        <div class="alert alert-success">
+            {{ flash_message }}
+        </div>
+    {% endfor %}
 {{ breadCrumb.create(category, lesson) }}
 
 <div class="row">
-    <form class="col-md-9">
+    <div class="col-md-9">
         {% for sentence in lesson.sentences %} {# loop.index starts from 1 #}
             <div class="row">
                 <div class="col-xs-2 col-sm-1 col-md-1">
@@ -33,19 +37,19 @@
                 </div>
             </div>
         {% endfor %}
-    </form>
+    </div>
 
     <div class="col-md-3">
         <div class="sticky-sidebar-wrapper">
             <div class="row" data-spy="affix" data-offset-top="105">
-                <div class="col-sm-6 col-md-12 hidden-lg form-group">
-                    <button data-url="{{ path("user_update_progress") }}" id="js-update-progress-btn" class="btn btn-lg btn-success btn-block js-btn-submit" title="Lưu thành tích và chuyển sang bài tiếp theo" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
+                <div class="col-xs-12 hidden form-group">
+                    <button data-lesson-id="{{ lesson.id }}" data-url="{{ path("user_update_progress") }}" id="js-update-progress-btn" class="btn btn-lg btn-success btn-block js-btn-submit" title="Lưu thành tích và chuyển sang bài tiếp theo" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
                         <i class="glyphicon glyphicon-ok" ></i>
                         Hoàn thành
                     </button>
                 </div>
-                <div class="col-sm-6 col-md-12 form-group">
-                    <button data-url="{{ path("user_save_lesson") }}" id="js-save-lesson-btn" class="btn btn-lg btn-default btn-block js-btn-submit" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
+                <div class="col-xs-12 form-group">
+                    <button data-lesson-id="{{ lesson.id }}" data-url="{{ path("user_save_lesson") }}" id="js-save-lesson-btn" class="btn btn-lg btn-default btn-block js-btn-submit" title="Lưu lại trạng thái hiện tại (tối đa 5 bài)" {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}>
                         <i class="glyphicon glyphicon-paperclip"></i>
                         Lưu trạng thái
                     </button>
@@ -93,7 +97,27 @@
 
     <script>
         function submitLessonForm(url) {
-            console.log(url);
+            $.ajax({
+                url: url,
+                method: 'post',
+                data: getUserAnswersData()
+            }).then(function () {
+                location.reload(true);
+            });
+        }
+        
+        function getUserAnswersData() {
+            var $answers = $('.done');
+            var answers = {
+                lessonId: $('#lessonWrapper').data('lesson-id'),
+                correctAnswers: {}
+            };
+
+            for (var i = 0; i < $answers.length; i++) {
+                answers.correctAnswers[$($answers[i]).attr('tabindex')] = $($answers[i]).val().split(' ').length;
+            }
+
+            return answers;
         }
 
         function showLoginForm() {
@@ -183,14 +207,13 @@
 
             {# hopefully our users wont do the last sentence first :) #}
             for (var i = $userInputs.length - 1; i >= 0; i--) {
-                console.dir($userInputs[i].className.indexOf('done'));
-                if ($userInputs[i].className.indexOf('done') === -1) {
+                if ($($userInputs[i]).hasClass('done') == false) {
                     return;
                 }
             }
 
-            $('#js-update-progress-btn').closest('.form-group').removeClass('hidden-lg');
-            $('#js-save-lesson-btn').closest('.form-group').addClass('hidden-lg');
+            $('#js-update-progress-btn').closest('.form-group').removeClass('hidden');
+            $('#js-save-lesson-btn').closest('.form-group').addClass('hidden');
         }
 
         function compareAnswers($inputElement, $answerElement) {
@@ -251,11 +274,33 @@
                 }
             }
         }
+
+        function mapErrorsToForm($form, errors) {
+            var html = '';
+
+            $.each(errors, function (field, message) {
+                if (typeof message === 'object') {
+                    $.each(message, function (childField, childMessage) {
+                        message = childMessage;
+                    })
+                }
+                html += '<div class=\"alert alert-danger\">'+message+'</div>';
+            });
+
+            $form.find('.js-modal-form-error').html(html);
+        }
     </script>
 
     <script>
         $(document).ready(function(){
-            updateLessonFormSubmitType();
+            $('html, body').scrollTop(0);
+
+            $(window).on('load', function() {
+                setTimeout(function(){
+                    $('html, body').scrollTop(0);
+                }, 0);
+            });
+
             $(".input").focus(function(){
                 $("html, body").animate({scrollTop: $(this).offset().top - 100});
             });
@@ -276,17 +321,16 @@
 
             $authModal.on('submit', 'form', function (e) {
                 e.preventDefault();
-                var currentForm = $(this);
+                var $currentForm = $(this);
 
                 $.ajax({
                     url: $(this).attr("action"),
                     data: $(this).serialize(),
-                    method: "post"
-                }).then(function (data) {
-                    submitLessonForm();
+                    method: 'post'
+                }).then(function () {
+                    submitLessonForm($currentForm.data('url'));
                 }).catch(function (jqXHR) {
-                    var response = JSON.parse(jqXHR.responseText);
-                    currentForm.find($(".js-modal-form-error")).html("<div class=\"alert alert-danger\">"+response.error+"</div>");
+                    mapErrorsToForm($currentForm, JSON.parse(jqXHR.responseText));
                 });
             });
 
@@ -300,14 +344,14 @@
                 showLoginForm();
             });
 
-//            for (var i = 0; i <22; i++) {
-//                var $inputElement = $('#input'+i);
-//                var $answerElement = $('#answer'+i);
-//                var $btnCheck = $('#btn-check'+i);
-//
-//                $inputElement.val($answerElement.html());
-//                $btnCheck.click();
-//            }
+            for (var i = 0; i < 22; i++) {
+                var $inputElement = $('#input'+i);
+                var $answerElement = $('#answer'+i);
+                var $btnCheck = $('#btn-check'+i);
+
+                $inputElement.val($answerElement.html());
+                $btnCheck.click();
+            }
         });
     </script>
 {% endblock %}

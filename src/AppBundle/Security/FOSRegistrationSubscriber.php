@@ -12,6 +12,7 @@ namespace AppBundle\Security;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\FOSUserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -26,25 +27,37 @@ class FOSRegistrationSubscriber implements EventSubscriberInterface
 
         $form = $event->getForm();
 
-        if (count($validationErrors = $form->getErrors()) == 0) {
-            return $event->setResponse(new JsonResponse(['success' => true]));
+        if (!$form->getErrors()) {
+            $event->setResponse(new JsonResponse());
+        } else {
+            // There is some errors, prepare a failure response
+            $errors = $this->getFormErrors($form);
+
+            // Set the status to Bad Request in order to grab it in front (i.e $.ajax({ ...}).error(...))
+            $response = new JsonResponse($errors, 400);
+            $event->setResponse($response);
         }
-
-        // There is some errors, prepare a failure response
-        $body = [];
-
-        // Add the errors in your response body
-        foreach ($validationErrors as $error) {
-            $body[] = [
-                'property' => $error->getPropertyPath(), // The field
-                'message'  => $error->getMessage() // The error message
-            ];
-        }
-
-        // Set the status to Bad Request in order to grab it in front (i.e $.ajax({ ...}).error(...))
-        $response = new JsonResponse($body, 400);
-        $event->setResponse($response);
     }
+
+    private function getFormErrors(FormInterface $form)
+    {
+        $errors = [];
+
+        foreach ($form->getErrors() as $error) {
+            $errors[] = $error->getMessage();
+        }
+
+        foreach ($form->all() as $childForm) {
+            if ($childForm instanceof FormInterface) {
+                if ($childErrors = $this->getFormErrors($childForm)) {
+                    $errors[$childForm->getName()] = $childErrors;
+                }
+            }
+        }
+
+        return $errors;
+    }
+
 
     public function onRegistrationSuccess(FormEvent $event)
     {

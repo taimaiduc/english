@@ -5,7 +5,7 @@
         <h3>Register</h3>
 
         {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
-            <div class=".js-modal-form-error">
+            <div class="js-modal-form-error">
                 {% for flashMessage in app.session.flashbag.get('error') %}
                     <div class="alert alert-danger">{{ flashMessage }}</div>
                 {% endfor %}

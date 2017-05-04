@@ -30,10 +30,13 @@ class UserController extends BaseController
             return new Response("You are not logged in", 403);
         }
 
+        if ($request->isXmlHttpRequest()) {
+            $this->addFlash('success', 'ok');
+            return new JsonResponse();
+        }
         /*
          * $dataExplained = array(
          *      'lessonId' => (int), // used to query lesson
-         *      'username' => (string), // used to query User
          *      'correctAnswers' => array(
          *          (int) answerIndex => (int) wordCount,
          *          0 => 10, // means the first answer has 10 words
@@ -41,7 +44,7 @@ class UserController extends BaseController
          *      )
          * )
          */
-        $data = $request->request->all();
+        $data = json_decode($request->getContent());
 
         // user did not do anything
         if (!$userAnswers = $data['correctAnswers']) {
@@ -66,9 +69,15 @@ class UserController extends BaseController
     /**
      * @Route("/user/saveLesson", name="user_save_lesson")
      */
-    public function saveLesson()
+    public function saveLesson(Request $request)
     {
+        if (!$this->get('security.authorization_checker')->isGranted('ROLE_USER')) {
+            return new Response("You are not logged in", 403);
+        }
 
+        $data = $request->request->all();
+        print_r($data);
+        die;
     }
 
     /**
