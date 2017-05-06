@@ -109,14 +109,14 @@
 
     <script>
         function submitLessonForm($button) {
-            console.log(getUserAnswersData($button));
-//            $.ajax({
-//                url: url,
-//                method: 'post',
-//                data: getUserAnswersData($button)
-//            }).then(function () {
-//                location.reload(true);
-//            });
+            $.ajax({
+                url: $button.data('url'),
+                method: 'post',
+                data: getUserAnswersData($button)
+            }).then(function (data) {
+                console.log('it works');
+                console.log(data);
+            });
         }
 
         function getUserAnswersData($button) {
@@ -132,7 +132,6 @@
         }
 
         function saveLessonButtonClicked($button) {
-            console.log($button.is('#js-save-lesson-btn'));
             return $button.is('#js-save-lesson-btn');
         }
 
@@ -180,8 +179,8 @@
         }
 
         function toggleAuthForms($form) {
-            var $formWrapper = $('#authModal');
-            $formWrapper.find('.modal-body').addClass('hidden');
+            var $authFormWrapper = $('#authModal');
+            $authFormWrapper.find('.modal-body').addClass('hidden');
 
             $form.removeClass('hidden');
         }
@@ -344,8 +343,10 @@
                 $('.js-btn-submit').removeClass('active');
 
                 isUserLoggedIn().then(function () {
+                    console.log('logged in');
                     submitLessonForm($(e.currentTarget));
                 }).catch(function () {
+                    console.log('not logged in');
                     $(e.currentTarget).addClass('active');
                     showLoginForm();
                 });

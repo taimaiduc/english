@@ -123,4 +123,15 @@ class Lesson
     {
         $this->position = $position;
     }
+
+    public function getTotalWords()
+    {
+        $totalWords = 0;
+
+        foreach ($this->getSentences() as $sentence) {
+            $totalWords += count(explode(' ', $sentence));
+        }
+
+        return $totalWords;
+    }
 }

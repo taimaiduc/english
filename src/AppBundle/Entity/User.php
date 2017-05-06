@@ -24,9 +24,14 @@ class User extends BaseUser
     private $startedDate;
 
     /**
-     * @ORM\Column(type="date", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    private $lastActiveDate;
+    private $lastActiveTime;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $savedLesson;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -41,17 +46,17 @@ class User extends BaseUser
     /**
      * @return mixed
      */
-    public function getLastActiveDate()
+    public function getLastActiveTime()
     {
-        return $this->lastActiveDate;
+        return $this->lastActiveTime;
     }
 
     /**
-     * @param mixed $lastActiveDate
+     * @param mixed $lastActiveTime
      */
-    public function setLastActiveDate($lastActiveDate)
+    public function setLastActiveTime(\DateTime $lastActiveTime)
     {
-        $this->lastActiveDate = $lastActiveDate;
+        $this->lastActiveTime = $lastActiveTime;
     }
 
     /**
@@ -59,7 +64,7 @@ class User extends BaseUser
      */
     public function getProgress()
     {
-        return json_decode($this->progress);
+        return json_decode($this->progress, true);
     }
 
     /**
@@ -81,10 +86,24 @@ class User extends BaseUser
     /**
      * @param mixed $startedDate
      */
-    public function setStartedDate($startedDate)
+    public function setStartedDate(\DateTime $startedDate)
     {
         $this->startedDate = $startedDate;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getSavedLesson()
+    {
+        return json_decode($this->savedLesson, true);
+    }
 
+    /**
+     * @param array $savedLesson
+     */
+    public function setSavedLesson(array $savedLesson)
+    {
+        $this->savedLesson = json_encode($savedLesson);
+    }
 }
