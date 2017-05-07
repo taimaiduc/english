@@ -31,7 +31,7 @@ class User extends BaseUser
     /**
      * @ORM\Column(type="text", nullable=true)
      */
-    private $savedLesson;
+    private $savedLessons;
 
     /**
      * @ORM\Column(type="text", nullable=true)
@@ -94,16 +94,16 @@ class User extends BaseUser
     /**
      * @return mixed
      */
-    public function getSavedLesson()
+    public function getSavedLessons()
     {
-        return json_decode($this->savedLesson, true);
+        return json_decode($this->savedLessons, true);
     }
 
     /**
-     * @param array $savedLesson
+     * @param array $lessons
      */
-    public function setSavedLesson(array $savedLesson)
+    public function setSavedLessons(array $lessons)
     {
-        $this->savedLesson = json_encode($savedLesson);
+        $this->savedLessons = json_encode($lessons);
     }
 }

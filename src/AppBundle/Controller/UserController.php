@@ -8,16 +8,15 @@
 
 namespace AppBundle\Controller;
 
+use AppBundle\Entity\Lesson;
 use AppBundle\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class UserController extends BaseController
 {
@@ -34,9 +33,9 @@ class UserController extends BaseController
         }
 
         $em = $this->getDoctrine()->getManager();
-        $lesson = $em->getRepository('AppBundle:Lesson')->find($request->request->get('lessonId'));
+        $lesson = $this->findLessonByRequestedId($request, $em);
 
-        $userCurrentProgress = $this->updateUserProgress($em, $user, $lesson->getTotalWords());
+        $userProgress = $this->updateUserProgress($em, $user, $lesson);
         $this->addFlash('success', 'Your progress has been updated successfully');
 
 //        $leaderBoard = $em->getRepository('AppBundle:Ranking')->findAll()[0];
@@ -48,7 +47,7 @@ class UserController extends BaseController
     /**
      * @Route("/user/saveLesson", name="user_save_lesson")
      */
-    public function saveLesson(Request $request)
+    public function saveLessonAction(Request $request)
     {
         $this->checkXmlHttpRequest($request);
 
@@ -56,8 +55,43 @@ class UserController extends BaseController
             return new Response('', 403);
         }
 
-        $lessonId = $request->request->get('lessonId');
+        $em = $this->getDoctrine()->getManager();
+        $lesson = $this->findLessonByRequestedId($request, $em);
+
         $doneSentences = $request->request->get('doneSentences');
+
+        $savedLessonsUpdated = $this->updateUsersSavedLessonList($user, $lesson, $doneSentences);
+
+        $user->setSavedLessons($savedLessonsUpdated);
+
+        $em->persist($user);
+        $em->flush();
+    }
+
+    private function updateUsersSavedLessonList(User $user, Lesson $lesson, $doneSentences = null)
+    {
+        /*
+        $savedLessonExample = [
+            $lessonId => [$sentenceIndexes]
+            1 => [1, 2, 10, 11]
+            2 => [1, 3, 4]
+        ]
+        */
+
+        $savedLessons = $user->getSavedLessons();
+
+        if ($doneSentences) {
+            $savedLessons[$lesson->getId()] = $doneSentences;
+        } else {
+            if (isset($savedLessons[$lesson->getId()])) {
+                unset($savedLessons[$lesson->getId()]);
+            } else {
+                //nothing changes
+                return null;
+            }
+        }
+
+        return $savedLessons;
     }
 
     /**
@@ -74,7 +108,7 @@ class UserController extends BaseController
         return new Response('abc');
     }
 
-    private function updateUserProgress(ObjectManager $em, User $user, $wordCount)
+    private function updateUserProgress(ObjectManager $em, User $user, Lesson $lesson)
     {
         /*
         Assume that the date today is 2017-05-10:
@@ -122,13 +156,17 @@ class UserController extends BaseController
 
         // if this is the first lesson that the user has done today
         if (!isset($progress[$today])) {
-            $progress[$today] = $wordCount;
+            $progress[$today] = $lesson->getTotalWords();
         } else {
-            $progress[$today] += $this->validateWordCount($user->getLastActiveTime(), $timeNow, $wordCount);
+            $progress[$today] += $this->validateWordCount($user->getLastActiveTime(), $timeNow, $lesson->getTotalWords());
         }
 
         $user->setProgress($progress);
         $user->setLastActiveTime($timeNow);
+
+        if ($savedLessonsUpdated = $this->updateUsersSavedLessonList($user, $lesson)) {
+            $user->setSavedLessons($savedLessonsUpdated);
+        }
 
         $em->persist($user);
         $em->flush();
@@ -159,5 +197,16 @@ class UserController extends BaseController
         if (!$request->isXmlHttpRequest()) {
             throw new NotFoundHttpException();
         }
+    }
+
+    private function findLessonByRequestedId(Request $request, ObjectManager $em)
+    {
+        $lesson = $em->getRepository('AppBundle:Lesson')->find($request->request->get('lessonId'));
+
+        if (!$lesson) {
+            throw new NotFoundHttpException();
+        }
+
+        return $lesson;
     }
 }
