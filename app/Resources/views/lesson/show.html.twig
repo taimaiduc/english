@@ -9,7 +9,11 @@
     {% endfor %}
 {{ breadCrumb.create(category, lesson) }}
 
-<div class="row lesson-wrapper" id="lesson-wrapper" data-lesson-id="{{ lesson.id }}">
+<div class="row lesson-wrapper"
+     id="lesson-wrapper"
+     data-lesson-id="{{ lesson.id }}"
+     data-update-users-progress-url="{{ path("user_update_progress") }}"
+>
     <div class="col-md-9">
         {% for sentence in lesson.sentences %} {# loop.index starts from 1 #}
             <div class="row">
@@ -24,7 +28,7 @@
 
                 <div class="col-xs-7 col-sm-9 col-md-10">
                     <div class="form-group">
-                        <input class="form-control input" id="input{{ loop.index }}" placeholder="{{ loop.index }}." onkeydown="handleInputOnkeyDown({{ loop.index }}, event)" tabindex="{{ loop.index }}">
+                        <input class="form-control input" id="input{{ loop.index }}" placeholder="{{ loop.index }}." onkeydown="handleInputOnKeyDown({{ loop.index }}, event)" tabindex="{{ loop.index }}">
                         <p class="text-left hidden" id="answer{{ loop.index }}">{{ sentence }}</p>
                         <p class="text-left result" id="result{{ loop.index }}"></p>
                     </div>
@@ -44,26 +48,12 @@
             <div class="row" data-spy="affix" data-offset-top="105">
                 <div class="col-xs-12 hidden form-group">
                     <button
-                            data-url="{{ path("user_update_progress") }}"
                             id="js-update-progress-btn"
-                            class="btn btn-lg btn-success btn-block js-btn-submit"
-                            title="Lưu thành tích và chuyển sang bài tiếp theo"
+                            class="btn btn-lg btn-success btn-block js-update-progress-btn"
                             {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}
                     >
-                        <i class="glyphicon glyphicon-ok" ></i>
-                        Hoàn thành
-                    </button>
-                </div>
-                <div class="col-xs-12 form-group">
-                    <button
-                            data-url="{{ path("user_save_lesson") }}"
-                            id="js-save-lesson-btn"
-                            class="btn btn-lg btn-default btn-block js-btn-submit"
-                            title="Lưu lại trạng thái hiện tại (tối đa 5 bài)"
-                            {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}
-                    >
-                        <i class="glyphicon glyphicon-paperclip"></i>
-                        Lưu lại làm sau
+                        <i class="glyphicon glyphicon-paperclip" ></i>
+                        Tạm lưu làm sau
                     </button>
                 </div>
             </div>
@@ -108,37 +98,29 @@
     {{ parent() }}
 
     <script>
-        function submitLessonForm($button) {
+        function submitLessonForm() {
             $.ajax({
-                url: $button.data('url'),
+                url: {{ path("user_update_progress") }},
                 method: 'post',
-                data: getUserAnswersData($button)
+                data: getUserAnswersData()
             }).then(function (data) {
                 console.log('it works');
                 console.log(data);
             });
         }
 
-        function getUserAnswersData($button) {
+        function getUserAnswersData() {
             var data = {
-                lessonId: getLessonId()
+                lessonId: $('#lesson-wrapper').data('lesson-id')
             };
 
-            if (saveLessonButtonClicked($button)) {
-                data.doneSentences = getDoneSentences()
+            if (!isLessonDone()) {
+                data.doneSentences = getDoneSentences();
             }
 
             return data;
         }
 
-        function saveLessonButtonClicked($button) {
-            return $button.is('#js-save-lesson-btn');
-        }
-
-        function getLessonId() {
-            return $('#lesson-wrapper').data('lesson-id');
-        }
-        
         function getDoneSentences() {
             var sentences = [];
 
@@ -147,6 +129,10 @@
             });
 
             return sentences;
+        }
+
+        function isLessonDone() {
+            return $('.input.done').length < $('.input').length;
         }
 
         function showLoginForm() {
@@ -223,26 +209,7 @@
                 $btnCheck.html('<b class="glyphicon glyphicon-ok text-success"></b>');
                 $resultElement.html('');
                 $inputElement.val($answerElement.html()).addClass('done');
-                updateLessonFormSubmitType();
             }
-        }
-        
-        function updateLessonFormSubmitType() {
-            {# there are 2 types of submission.
-             If user has answered all sentences and they are all correct, we update user's stats (number of words)
-             Else, we save the lesson for the user to finish it later. #}
-
-            var $userInputs = $('.input');
-
-            {# hopefully our users wont do the last sentence first :) #}
-            for (var i = $userInputs.length - 1; i >= 0; i--) {
-                if ($($userInputs[i]).hasClass('done') == false) {
-                    return;
-                }
-            }
-
-            $('#js-update-progress-btn').closest('.form-group').removeClass('hidden');
-            $('#js-save-lesson-btn').closest('.form-group').addClass('hidden');
         }
 
         function compareAnswers($inputElement, $answerElement) {
@@ -263,7 +230,7 @@
             return result.join(" ");
         }
 
-        function handleInputOnkeyDown(index, event) {
+        function handleInputOnKeyDown(index, event) {
             {# Ctrl + Space = toggleAudio() #}
             if (event.ctrlKey && event.keyCode == 32) {
                 toggleAudio(index);
@@ -327,29 +294,20 @@
 
     <script>
         $(document).ready(function(){
-            $('html, body').scrollTop(0);
-
-            $(window).on('load', function() {
-                setTimeout(function(){
-                    $('html, body').scrollTop(0);
-                }, 0);
-            });
+            $("html,body").animate({scrollTop: 0}, 100);
 
             $(".input").focus(function(){
                 $("html, body").animate({scrollTop: $(this).offset().top - 100});
             });
 
-            $('.js-btn-submit').on('click', function (e) {
-                $('.js-btn-submit').removeClass('active');
-
-                isUserLoggedIn().then(function () {
-                    console.log('logged in');
-                    submitLessonForm($(e.currentTarget));
-                }).catch(function () {
-                    console.log('not logged in');
-                    $(e.currentTarget).addClass('active');
-                    showLoginForm();
-                });
+            $('#js-update-progress-btn').on('click', function () {
+                isUserLoggedIn()
+                    .then(function () {
+                        submitLessonForm();
+                    })
+                    .catch(function () {
+                        showLoginForm();
+                    });
             });
 
             var $authModal = $('#authModal');
@@ -363,7 +321,7 @@
                     data: $(this).serialize(),
                     method: 'post'
                 }).then(function () {
-                    submitLessonForm($('.js-btn-submit.active'));
+                    submitLessonForm();
                 }).catch(function (jqXHR) {
                     mapErrorsToForm($currentForm, JSON.parse(jqXHR.responseText));
                 });
