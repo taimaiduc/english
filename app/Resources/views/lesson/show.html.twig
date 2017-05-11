@@ -46,10 +46,10 @@
     <div class="col-md-3">
         <div class="sticky-sidebar-wrapper">
             <div class="row" data-spy="affix" data-offset-top="105">
-                <div class="col-xs-12 hidden form-group">
+                <div class="col-xs-12 form-group">
                     <button
-                            id="js-update-progress-btn"
-                            class="btn btn-lg btn-success btn-block js-update-progress-btn"
+                            id="js-update-users-stats"
+                            class="btn btn-lg btn-success btn-block"
                             {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}
                     >
                         <i class="glyphicon glyphicon-paperclip" ></i>
@@ -98,22 +98,29 @@
     {{ parent() }}
 
     <script>
-        function submitLessonForm() {
+        function updateUserStats() {
             $.ajax({
-                url: {{ path("user_update_progress") }},
+                url: '{{ path('user_update_progress') }}',
                 method: 'post',
                 data: getUserAnswersData()
             }).then(function (data) {
+                console.log(getUserAnswersData());
                 console.log('it works');
                 console.log(data);
             });
         }
+        
+        function getLessonId() {
+            return $('#lesson-wrapper').data('lesson-id');
+        }
 
         function getUserAnswersData() {
-            var data = {
-                lessonId: $('#lesson-wrapper').data('lesson-id')
+            let data = {
+                lessonId: getLessonId() 
             };
 
+            {# if the lesson is done, we dont need to send all the sentence indexes,
+            we only send them when the lesson is not done #}
             if (!isLessonDone()) {
                 data.doneSentences = getDoneSentences();
             }
@@ -122,7 +129,7 @@
         }
 
         function getDoneSentences() {
-            var sentences = [];
+            let sentences = [0];
 
             $('.done').each(function () {
                 sentences.push($(this).attr('tabindex'));
@@ -132,11 +139,11 @@
         }
 
         function isLessonDone() {
-            return $('.input.done').length < $('.input').length;
+            return $('.input.done').length === $('.input').length;
         }
 
         function showLoginForm() {
-            var $form = $('#js-modal-body-login');
+            let $form = $('#js-modal-body-login');
 
             if ($form.is(':empty')) {
                 $.ajax({
@@ -150,7 +157,7 @@
         }
 
         function showRegistrationForm() {
-            var $form = $('#js-modal-body-register');
+            let $form = $('#js-modal-body-register');
 
             if ($form.is(':empty')) {
                 $.ajax({
@@ -165,18 +172,18 @@
         }
 
         function toggleAuthForms($form) {
-            var $authFormWrapper = $('#authModal');
+            let $authFormWrapper = $('#authModal');
             $authFormWrapper.find('.modal-body').addClass('hidden');
 
             $form.removeClass('hidden');
         }
 
         function toggleAudio(index) {
-            var audioElements = document.getElementsByTagName('audio');
-            var currentAudio = document.getElementById('audio'+index);
+            let audioElements = document.getElementsByTagName('audio');
+            let currentAudio = document.getElementById('audio'+index);
 
             {# if there's another audio playing, stop it. #}
-            for (var i = 0; i < audioElements.length; i++) {
+            for (let i = 0; i < audioElements.length; i++) {
                 if (audioElements[i] != currentAudio && !audioElements[i].paused) {
                     audioElements[i].pause();
                     break;
@@ -187,8 +194,8 @@
         }
 
         function checkAnswer(index) {
-            var $inputElement = $('#input'+index);
-            var $answerElement = $('#answer'+index);
+            let $inputElement = $('#input'+index);
+            let $answerElement = $('#answer'+index);
 
             // if the sentence is already done
             if ($inputElement.hasClass('done')) {
@@ -196,10 +203,10 @@
                 return;
             }
 
-            var resultContent = compareAnswers($inputElement, $answerElement);
-            var $resultElement = $("#result"+index);
+            let resultContent = compareAnswers($inputElement, $answerElement);
+            let $resultElement = $("#result"+index);
 
-            var $btnCheck = $('#btn-check'+index);
+            let $btnCheck = $('#btn-check'+index);
 
             // if user's answer is not correct
             if (resultContent.indexOf('text-danger') !== -1) {
@@ -213,11 +220,11 @@
         }
 
         function compareAnswers($inputElement, $answerElement) {
-            var input = $inputElement.val().trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
-            var answer = $answerElement.html().trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
-            var result = $answerElement.html().split(' '); // the result after comparing input and answer
+            let input = $inputElement.val().trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
+            let answer = $answerElement.html().trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
+            let result = $answerElement.html().split(' '); // the result after comparing input and answer
 
-            for (var i = 0; i < result.length; i++) {
+            for (let i = 0; i < result.length; i++) {
                 if (answer[i] != input[i]){
                     result[i] = "<span class='text-danger'>"+result[i]+"</span>";
                 }
@@ -248,12 +255,12 @@
 
            {# Down arrow key = next sentence || Up arrow key = previous sentence #}
             else if (event.keyCode== 40 || event.keyCode==38) {
-                var inputs = document.querySelectorAll('[tabindex]');
-                var currentInputIndex = document.activeElement.getAttribute('tabindex');
+                let inputs = document.querySelectorAll('[tabindex]');
+                let currentInputIndex = document.activeElement.getAttribute('tabindex');
 
                 {# Down arrow key = focus next input #}
                 if (event.keyCode == 40) {
-                    var nextInput = inputs[currentInputIndex];
+                    let nextInput = inputs[currentInputIndex];
                     if(nextInput != undefined) {
                         nextInput.focus();
                     }
@@ -261,8 +268,8 @@
 
                 {# Up arrow key = focus previous input #}
                 else {
-                    var previousInputIndex = parseInt(currentInputIndex)-2;
-                    var previousInput = inputs[previousInputIndex];
+                    let previousInputIndex = parseInt(currentInputIndex)-2;
+                    let previousInput = inputs[previousInputIndex];
                     if (previousInput != undefined) {
                         previousInput.focus();
                     }
@@ -271,7 +278,7 @@
         }
 
         function mapErrorsToForm($form, errors) {
-            var html = '';
+            let html = '';
 
             $.each(errors, function (field, message) {
                 if (typeof message === 'object') {
@@ -290,6 +297,20 @@
                 url: "{{ path("user_show") }}"
             });
         }
+        
+        function setDoneSentences(indexes) {
+            let firstUndoneSentenceIndex;
+
+            for (let i = 1;  i <= Math.max(...indexes); i++) {
+                if (indexes.includes(i)) {
+                    $('#input'+i).val($('#answer'+i).html());
+                    $('#btn-check'+i).click();
+                } else if (!firstUndoneSentenceIndex && !indexes.includes(i)) {
+                    firstUndoneSentenceIndex = i;
+                    $('#input'+firstUndoneSentenceIndex).focus();
+                }
+            }
+        }
     </script>
 
     <script>
@@ -300,30 +321,29 @@
                 $("html, body").animate({scrollTop: $(this).offset().top - 100});
             });
 
-            $('#js-update-progress-btn').on('click', function () {
+            $('#js-update-users-stats').on('click', function () {
                 isUserLoggedIn()
                     .then(function () {
-                        submitLessonForm();
+                        updateUserStats();
                     })
                     .catch(function () {
                         showLoginForm();
                     });
             });
 
-            var $authModal = $('#authModal');
+            let $authModal = $('#authModal');
 
             $authModal.on('submit', 'form', function (e) {
                 e.preventDefault();
-                var $currentForm = $(this);
 
                 $.ajax({
-                    url: $(this).attr("action"),
+                    url: $(this).attr('action'),
                     data: $(this).serialize(),
                     method: 'post'
                 }).then(function () {
-                    submitLessonForm();
+                    updateUserStats();
                 }).catch(function (jqXHR) {
-                    mapErrorsToForm($currentForm, JSON.parse(jqXHR.responseText));
+                    mapErrorsToForm($(this), JSON.parse(jqXHR.responseText));
                 });
             });
 
@@ -337,14 +357,21 @@
                 showLoginForm();
             });
 
-            for (var i = 0; i < 22; i++) {
-                var $inputElement = $('#input'+i);
-                var $answerElement = $('#answer'+i);
-                var $btnCheck = $('#btn-check'+i);
+//            let indexes = [1,2,3,4,5,6,7,8,9,18,20];
+            let indexes = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
 
-                $inputElement.val($answerElement.html());
-                $btnCheck.click();
-            }
+            setDoneSentences(indexes);
+//            for (let i = 0; i < 22; i++) {
+//                let $inputElement = $('#input'+i);
+//                let $answerElement = $('#answer'+i);
+//                let $btnCheck = $('#btn-check'+i);
+//
+//                $inputElement.val($answerElement.html());
+//                $btnCheck.click();
+//                if (i == 21) {
+//                    $('#input22').focus();
+//                }
+//            }
         });
     </script>
 {% endblock %}

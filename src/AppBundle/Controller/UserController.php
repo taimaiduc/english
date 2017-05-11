@@ -59,12 +59,15 @@ class UserController extends BaseController
             throw new NotFoundHttpException();
         }
 
-        $doneSentences = $request->request->get('doneSentences');
-        if (!$doneSentences) {
+        // if all sentences are done, $_POST['doneSentences'] == null
+        if (!$doneSentences = $request->request->get('doneSentences')) {
             $this->updateUserProgress($em, $user, $lesson);
         }
 
         $this->updateUsersSavedLessonList($user, $lessonId, $doneSentences);
+
+        $em->persist($user);
+        $em->flush();
 
         $this->addFlash('success', 'Your progress has been updated successfully');
 
@@ -74,28 +77,27 @@ class UserController extends BaseController
         return new Response(null, 204);
     }
 
-    private function updateUsersSavedLessonList(User $user, Lesson $lesson, $doneSentences = null)
+    private function updateUsersSavedLessonList(User $user, $lessonId, $doneSentences = null)
     {
         /*
         $savedLessonExample = [
-            $lessonId => [$sentenceIndexes]
-            1 => [1, 2, 10, 11]
+            $lessonId => [$sentenceIndexes],
+            1 => [1, 2, 10, 11],
             2 => [1, 3, 4]
         ]
         */
 
         $savedLessons = $user->getSavedLessons();
-
+        var_dump($lessonId); die;
         if ($doneSentences) {
-            $savedLessons[$lesson->getId()] = $doneSentences;
+            $savedLessons[$lessonId] = $doneSentences;
         } else {
-            if (isset($savedLessons[$lesson->getId()])) {
-                unset($savedLessons[$lesson->getId()]);
-            } else {
-                //nothing changes
-                return null;
+            if (isset($savedLessons[$lessonId])) {
+                unset($savedLessons[$lessonId]);
             }
         }
+
+        $user->setSavedLessons($savedLessons);
 
         return $savedLessons;
     }
