@@ -59,15 +59,15 @@ class UserController extends BaseController
             throw new NotFoundHttpException();
         }
 
-        // if all sentences are done, $_POST['doneSentences'] == null
-        if (!$doneSentences = $request->request->get('doneSentences')) {
-            $this->updateUserProgress($em, $user, $lesson);
+        $doneSentences = $request->request->get('doneSentences');
+
+        $updatedSavedLessons = $this->updateUsersSavedLessonList($user, $lessonId, $doneSentences);
+
+        if ($updatedSavedLessons !== null) {
+            $user->setSavedLessons($updatedSavedLessons);
         }
 
-        $this->updateUsersSavedLessonList($user, $lessonId, $doneSentences);
-
-        $em->persist($user);
-        $em->flush();
+        $this->updateUserProgress($em, $user, $lesson, $doneSentences);
 
         $this->addFlash('success', 'Your progress has been updated successfully');
 
@@ -88,21 +88,21 @@ class UserController extends BaseController
         */
 
         $savedLessons = $user->getSavedLessons();
-        var_dump($lessonId); die;
+
         if ($doneSentences) {
             $savedLessons[$lessonId] = $doneSentences;
         } else {
             if (isset($savedLessons[$lessonId])) {
                 unset($savedLessons[$lessonId]);
+            } else {
+                return null;
             }
         }
-
-        $user->setSavedLessons($savedLessons);
 
         return $savedLessons;
     }
 
-    private function updateUserProgress(ObjectManager $em, User $user, Lesson $lesson)
+    private function updateUserProgress(ObjectManager $em, User $user, Lesson $lesson, $doneSentences)
     {
         /*
         Assume that the date today is 2017-05-10:
@@ -150,19 +150,15 @@ class UserController extends BaseController
 
         // if this is the first lesson that the user has done today
         if (!isset($progress[$today])) {
-            $progress[$today] = $lesson->getTotalWords();
-        } else {
-            $progress[$today] += $this->validateWordCount($user->getLastActiveTime(), $timeNow, $lesson->getTotalWords());
+            $progress[$today] = 0;
         }
+
+        $progress[$today] += $doneSentences ? 0 : $lesson->getTotalWords();
 
         $user->setProgress($progress);
         $user->setLastActiveTime($timeNow);
-
-        if ($savedLessonsUpdated = $this->updateUsersSavedLessonList($user, $lesson)) {
-            $user->setSavedLessons($savedLessonsUpdated);
-        }
-
-        return $user;
+        $em->persist($user);
+        $em->flush();
     }
 
     private function updateLeaderBoard($userProgress)

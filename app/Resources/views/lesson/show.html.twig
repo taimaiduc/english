@@ -105,18 +105,18 @@
                 data: getUserAnswersData()
             }).then(function (data) {
                 console.log(getUserAnswersData());
-                console.log('it works');
+                console.log('server data from here');
                 console.log(data);
             });
         }
-        
+
         function getLessonId() {
             return $('#lesson-wrapper').data('lesson-id');
         }
 
         function getUserAnswersData() {
             let data = {
-                lessonId: getLessonId() 
+                lessonId: getLessonId()
             };
 
             {# if the lesson is done, we dont need to send all the sentence indexes,
@@ -297,7 +297,7 @@
                 url: "{{ path("user_show") }}"
             });
         }
-        
+
         function setDoneSentences(indexes) {
             let firstUndoneSentenceIndex;
 
@@ -358,20 +358,9 @@
             });
 
 //            let indexes = [1,2,3,4,5,6,7,8,9,18,20];
-            let indexes = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+            let indexes = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21, 22];
 
             setDoneSentences(indexes);
-//            for (let i = 0; i < 22; i++) {
-//                let $inputElement = $('#input'+i);
-//                let $answerElement = $('#answer'+i);
-//                let $btnCheck = $('#btn-check'+i);
-//
-//                $inputElement.val($answerElement.html());
-//                $btnCheck.click();
-//                if (i == 21) {
-//                    $('#input22').focus();
-//                }
-//            }
         });
     </script>
 {% endblock %}
