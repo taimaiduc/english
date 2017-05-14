@@ -124,12 +124,25 @@ class Lesson
         $this->position = $position;
     }
 
-    public function getTotalWords()
+    /**
+     * @param array|null $doneSentences
+     * @return int $totalWords
+     */
+    public function getTotalWords($doneSentences = null)
     {
         $totalWords = 0;
 
-        foreach ($this->getSentences() as $sentence) {
-            $totalWords += count(explode(' ', $sentence));
+        $lessonSentences = $this->getSentences();
+
+        if (is_array($doneSentences)) {
+            foreach ($doneSentences as $index) {
+                $totalWords += count(explode(' ', $lessonSentences[$index]));
+            }
+        }
+        else if ($doneSentences === null){
+            foreach ($lessonSentences as $sentence) {
+                $totalWords += count(explode(' ', $sentence));
+            }
         }
 
         return $totalWords;

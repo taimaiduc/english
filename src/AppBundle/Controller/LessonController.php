@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Lesson;
+use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 class LessonController extends BaseController
@@ -33,6 +34,23 @@ class LessonController extends BaseController
         $lesson = $this->getDoctrine()->getRepository('AppBundle:Lesson')
             ->findOneBy(['category' => $category, 'position' => $position]);
 
-        return $this->render('lesson/show.html.twig', array('category' => $category, 'lesson' => $lesson));
+        $data = array(
+            'category' => $category,
+            'lesson' => $lesson,
+            'savedSentences' => array()
+        );
+
+        /** @var User $user */
+        $user = $this->getUser();
+        if ($user) {
+            $savedLessons = $user->getSavedLessons();
+            foreach ($savedLessons as $lessonId => $savedSentences) {
+                if (isset($savedLessons[$lesson->getId()])) {
+                    $data['savedSentences'] = $savedSentences;
+                }
+            }
+        }
+
+        return $this->render('lesson/show.html.twig', $data);
     }
 }

@@ -15,27 +15,34 @@
      data-update-users-progress-url="{{ path("user_update_progress") }}"
 >
     <div class="col-md-9">
-        {% for sentence in lesson.sentences %} {# loop.index starts from 1 #}
+        {% for index, sentence in lesson.sentences %}
             <div class="row">
                 <div class="col-xs-2 col-sm-1 col-md-1">
-                    <button class="btn btn-default js-btn-play" onclick="toggleAudio({{ loop.index }})" type="button">
+                    <button class="btn btn-default js-btn-play" onclick="toggleAudio({{ index }})" type="button">
                         <i class="glyphicon glyphicon-volume-up"></i>
                     </button>
-                    <audio class="hidden" id="audio{{ loop.index }}">
-                        <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~loop.index~'.mp3') }}">
+                    <audio class="hidden" id="audio{{ index }}">
+                        {% set audioIndex = index+1 %}
+                        <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~audioIndex~'.mp3') }}">
                     </audio>
                 </div>
 
                 <div class="col-xs-7 col-sm-9 col-md-10">
                     <div class="form-group">
-                        <input class="form-control input" id="input{{ loop.index }}" placeholder="{{ loop.index }}." onkeydown="handleInputOnKeyDown({{ loop.index }}, event)" tabindex="{{ loop.index }}">
-                        <p class="text-left hidden" id="answer{{ loop.index }}">{{ sentence }}</p>
-                        <p class="text-left result" id="result{{ loop.index }}"></p>
+                        <input
+                                class="form-control input{% if index in savedSentences %} saved{% endif %}"
+                                id="input{{ index }}"
+                                placeholder="{{ audioIndex }}."
+                                onkeydown="handleInputOnKeyDown({{ index }}, event)"
+                                tabindex="{{ index }}"
+                        >
+                        <p class="text-left hidden" id="answer{{ index }}">{{ sentence }}</p>
+                        <p class="text-left result" id="result{{ index }}"></p>
                     </div>
                 </div>
 
                 <div class="col-xs-2 col-sm-1 col-md-1">
-                    <button class="btn btn-default" id="btn-check{{ loop.index }}" onclick="checkAnswer({{ loop.index }})" type="button">
+                    <button class="btn btn-default" id="btn-check{{ index }}" onclick="checkAnswer({{ index }})" type="button">
                         <i class="glyphicon glyphicon-question-sign text-mute"></i>
                     </button>
                 </div>
@@ -52,7 +59,7 @@
                             class="btn btn-lg btn-success btn-block"
                             {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}
                     >
-                        <i class="glyphicon glyphicon-paperclip" ></i>
+                        <i class="glyphicon glyphicon-ok glyphicon-paperclip"></i>
                         Tạm lưu làm sau
                     </button>
                 </div>
@@ -96,27 +103,34 @@
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.js"></script>
 
     <script>
         function updateUserStats() {
+            console.log(getUserAnswersData());
+            console.log('server data from here');
             $.ajax({
                 url: '{{ path('user_update_progress') }}',
                 method: 'post',
                 data: getUserAnswersData()
             }).then(function (data) {
-                console.log(getUserAnswersData());
-                console.log('server data from here');
                 console.log(data);
+                swal(
+                    'Good job!',
+                    'You clicked the button!',
+                    'success'
+                );
             });
         }
 
         function getLessonId() {
-            return $('#lesson-wrapper').data('lesson-id');
+            return '{{ lesson.id }}';
         }
 
         function getUserAnswersData() {
             let data = {
-                lessonId: getLessonId()
+                lessonId: getLessonId(),
+                isLessonDone: isLessonDone()
             };
 
             {# if the lesson is done, we dont need to send all the sentence indexes,
@@ -129,7 +143,7 @@
         }
 
         function getDoneSentences() {
-            let sentences = [0];
+            let sentences = [];
 
             $('.done').each(function () {
                 sentences.push($(this).attr('tabindex'));
@@ -139,7 +153,7 @@
         }
 
         function isLessonDone() {
-            return $('.input.done').length === $('.input').length;
+            return $('.input.done').length === $('.input').length ? 1 : 0;
         }
 
         function showLoginForm() {
@@ -196,6 +210,7 @@
         function checkAnswer(index) {
             let $inputElement = $('#input'+index);
             let $answerElement = $('#answer'+index);
+            let $btnCheck = $('#btn-check'+index);
 
             // if the sentence is already done
             if ($inputElement.hasClass('done')) {
@@ -206,8 +221,6 @@
             let resultContent = compareAnswers($inputElement, $answerElement);
             let $resultElement = $("#result"+index);
 
-            let $btnCheck = $('#btn-check'+index);
-
             // if user's answer is not correct
             if (resultContent.indexOf('text-danger') !== -1) {
                 $btnCheck.html('<b class="glyphicon glyphicon-remove text-danger"></b>');
@@ -216,6 +229,16 @@
                 $btnCheck.html('<b class="glyphicon glyphicon-ok text-success"></b>');
                 $resultElement.html('');
                 $inputElement.val($answerElement.html()).addClass('done');
+
+                {# try to update user's stats if all the sentences are done #}
+                if (isLessonDone()) {
+                    getSaveProgressButton().closest('.sticky-sidebar-wrapper').remove();
+
+                    isUserLoggedIn()
+                        .then(function () {
+                            updateUserStats();
+                        });
+                }
             }
         }
 
@@ -260,7 +283,8 @@
 
                 {# Down arrow key = focus next input #}
                 if (event.keyCode == 40) {
-                    let nextInput = inputs[currentInputIndex];
+                    let nextInputIndex = parseInt(currentInputIndex) + 1;
+                    let nextInput = inputs[nextInputIndex] ;
                     if(nextInput != undefined) {
                         nextInput.focus();
                     }
@@ -268,7 +292,7 @@
 
                 {# Up arrow key = focus previous input #}
                 else {
-                    let previousInputIndex = parseInt(currentInputIndex)-2;
+                    let previousInputIndex = parseInt(currentInputIndex) - 1;
                     let previousInput = inputs[previousInputIndex];
                     if (previousInput != undefined) {
                         previousInput.focus();
@@ -301,15 +325,49 @@
         function setDoneSentences(indexes) {
             let firstUndoneSentenceIndex;
 
-            for (let i = 1;  i <= Math.max(...indexes); i++) {
+            for (let i = 0;  i <= Math.max(...indexes); i++) {
                 if (indexes.includes(i)) {
                     $('#input'+i).val($('#answer'+i).html());
                     $('#btn-check'+i).click();
                 } else if (!firstUndoneSentenceIndex && !indexes.includes(i)) {
+
                     firstUndoneSentenceIndex = i;
                     $('#input'+firstUndoneSentenceIndex).focus();
                 }
             }
+        }
+        
+        function getSaveProgressButton() {
+            return $('#js-update-users-stats');
+        }
+        
+        function spinButton($button, text) {
+            $button.prop('disabled', true);
+
+            $oldHtml = $button.html();
+
+            let spinClass = 'glyphicon glyphicon-refresh glyphicon-spin';
+
+            if (!text) {
+                $button.find('i').attr('class', spinClass);
+            } else {
+                $button.html('<i class="'+spinClass+'"></i> ' + text);
+            }
+
+            setTimeout(function () {
+                $button.html($oldHtml);
+                $button.prop('disabled', false);
+            }, 2000);
+        }
+        
+        function getSavedSentenceIndexes() {
+            var indexes = [];
+
+            $('input.saved').each(function () {
+                indexes.push(parseInt($(this).attr('tabindex')));
+            });
+
+            return indexes;
         }
     </script>
 
@@ -318,18 +376,22 @@
             $("html,body").animate({scrollTop: 0}, 100);
 
             $(".input").focus(function(){
-                $("html, body").animate({scrollTop: $(this).offset().top - 100});
+                $("html, body").animate({scrollTop: $(this).offset().top - 100}, 200);
             });
 
-            $('#js-update-users-stats').on('click', function () {
+            $('#js-update-users-stats').on('click', function (e) {
+
                 isUserLoggedIn()
                     .then(function () {
+                        spinButton($(e.currentTarget));
                         updateUserStats();
                     })
                     .catch(function () {
                         showLoginForm();
                     });
             });
+
+            setDoneSentences(getSavedSentenceIndexes());
 
             let $authModal = $('#authModal');
 
@@ -357,10 +419,12 @@
                 showLoginForm();
             });
 
-//            let indexes = [1,2,3,4,5,6,7,8,9,18,20];
-            let indexes = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21, 22];
 
-            setDoneSentences(indexes);
         });
     </script>
+{% endblock %}
+
+{% block css %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.css">
 {% endblock %}
