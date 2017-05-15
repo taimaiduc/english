@@ -21,10 +21,17 @@
                         <li class=""><a href="">Xếp hạng</a></li>
                     </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
-                        {% if app.user %}
+                    <ul class="nav navbar-nav navbar-right {% if not app.user %}hidden{% endif %}" id="js-navbar-logged-in">
                         <li class="">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tài khoản<span class="caret"></span></a>
+                            <a href="#"
+                               class="dropdown-toggle"
+                               data-toggle="dropdown"
+                               role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false"
+                            >
+                                Tài khoản <span class="caret"></span>
+                            </a>
                             <ul class="dropdown-menu">
                                 <li><a href="">Thống kê</a></li>
                                 <li><a href="">Đổi mật khẩu</a></li>
@@ -32,10 +39,10 @@
                                 <li><a href="">Thoát</a></li>
                             </ul>
                         </li>
-                        {% else %}
-                            <li><a href="{{ path('fos_user_security_login') }}">Đăng nhập</a></li>
-                            <li><a href="{{ path('fos_user_registration_register') }}">Đăng kí</a></li>
-                        {% endif %}
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right {% if app.user %}hidden{% endif %}">
+                        <li><a href="{{ path('fos_user_security_login') }}">Đăng nhập</a></li>
+                        <li><a href="{{ path('fos_user_registration_register') }}">Đăng kí</a></li>
                     </ul>
                 </div>
             </div>

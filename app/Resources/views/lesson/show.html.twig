@@ -57,7 +57,7 @@
                     <button
                             id="js-update-users-stats"
                             class="btn btn-lg btn-success btn-block"
-                            {% if not app.user %}data-toggle="modal" data-target="#authModal"{% endif %}
+                            data-target="#authModal"
                     >
                         <i class="glyphicon glyphicon-ok glyphicon-paperclip"></i>
                         Tạm lưu làm sau
@@ -85,19 +85,17 @@
 
 {{ breadCrumb.create(category, lesson, 'hidden-sm hidden-xs') }}
 
-{% if not app.user %}
-    <div id="authModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body hidden" id="js-modal-body-login"></div>
-                <div class="modal-body" id="js-modal-body-register"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-                </div>
+<div id="authModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body hidden" id="js-modal-body-login"></div>
+            <div class="modal-body" id="js-modal-body-register"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
-{% endif %}
+</div>
 
 {% endblock %}
 
@@ -157,6 +155,8 @@
         }
 
         function showLoginForm() {
+            getAuthModal().modal('show');
+
             let $form = $('#js-modal-body-login');
 
             if ($form.is(':empty')) {
@@ -232,12 +232,15 @@
 
                 {# try to update user's stats if all the sentences are done #}
                 if (isLessonDone()) {
-                    getSaveProgressButton().closest('.sticky-sidebar-wrapper').remove();
-
                     isUserLoggedIn()
                         .then(function () {
+                            getSaveProgressButton().closest('.sticky-sidebar-wrapper').remove();
                             updateUserStats();
-                        });
+                        })
+                        .catch(function () {
+                            getSaveProgressButton().html('<i class="glyphicon glyphicon-check"></i> Lưu kết quả')
+                        })
+                    ;
                 }
             }
         }
@@ -340,6 +343,10 @@
         function getSaveProgressButton() {
             return $('#js-update-users-stats');
         }
+
+        function getAuthModal() {
+            return $('#authModal');
+        }
         
         function spinButton($button, text) {
             $button.prop('disabled', true);
@@ -361,13 +368,19 @@
         }
         
         function getSavedSentenceIndexes() {
-            var indexes = [];
+            let indexes = [];
 
             $('input.saved').each(function () {
                 indexes.push(parseInt($(this).attr('tabindex')));
             });
 
             return indexes;
+        }
+        
+        function updateLoggedInNavBar() {
+            if ($('#js-navbar-logged-in').hasClass('hidden')) {
+                $('.navbar-right').toggleClass('hidden');
+            }
         }
     </script>
 
@@ -380,10 +393,11 @@
             });
 
             $('#js-update-users-stats').on('click', function (e) {
+                let $self = $(e.currentTarget);
 
                 isUserLoggedIn()
                     .then(function () {
-                        spinButton($(e.currentTarget));
+                        spinButton($self);
                         updateUserStats();
                     })
                     .catch(function () {
@@ -391,9 +405,11 @@
                     });
             });
 
-            setDoneSentences(getSavedSentenceIndexes());
+//            setDoneSentences(getSavedSentenceIndexes());
 
-            let $authModal = $('#authModal');
+            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]);
+
+            let $authModal = getAuthModal();
 
             $authModal.on('submit', 'form', function (e) {
                 e.preventDefault();
@@ -404,6 +420,9 @@
                     method: 'post'
                 }).then(function () {
                     updateUserStats();
+                    $authModal.modal('hide');
+                    updateLoggedInNavBar();
+                    getSaveProgressButton().closest('.sticky-sidebar-wrapper').remove();
                 }).catch(function (jqXHR) {
                     mapErrorsToForm($(this), JSON.parse(jqXHR.responseText));
                 });
@@ -418,8 +437,6 @@
                 e.preventDefault();
                 showLoginForm();
             });
-
-
         });
     </script>
 {% endblock %}
