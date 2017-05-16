@@ -44,7 +44,7 @@ class User extends BaseUser
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getLastActiveTime()
     {
@@ -76,7 +76,7 @@ class User extends BaseUser
     }
 
     /**
-     * @return mixed
+     * @return \DateTime
      */
     public function getStartedDate()
     {

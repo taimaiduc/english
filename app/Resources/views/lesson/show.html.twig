@@ -105,14 +105,16 @@
 
     <script>
         function updateUserStats() {
-            console.log(getUserAnswersData());
-            console.log('server data from here');
             $.ajax({
                 url: '{{ path('user_update_progress') }}',
                 method: 'post',
                 data: getUserAnswersData()
             }).then(function (data) {
-                console.log(data);
+
+                if (isLessonDone()) {
+                    removeSaveProgressButton();
+                }
+
                 swal(
                     'Good job!',
                     'You clicked the button!',
@@ -234,7 +236,6 @@
                 if (isLessonDone()) {
                     isUserLoggedIn()
                         .then(function () {
-                            getSaveProgressButton().closest('.sticky-sidebar-wrapper').remove();
                             updateUserStats();
                         })
                         .catch(function () {
@@ -264,6 +265,8 @@
         }
 
         function handleInputOnKeyDown(index, event) {
+
+
             {# Ctrl + Space = toggleAudio() #}
             if (event.ctrlKey && event.keyCode == 32) {
                 toggleAudio(index);
@@ -279,13 +282,14 @@
                 document.getElementById('result'+index).style.display = 'none';
             }
 
-           {# Down arrow key = next sentence || Up arrow key = previous sentence #}
-            else if (event.keyCode== 40 || event.keyCode==38) {
+           {# Tab or Down arrow key = next sentence || Up arrow key = previous sentence #}
+            else if (event.keyCode == 9 || event.keyCode == 40 || event.keyCode == 38) {
+                event.preventDefault();
                 let inputs = document.querySelectorAll('[tabindex]');
                 let currentInputIndex = document.activeElement.getAttribute('tabindex');
 
-                {# Down arrow key = focus next input #}
-                if (event.keyCode == 40) {
+                {# Down arrow key || Tab = focus next input #}
+                if (event.keyCode == 40 || event.keyCode == 9) {
                     let nextInputIndex = parseInt(currentInputIndex) + 1;
                     let nextInput = inputs[nextInputIndex] ;
                     if(nextInput != undefined) {
@@ -342,6 +346,10 @@
         
         function getSaveProgressButton() {
             return $('#js-update-users-stats');
+        }
+
+        function removeSaveProgressButton() {
+            getSaveProgressButton().closest('.sticky-sidebar-wrapper').remove();
         }
 
         function getAuthModal() {
@@ -405,9 +413,9 @@
                     });
             });
 
-//            setDoneSentences(getSavedSentenceIndexes());
+            setDoneSentences(getSavedSentenceIndexes());
 
-            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]);
+//            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]);
 
             let $authModal = getAuthModal();
 
@@ -422,7 +430,6 @@
                     updateUserStats();
                     $authModal.modal('hide');
                     updateLoggedInNavBar();
-                    getSaveProgressButton().closest('.sticky-sidebar-wrapper').remove();
                 }).catch(function (jqXHR) {
                     mapErrorsToForm($(this), JSON.parse(jqXHR.responseText));
                 });

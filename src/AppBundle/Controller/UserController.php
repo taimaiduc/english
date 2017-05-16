@@ -84,14 +84,12 @@ class UserController extends BaseController
         /** @var array|null $doneSentences */
         $doneSentences = $request->request->get('doneSentences');
 
-        $this->updateUserProgress($em, $user, $lesson, $isLessonDone, $doneSentences);
-
-        $this->addFlash('success', 'Your progress has been updated successfully');
+        $updatedData = $this->updateUserProgress($em, $user, $lesson, $isLessonDone, $doneSentences);
 
 //        $leaderBoard = $em->getRepository('AppBundle:Ranking')->findAll()[0];
 //        $this->updateLeaderBoard($userCurrentProgress, $leaderBoard);
 
-        return new Response(null, 204);
+        return new JsonResponse($updatedData, 204);
     }
 
     private function updateUsersSavedLessonList(User $user, $lessonId, $doneSentences = null)
@@ -161,7 +159,7 @@ class UserController extends BaseController
             $today = 0;
         } else {
             $progress = $user->getProgress();
-            $today = $timeNow->diff($startedDate)->d;
+            $today = ($timeNow->getTimestamp() - $startedDate->getTimestamp())/24/60/60;
         }
 
         // if this is the first lesson that the user has done today
@@ -193,7 +191,6 @@ class UserController extends BaseController
         }
         $totalWords = $lesson->getTotalWords($doneSentences);
         $totalWords = $this->validateWordCount($user->getLastActiveTime(), $timeNow, $totalWords);
-
         $progress[$today] += $totalWords;
 
         $user->setLastActiveTime($timeNow);
@@ -201,6 +198,14 @@ class UserController extends BaseController
         $user->setProgress($progress);
         $em->persist($user);
         $em->flush();
+
+        $message = $isLessonDone ? 'luu bai thanh cong' : 'ban da hoan thanh bai nay';
+
+        return [
+            'message' => $message,
+            'username' => $user->getUsername(),
+            'todayProgress' => $progress[$today]
+        ];
     }
 
     private function updateLeaderBoard($userProgress)
@@ -217,8 +222,7 @@ class UserController extends BaseController
     private function validateWordCount(\DateTime $lastActiveTime, \DateTime $timeNow, $wordCount)
     {
         // if a user types faster than 1 word/second, he's probably cheating
-        $seconds = $timeNow->diff($lastActiveTime)->s;
-
-        return $wordCount/$seconds > 1 ? $wordCount : 0;
+        $seconds = $timeNow->getTimestamp() - $lastActiveTime->getTimestamp();
+        return $seconds/$wordCount > 1 ? $wordCount : 0;
     }
 }
