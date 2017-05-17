@@ -2,11 +2,11 @@
 {% import 'macros/breadcrumb.html.twig' as breadCrumb %}
 
 {% block content %}
-    {% for flash_message in app.session.flashBag.get('success') %}
+    {#{% for flash_message in app.session.flashBag.get('success') %}
         <div class="alert alert-success">
             {{ flash_message }}
         </div>
-    {% endfor %}
+    {% endfor %}#}
 {{ breadCrumb.create(category, lesson) }}
 
 <div class="row lesson-wrapper"
@@ -104,20 +104,21 @@
     <script src="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.js"></script>
 
     <script>
+        function
+
         function updateUserStats() {
             $.ajax({
                 url: '{{ path('user_update_progress') }}',
                 method: 'post',
                 data: getUserAnswersData()
             }).then(function (data) {
-
                 if (isLessonDone()) {
                     removeSaveProgressButton();
                 }
 
                 swal(
                     'Good job!',
-                    'You clicked the button!',
+                    data.message,
                     'success'
                 );
             });

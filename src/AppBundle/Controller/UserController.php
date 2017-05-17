@@ -11,7 +11,6 @@ namespace AppBundle\Controller;
 use AppBundle\Entity\Lesson;
 use AppBundle\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\EntityNotFoundException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,6 +24,8 @@ class UserController extends BaseController
 {
     /**
      * @Route("/user", name="user_show")
+     * @param Request $request
+     * @return Response
      */
     public function showAction(Request $request)
     {
@@ -45,9 +46,16 @@ class UserController extends BaseController
      *
      * This function only accepts ajax requests from logged in users.
      * Cases may happen:
+     * -----the user saves the lesson without doing any sentences-----
+     * $_POST_Example = [
+     *      'lessonId' => 1,
+     *      'isLessonDone' => 0
+     * ]
+     *
      * -----the user saves the lesson-----
      * $_POST_Example = [
      *      'lessonId' => 1,
+     *      'isLessonDone' => 0
      *      'doneSentences' => [0, 1, 2, 3, 4, 5, 6, 10 ,20]
      * ]
      * As the sentence indexes start from 1,
@@ -57,6 +65,7 @@ class UserController extends BaseController
      * -----the user finished the lesson-----
      * $_POST_Example = [
      *      'lessonId' => 1
+     *      'isLessonDone' => 1
      * ]
      *
      */
@@ -89,32 +98,7 @@ class UserController extends BaseController
 //        $leaderBoard = $em->getRepository('AppBundle:Ranking')->findAll()[0];
 //        $this->updateLeaderBoard($userCurrentProgress, $leaderBoard);
 
-        return new JsonResponse($updatedData, 204);
-    }
-
-    private function updateUsersSavedLessonList(User $user, $lessonId, $doneSentences = null)
-    {
-        /*
-        $savedLessonExample = [
-            $lessonId => [$sentenceIndexes],
-            1 => [1, 2, 10, 11],
-            2 => [1, 3, 4]
-        ]
-        */
-
-        $savedLessons = $user->getSavedLessons();
-
-        if ($doneSentences) {
-            $savedLessons[$lessonId] = $doneSentences;
-        } else {
-            if (isset($savedLessons[$lessonId])) {
-                unset($savedLessons[$lessonId]);
-            } else {
-                return null;
-            }
-        }
-
-        return $savedLessons;
+        return new JsonResponse($updatedData);
     }
 
     private function updateUserProgress(ObjectManager $em, User $user, Lesson $lesson, $isLessonDone, $doneSentences = null)
@@ -153,13 +137,13 @@ class UserController extends BaseController
 
         // if the user hasn't started any lesson (all three values above were set to null as default values)
         // $today = the number of days after the started day.
-        if (!$startedDate = $user->getStartedDate()) {
-            $user->setStartedDate($timeNow);
+        if (!$startedDate = $user->getFirstActiveDate()) {
+            $user->setFirstActiveDate($timeNow);
             $progress = array();
             $today = 0;
         } else {
             $progress = $user->getProgress();
-            $today = ($timeNow->getTimestamp() - $startedDate->getTimestamp())/24/60/60;
+            $today = $timeNow->diff($startedDate)->format('%a');
         }
 
         // if this is the first lesson that the user has done today
@@ -177,17 +161,25 @@ class UserController extends BaseController
 
         // if lesson had been saved
         if (isset($savedLessons[$lessonId])) {
+
             if ($isLessonDone) {
                 $doneSentences = array_diff(array_keys($lesson->getSentences()), $savedLessons[$lessonId]);
                 unset($savedLessons[$lessonId]);
-            } else {
-                $doneSentences = array_diff($doneSentences, $savedLessons[$lessonId]);
-                $savedLessons[$lessonId] = array_merge($savedLessons[$lessonId], $doneSentences);
             }
-        } else {
+            else {
+                if (count($doneSentences) > count($savedLessons[$lessonId])) {
+                    $doneSentences = array_diff($doneSentences, $savedLessons[$lessonId]);
+                    $savedLessons[$lessonId] = array_merge($savedLessons[$lessonId], $doneSentences);
+                }
+            }
+
+        }
+        else {
+
             if (!$isLessonDone) {
                 $savedLessons[$lessonId] = $doneSentences;
             }
+
         }
         $totalWords = $lesson->getTotalWords($doneSentences);
         $totalWords = $this->validateWordCount($user->getLastActiveTime(), $timeNow, $totalWords);
@@ -199,18 +191,21 @@ class UserController extends BaseController
         $em->persist($user);
         $em->flush();
 
-        $message = $isLessonDone ? 'luu bai thanh cong' : 'ban da hoan thanh bai nay';
+        $message = $isLessonDone ? 'ban da hoan thanh bai nay' : 'luu bai thanh cong';
+
+        if (count($progress) <= 1) {
+            $highestWordCountADay = 300;
+        } else {
+            $highestWordCountADay = max($progress);
+        }
+        $todayProgressPercentage = $progress[$today]/$highestWordCountADay;
 
         return [
             'message' => $message,
             'username' => $user->getUsername(),
-            'todayProgress' => $progress[$today]
+            'todayProgress' => $progress[$today],
+            'todayProgressPercentage' => $todayProgressPercentage
         ];
-    }
-
-    private function updateLeaderBoard($userProgress)
-    {
-
     }
 
     /**
@@ -221,8 +216,13 @@ class UserController extends BaseController
      */
     private function validateWordCount(\DateTime $lastActiveTime, \DateTime $timeNow, $wordCount)
     {
+        if (!$wordCount) {
+            return 0;
+        }
+
         // if a user types faster than 1 word/second, he's probably cheating
         $seconds = $timeNow->getTimestamp() - $lastActiveTime->getTimestamp();
+
         return $seconds/$wordCount > 1 ? $wordCount : 0;
     }
 }

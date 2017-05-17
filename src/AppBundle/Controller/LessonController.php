@@ -6,6 +6,7 @@ use AppBundle\Entity\Category;
 use AppBundle\Entity\Lesson;
 use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Response;
 
 class LessonController extends BaseController
 {
@@ -22,6 +23,9 @@ class LessonController extends BaseController
     }
 
     /**
+     * @param $categorySlug
+     * @param $position
+     * @return Response
      * @Route("/lessons/{categorySlug}/{position}", name="lessons_show")
      */
     public function showAction($categorySlug, $position)
@@ -43,7 +47,7 @@ class LessonController extends BaseController
         /** @var User $user */
         $user = $this->getUser();
         if ($user) {
-            $savedLessons = $user->getSavedLessons();
+            $savedLessons = $user->getSavedLessons() ? $user->getSavedLessons() : array();
             foreach ($savedLessons as $lessonId => $savedSentences) {
                 if (isset($savedLessons[$lesson->getId()])) {
                     $data['savedSentences'] = $savedSentences;

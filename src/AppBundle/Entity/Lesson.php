@@ -61,7 +61,7 @@ class Lesson
     }
 
     /**
-     * @return mixed
+     * @return Category
      */
     public function getCategory()
     {
@@ -69,7 +69,7 @@ class Lesson
     }
 
     /**
-     * @param mixed $category
+     * @param Category $category
      */
     public function setCategory($category)
     {
@@ -146,5 +146,23 @@ class Lesson
         }
 
         return $totalWords;
+    }
+
+    public function getNextLessonPosition()
+    {
+        if ($this->position >= $this->getCategory()->getTotalLessons()) {
+            return null;
+        }
+
+        return $this->position + 1;
+    }
+
+    public function getPreviousLessonPosision()
+    {
+        if ($this->position <= 1) {
+            return null;
+        }
+
+        return $this->position - 1;
     }
 }

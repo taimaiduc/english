@@ -19,9 +19,9 @@ class User extends BaseUser
     protected $id;
 
     /**
-     * @ORM\Column(type="date", nullable=true)
+     * @ORM\Column(type="datetime", nullable=true)
      */
-    private $startedDate;
+    private $firstActiveDate;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -78,17 +78,17 @@ class User extends BaseUser
     /**
      * @return \DateTime
      */
-    public function getStartedDate()
+    public function getFirstActiveDate()
     {
-        return $this->startedDate;
+        return $this->firstActiveDate;
     }
 
     /**
-     * @param mixed $startedDate
+     * @param mixed $firstActiveDate
      */
-    public function setStartedDate(\DateTime $startedDate)
+    public function setFirstActiveDate(\DateTime $firstActiveDate)
     {
-        $this->startedDate = $startedDate;
+        $this->firstActiveDate = $firstActiveDate;
     }
 
     /**
@@ -105,5 +105,35 @@ class User extends BaseUser
     public function setSavedLessons(array $lessons)
     {
         $this->savedLessons = json_encode($lessons);
+    }
+
+    /**
+     * @return array
+     * $todayProgressExample = [
+     *      'point' => 123
+     *      'percentage' => 45
+     * ]
+     */
+    public function getTodayProgress()
+    {
+        $todayProgress = array(
+            'points' => 0,
+            'percentage' => 0
+        );
+        $dateToday = new \DateTime();
+
+        if ($dateToday->diff($this->lastActiveTime)->format('%a') != 0) {
+            return $todayProgress;
+        }
+
+        $progress = $this->getProgress();
+
+        $highestPoint = max($progress);
+        $todayPoint = $progress[max(array_keys($progress))];
+
+        $todayProgress['point'] = $todayPoint;
+        $todayProgress['percentage'] = ($todayPoint/$highestPoint)*100;
+
+        return $todayProgress;
     }
 }
