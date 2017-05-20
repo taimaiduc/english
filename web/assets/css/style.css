@@ -2,6 +2,18 @@
     padding: 0 12px;
 }
 
+.btn-link:focus {
+    outline: none;
+}
+
+.progress p{
+    position: absolute;
+    width: 93%;
+    border-radius: 20%;
+    padding: 0 5px;
+}
+
+
 .glyphicon-refresh.spinning {
     transform-origin: 48% 50%;
 }

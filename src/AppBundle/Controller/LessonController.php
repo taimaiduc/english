@@ -7,6 +7,7 @@ use AppBundle\Entity\Lesson;
 use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class LessonController extends BaseController
 {
@@ -34,9 +35,17 @@ class LessonController extends BaseController
         $category = $this->getDoctrine()->getRepository('AppBundle:Category')
             ->findOneBy(['slug' => $categorySlug]);
 
+        if (!$category) {
+            throw new NotFoundHttpException();
+        }
+
         /** @var Lesson $lesson */
         $lesson = $this->getDoctrine()->getRepository('AppBundle:Lesson')
             ->findOneBy(['category' => $category, 'position' => $position]);
+
+        if (!$lesson) {
+            throw new NotFoundHttpException();
+        }
 
         $data = array(
             'category' => $category,
@@ -48,10 +57,9 @@ class LessonController extends BaseController
         $user = $this->getUser();
         if ($user) {
             $savedLessons = $user->getSavedLessons() ? $user->getSavedLessons() : array();
-            foreach ($savedLessons as $lessonId => $savedSentences) {
-                if (isset($savedLessons[$lesson->getId()])) {
-                    $data['savedSentences'] = $savedSentences;
-                }
+
+            if (isset($savedLessons[$lesson->getId()])) {
+                $data['savedSentences'] = $savedLessons[$lesson->getId()];
             }
         }
 

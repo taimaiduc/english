@@ -87,7 +87,7 @@ class UserController extends BaseController
             throw new NotFoundHttpException();
         }
 
-        /** @var String|'0'|'1' $isLessonDone */
+        /** @var String|boolean $isLessonDone */
         $isLessonDone = $request->request->get('isLessonDone');
 
         /** @var array|null $doneSentences */
@@ -136,17 +136,18 @@ class UserController extends BaseController
         $timeNow = new \DateTime();
 
         // if the user hasn't started any lesson (all three values above were set to null as default values)
-        // $today = the number of days after the started day.
-        if (!$startedDate = $user->getFirstActiveDate()) {
+        // $today = the number of days after the first active day.
+        if (!$firstActiveDate = $user->getFirstActiveDate()) {
             $user->setFirstActiveDate($timeNow);
             $progress = array();
             $today = 0;
         } else {
             $progress = $user->getProgress();
-            $today = $timeNow->diff($startedDate)->format('%a');
+            $today = $timeNow->diff($firstActiveDate)->format('%a');
         }
 
         // if this is the first lesson that the user has done today
+        // set to 0 to prevent undefined error
         if (!isset($progress[$today])) {
             $progress[$today] = 0;
         }
@@ -167,8 +168,7 @@ class UserController extends BaseController
                 unset($savedLessons[$lessonId]);
             }
             else {
-                if (count($doneSentences) > count($savedLessons[$lessonId])) {
-                    $doneSentences = array_diff($doneSentences, $savedLessons[$lessonId]);
+                if ($doneSentences = array_diff($doneSentences, $savedLessons[$lessonId])) {
                     $savedLessons[$lessonId] = array_merge($savedLessons[$lessonId], $doneSentences);
                 }
             }
@@ -191,20 +191,43 @@ class UserController extends BaseController
         $em->persist($user);
         $em->flush();
 
-        $message = $isLessonDone ? 'ban da hoan thanh bai nay' : 'luu bai thanh cong';
+        return [
+            'todayProgress' => $user->getTodayProgress(),
+        ];
+    }
 
-        if (count($progress) <= 1) {
-            $highestWordCountADay = 300;
-        } else {
-            $highestWordCountADay = max($progress);
+    /**
+     * @param ObjectManager $em
+     * @param User $user
+     * @param $lessonId
+     * @param $resetType 1 = reset lesson, 2 = delete lesson
+     * @return array
+     */
+    private function resetLesson(ObjectManager $em, User $user, $lessonId, $resetType)
+    {
+        $savedLessons = $user->getSavedLessons();
+
+        if ($resetType == 2) {
+            if (isset($savedLessons[$lessonId])) {
+                unset($savedLessons[$lessonId]);
+            }
+            $message = 'Xoa thanh cong';
         }
-        $todayProgressPercentage = $progress[$today]/$highestWordCountADay;
+        else {
+            if (isset($savedLessons[$lessonId])) {
+                $savedLessons[$lessonId] = array();
+            }
+            $message = 'reset thanh cong';
+        }
+
+        $user->setSavedLessons($savedLessons);
+        $em->persist($user);
+        $em->flush();
 
         return [
             'message' => $message,
             'username' => $user->getUsername(),
-            'todayProgress' => $progress[$today],
-            'todayProgressPercentage' => $todayProgressPercentage
+            'todayProgress' => $user->getTodayProgress()
         ];
     }
 
@@ -214,9 +237,9 @@ class UserController extends BaseController
      * @param integer $wordCount
      * @return integer validatedWordCount;
      */
-    private function validateWordCount(\DateTime $lastActiveTime, \DateTime $timeNow, $wordCount)
+    private function validateWordCount(\DateTime $lastActiveTime = null, \DateTime $timeNow, $wordCount)
     {
-        if (!$wordCount) {
+        if (!$wordCount || !$lastActiveTime) {
             return 0;
         }
 

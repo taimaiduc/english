@@ -7,6 +7,26 @@
             {{ flash_message }}
         </div>
     {% endfor %}#}
+{% if app.user and app.user.todayProgress.point and app.user.todayProgress.percentage %}
+    {% set progressPoint = app.user.todayProgress.point %}
+    {% set progressPercentage = app.user.todayProgress.percentage %}
+{% else %}
+    {% set progressPoint = 0 %}
+    {% set progressPercentage = 0 %}
+{% endif %}
+
+<div class="row">
+    <div class="col-xs-12">
+        <div
+                class="progress"
+                id="progress-wrapper"
+                data-progress-point="{{ progressPoint }}"
+                data-progress-percentage="{{ progressPercentage }}"
+        ></div>
+    </div>
+</div>
+
+
 {{ breadCrumb.create(category, lesson) }}
 
 <div class="row lesson-wrapper"
@@ -104,8 +124,6 @@
     <script src="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.js"></script>
 
     <script>
-        function
-
         function updateUserStats() {
             $.ajax({
                 url: '{{ path('user_update_progress') }}',
@@ -116,11 +134,15 @@
                     removeSaveProgressButton();
                 }
 
-                swal(
-                    'Good job!',
-                    data.message,
-                    'success'
-                );
+                swal({
+                    type: 'success',
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    html: getAlertContent(),
+                })
+                    .catch( function () {
+                        renderTodayProgress(data.todayProgress.point, data.todayProgress.percentage);
+                    });
             });
         }
 
@@ -167,10 +189,11 @@
                     url: "{{ path('fos_user_security_login') }}"
                 }).then(function (data) {
                     $form.html(data);
+                    toggleAuthForms($form);
                 });
+            } else {
+                toggleAuthForms($form);
             }
-
-            toggleAuthForms($form);
         }
 
         function showRegistrationForm() {
@@ -182,10 +205,11 @@
                     method: 'get'
                 }).then(function (data) {
                     $form.html(data);
+                    toggleAuthForms($form);
                 });
+            } else {
+                toggleAuthForms($form);
             }
-
-            toggleAuthForms($form);
         }
 
         function toggleAuthForms($form) {
@@ -201,7 +225,7 @@
 
             {# if there's another audio playing, stop it. #}
             for (let i = 0; i < audioElements.length; i++) {
-                if (audioElements[i] != currentAudio && !audioElements[i].paused) {
+                if (audioElements[i] !== currentAudio && !audioElements[i].paused) {
                     audioElements[i].pause();
                     break;
                 }
@@ -253,7 +277,7 @@
             let result = $answerElement.html().split(' '); // the result after comparing input and answer
 
             for (let i = 0; i < result.length; i++) {
-                if (answer[i] != input[i]){
+                if (answer[i] !== input[i]){
                     result[i] = "<span class='text-danger'>"+result[i]+"</span>";
                 }
             }
@@ -269,31 +293,31 @@
 
 
             {# Ctrl + Space = toggleAudio() #}
-            if (event.ctrlKey && event.keyCode == 32) {
+            if (event.ctrlKey && event.keyCode === 32) {
                 toggleAudio(index);
             }
 
             {# Enter = Compare input & answer #}
-            else if (event.keyCode == 13) {
+            else if (event.keyCode === 13) {
                 checkAnswer(index);
             }
 
             {# Ctrl + Enter = Hide result #}
-            else if (event.ctrlKey && event.keyCode == 13) {
+            else if (event.ctrlKey && event.keyCode === 13) {
                 document.getElementById('result'+index).style.display = 'none';
             }
 
            {# Tab or Down arrow key = next sentence || Up arrow key = previous sentence #}
-            else if (event.keyCode == 9 || event.keyCode == 40 || event.keyCode == 38) {
+            else if (event.keyCode === 9 || event.keyCode === 40 || event.keyCode === 38) {
                 event.preventDefault();
                 let inputs = document.querySelectorAll('[tabindex]');
                 let currentInputIndex = document.activeElement.getAttribute('tabindex');
 
                 {# Down arrow key || Tab = focus next input #}
-                if (event.keyCode == 40 || event.keyCode == 9) {
+                if (event.keyCode === 40 || event.keyCode === 9) {
                     let nextInputIndex = parseInt(currentInputIndex) + 1;
                     let nextInput = inputs[nextInputIndex] ;
-                    if(nextInput != undefined) {
+                    if(nextInput !== undefined) {
                         nextInput.focus();
                     }
                 }
@@ -302,7 +326,7 @@
                 else {
                     let previousInputIndex = parseInt(currentInputIndex) - 1;
                     let previousInput = inputs[previousInputIndex];
-                    if (previousInput != undefined) {
+                    if (previousInput !== undefined) {
                         previousInput.focus();
                     }
                 }
@@ -365,7 +389,11 @@
             let spinClass = 'glyphicon glyphicon-refresh glyphicon-spin';
 
             if (!text) {
-                $button.find('i').attr('class', spinClass);
+                if ($button.has('i')) {
+                    $button.find('i').attr('class', spinClass);
+                } else {
+                    $button.prepend('<i class="'+spinClass+'"></i> ');
+                }
             } else {
                 $button.html('<i class="'+spinClass+'"></i> ' + text);
             }
@@ -373,7 +401,7 @@
             setTimeout(function () {
                 $button.html($oldHtml);
                 $button.prop('disabled', false);
-            }, 2000);
+            }, 3000);
         }
         
         function getSavedSentenceIndexes() {
@@ -390,6 +418,59 @@
             if ($('#js-navbar-logged-in').hasClass('hidden')) {
                 $('.navbar-right').toggleClass('hidden');
             }
+        }
+
+        function renderTodayProgress(point, percentage) {
+            let $progressWrapper = $('#progress-wrapper');
+
+            // when page loads first time
+            if (!point || !percentage) {
+                point = $progressWrapper.attr('data-progress-point');
+                percentage = $progressWrapper.attr('data-progress-percentage');
+                if (point === 'undefined' || percentage === 'undefined') {
+                    return;
+                }
+            }
+
+            let html = `
+            <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100" style="width:${percentage}%"></div>
+            <p class="text-center"><b class="">${point} diem</b></p>
+            `;
+console.log(html);
+            $progressWrapper.html(html);
+        }
+
+        function getAlertContent() {
+            let title, cancelButton;
+            let previousLessonLink = '';
+            let nextLessonLink = '';
+
+            if (isLessonDone()) {
+                title = 'Bạn đã hoàn thành bài này';
+                cancelButton = '<a href="" class="btn btn-link btn-block btn-lg">Lại bài này</a>';
+            } else {
+                title = 'Lưu bài thành công';
+                cancelButton = '<a href="#" onclick="event.preventDefault(); swal.clickCancel()" class="btn btn-link btn-block btn-lg">Tiếp bài này</a>';
+            }
+
+            let nextLinkHref = $('.js-next-lesson-link').attr('href');
+            if (nextLinkHref) {
+                nextLessonLink = `<a href="${nextLinkHref}" class="btn btn-link btn-block btn-lg">Bài tiếp theo</a>`;
+            }
+
+            let previousLinkHref= $('.js-previous-lesson-link').attr('href');
+            if (previousLinkHref) {
+                previousLessonLink = `<a href="${previousLinkHref}" class="btn btn-link btn-block btn-lg">Bài trước</a>`;
+            }
+
+            return `
+                <h2>${title}</h2><hr/>
+                <div class="row">
+                    <div class="col-sm-4">${nextLessonLink}</div>
+                    <div class="col-sm-4">${previousLessonLink}</div>
+                    <div class="col-sm-4">${cancelButton}</div>
+                </div>
+            `;
         }
     </script>
 
@@ -413,6 +494,8 @@
                         showLoginForm();
                     });
             });
+
+            renderTodayProgress();
 
             setDoneSentences(getSavedSentenceIndexes());
 
@@ -438,7 +521,7 @@
 
             $authModal.on('click', '#js-btn-show-register-form', function (e) {
                 e.preventDefault();
-                showRegistrationForm();
+                showRegistrationForm($(e.currentTarget));
             });
 
             $authModal.on('click', '#js-btn-show-login-form', function (e) {

@@ -1,6 +1,16 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
+    {% if app.user %}
+        <h3>Bài đã lưu</h3>
+        {% for lesson in user.getDoneLessons %}
+        {% endfor %}
+
+        <h3>Bài đã hoàn thành</h3>
+        {% for lesson in user.getSavedLessons %}
+        {% endfor %}
+    {% endif %}
+
     {% for category in categories %}
 
         <h3>{{ category.name }}</h3>

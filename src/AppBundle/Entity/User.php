@@ -120,20 +120,48 @@ class User extends BaseUser
             'points' => 0,
             'percentage' => 0
         );
+
+        if (!$progress = $this->getProgress()) {
+            return $todayProgress;
+        }
+
         $dateToday = new \DateTime();
 
         if ($dateToday->diff($this->lastActiveTime)->format('%a') != 0) {
             return $todayProgress;
         }
 
-        $progress = $this->getProgress();
-
         $highestPoint = max($progress);
+        if ($highestPoint < 300) {
+            $highestPoint = 300;
+        }
         $todayPoint = $progress[max(array_keys($progress))];
 
         $todayProgress['point'] = $todayPoint;
-        $todayProgress['percentage'] = ($todayPoint/$highestPoint)*100;
+        $todayProgress['percentage'] = $todayPoint/$highestPoint*100;
 
         return $todayProgress;
+    }
+
+    public function getProgressWithDetails()
+    {
+        $detailedProgress = array();
+
+        if (!$progress = $this->getProgress()) {
+            return $detailedProgress;
+        }
+
+        $firstActiveDate = $this->getFirstActiveDate();
+        $highestPoint = max($progress);
+
+        foreach ($progress as $dayOffset => $point) {
+            $detailedProgress[] = array(
+                'date' => $firstActiveDate->add(new \DateInterval('P'.$dayOffset.'D'))->format('Y-m-d'),
+                'point' => $point,
+                'percentage' => $point/$highestPoint*100
+            );
+        }
+
+        return $detailedProgress;
     }
 }
