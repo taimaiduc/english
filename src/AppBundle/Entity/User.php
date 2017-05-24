@@ -117,7 +117,7 @@ class User extends BaseUser
     public function getTodayProgress()
     {
         $todayProgress = array(
-            'points' => 0,
+            'point' => 0,
             'percentage' => 0
         );
 

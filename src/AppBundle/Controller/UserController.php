@@ -139,6 +139,11 @@ class UserController extends BaseController
         // $today = the number of days after the first active day.
         if (!$firstActiveDate = $user->getFirstActiveDate()) {
             $user->setFirstActiveDate($timeNow);
+
+            // to prevent validationWordCount returns 0
+            $lastActiveTime = new \DateTime();
+            $user->setLastActiveTime($lastActiveTime->modify('-1 hour'));
+
             $progress = array();
             $today = 0;
         } else {
@@ -181,8 +186,12 @@ class UserController extends BaseController
             }
 
         }
-        $totalWords = $lesson->getTotalWords($doneSentences);
-        $totalWords = $this->validateWordCount($user->getLastActiveTime(), $timeNow, $totalWords);
+
+        $totalWords = $this->validateWordCount(
+            $user->getLastActiveTime(),
+            $timeNow,
+            $lesson->getTotalWords($doneSentences)
+        );
         $progress[$today] += $totalWords;
 
         $user->setLastActiveTime($timeNow);

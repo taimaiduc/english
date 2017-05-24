@@ -18,7 +18,6 @@
 <div class="row">
     <div class="col-xs-12">
         <div
-                class="progress"
                 id="progress-wrapper"
                 data-progress-point="{{ progressPoint }}"
                 data-progress-percentage="{{ progressPercentage }}"
@@ -425,6 +424,7 @@
 
             // when page loads first time
             if (!point || !percentage) {
+                console.log(point);
                 point = $progressWrapper.attr('data-progress-point');
                 percentage = $progressWrapper.attr('data-progress-percentage');
                 if (point === 'undefined' || percentage === 'undefined') {
@@ -432,9 +432,16 @@
                 }
             }
 
+            if (parseInt(point) === 0) {
+                console.log(point);
+                return;
+            }
+
             let html = `
+            <div class="progress">
             <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100" style="width:${percentage}%"></div>
             <p class="text-center"><b class="">${point} diem</b></p>
+            </div>
             `;
 console.log(html);
             $progressWrapper.html(html);
