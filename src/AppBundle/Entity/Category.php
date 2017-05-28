@@ -103,7 +103,7 @@ class Category
     }
 
     /**
-     * @return mixed
+     * @return ArrayCollection|Lesson[]
      */
     public function getLessons()
     {

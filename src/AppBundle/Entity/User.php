@@ -19,12 +19,12 @@ class User extends BaseUser
     protected $id;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime")
      */
     private $firstActiveDate;
 
     /**
-     * @ORM\Column(type="datetime", nullable=true)
+     * @ORM\Column(type="datetime")
      */
     private $lastActiveTime;
 
@@ -36,10 +36,21 @@ class User extends BaseUser
     /**
      * @ORM\Column(type="text", nullable=true)
      */
+    private $doneLessons;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
     private $progress;
 
     public function __construct()
     {
+        $this->firstActiveDate = new \DateTime();
+        $this->lastActiveTime = new \DateTime('-1 hour');
+        $this->savedLessons = '[]';
+        $this->doneLessons = '[]';
+        $this->progress = '[0]';
+
         parent::__construct();
     }
 
@@ -57,6 +68,40 @@ class User extends BaseUser
     public function setLastActiveTime(\DateTime $lastActiveTime)
     {
         $this->lastActiveTime = $lastActiveTime;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDoneLessons()
+    {
+        if ($this->doneLessons === null) {
+            $this->doneLessons = json_encode(array());
+        }
+        return json_decode($this->doneLessons, true);
+    }
+
+    /**
+     * @param mixed $doneLessons
+     */
+    public function setDoneLessons($doneLessons)
+    {
+        $this->doneLessons = json_encode($doneLessons);
+    }
+
+    public function addDoneLesson($lessonId)
+    {
+        if (!$doneLessons = $this->getDoneLessons()) {
+            $doneLessons = array();
+        }
+
+        if (isset($doneLessons[$lessonId])) {
+            $doneLessons[$lessonId] = $doneLessons[$lessonId] + 1;
+        } else {
+            $doneLessons[$lessonId] = 1;
+        }
+
+        $this->setDoneLessons($doneLessons);
     }
 
     /**
@@ -104,6 +149,10 @@ class User extends BaseUser
      */
     public function setSavedLessons(array $lessons)
     {
+        if (count($lessons) > 2) {
+            $lessons = array_slice($lessons, -2, null, true);
+        }
+
         $this->savedLessons = json_encode($lessons);
     }
 

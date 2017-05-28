@@ -55,7 +55,8 @@
                                 onkeydown="handleInputOnKeyDown({{ index }}, event)"
                                 tabindex="{{ index }}"
                         >
-                        <p class="text-left hidden" id="answer{{ index }}">{{ sentence }}</p>
+                        {% set engViet = sentence|split('|') %}
+                        <p class="text-left hidden" id="answer{{ index }}">{{ engViet[0] }}</p>
                         <p class="text-left result" id="result{{ index }}"></p>
                     </div>
                 </div>
@@ -127,8 +128,9 @@
             $.ajax({
                 url: '{{ path('user_update_progress') }}',
                 method: 'post',
-                data: getUserAnswersData()
+                data: JSON.stringify(getUserAnswersData())
             }).then(function (data) {
+                console.log(data);
                 if (isLessonDone()) {
                     removeSaveProgressButton();
                 }
@@ -152,7 +154,8 @@
         function getUserAnswersData() {
             let data = {
                 lessonId: getLessonId(),
-                isLessonDone: isLessonDone()
+                isLessonDone: isLessonDone(),
+                doneSentences: null
             };
 
             {# if the lesson is done, we dont need to send all the sentence indexes,
@@ -179,8 +182,6 @@
         }
 
         function showLoginForm() {
-            getAuthModal().modal('show');
-
             let $form = $('#js-modal-body-login');
 
             if ($form.is(':empty')) {
@@ -189,10 +190,14 @@
                 }).then(function (data) {
                     $form.html(data);
                     toggleAuthForms($form);
+                    getAuthModal().modal('show');
                 });
             } else {
                 toggleAuthForms($form);
+                getAuthModal().modal('show');
             }
+
+
         }
 
         function showRegistrationForm() {
@@ -381,14 +386,14 @@
         }
         
         function spinButton($button, text) {
-            $button.prop('disabled', true);
-
+            $button.css('pointer-events', 'none');
             $oldHtml = $button.html();
+
 
             let spinClass = 'glyphicon glyphicon-refresh glyphicon-spin';
 
             if (!text) {
-                if ($button.has('i')) {
+                if ($button.find('i').length > 0) {
                     $button.find('i').attr('class', spinClass);
                 } else {
                     $button.prepend('<i class="'+spinClass+'"></i> ');
@@ -399,8 +404,8 @@
 
             setTimeout(function () {
                 $button.html($oldHtml);
-                $button.prop('disabled', false);
-            }, 3000);
+                $button.css('pointer-events', 'auto');
+            }, 2500);
         }
         
         function getSavedSentenceIndexes() {
@@ -424,7 +429,6 @@
 
             // when page loads first time
             if (!point || !percentage) {
-                console.log(point);
                 point = $progressWrapper.attr('data-progress-point');
                 percentage = $progressWrapper.attr('data-progress-percentage');
                 if (point === 'undefined' || percentage === 'undefined') {
@@ -433,7 +437,6 @@
             }
 
             if (parseInt(point) === 0) {
-                console.log(point);
                 return;
             }
 
@@ -443,7 +446,7 @@
             <p class="text-center"><b class="">${point} diem</b></p>
             </div>
             `;
-console.log(html);
+
             $progressWrapper.html(html);
         }
 
@@ -479,22 +482,29 @@ console.log(html);
                 </div>
             `;
         }
+
+        function ajaxSubmitForm($form) {
+            return $.ajax({
+                url: $form.attr('action'),
+                data: $form.serialize(),
+                method: 'post'
+            });
+        }
     </script>
 
     <script>
         $(document).ready(function(){
-            $("html,body").animate({scrollTop: 0}, 100);
+            $("body").animate({scrollTop: 0}, 100);
 
             $(".input").focus(function(){
-                $("html, body").animate({scrollTop: $(this).offset().top - 100}, 200);
+                $("body").animate({scrollTop: $(this).offset().top - 100}, 200);
             });
 
-            $('#js-update-users-stats').on('click', function (e) {
-                let $self = $(e.currentTarget);
+            $('#js-update-users-stats').on('click', function () {
+                spinButton($(this));
 
                 isUserLoggedIn()
                     .then(function () {
-                        spinButton($self);
                         updateUserStats();
                     })
                     .catch(function () {
@@ -506,29 +516,28 @@ console.log(html);
 
             setDoneSentences(getSavedSentenceIndexes());
 
-//            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]);
+//            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21]);
 
             let $authModal = getAuthModal();
 
             $authModal.on('submit', 'form', function (e) {
                 e.preventDefault();
+                let $self = $(this);
 
-                $.ajax({
-                    url: $(this).attr('action'),
-                    data: $(this).serialize(),
-                    method: 'post'
-                }).then(function () {
-                    updateUserStats();
-                    $authModal.modal('hide');
-                    updateLoggedInNavBar();
-                }).catch(function (jqXHR) {
-                    mapErrorsToForm($(this), JSON.parse(jqXHR.responseText));
-                });
+                ajaxSubmitForm($self)
+                    .then(function () {
+                        updateUserStats();
+                        $authModal.modal('hide');
+                        updateLoggedInNavBar();
+                    })
+                    .catch(function (jqXHR) {
+                        mapErrorsToForm($self, jqXHR.responseJSON);
+                    });
             });
 
             $authModal.on('click', '#js-btn-show-register-form', function (e) {
                 e.preventDefault();
-                showRegistrationForm($(e.currentTarget));
+                showRegistrationForm();
             });
 
             $authModal.on('click', '#js-btn-show-login-form', function (e) {

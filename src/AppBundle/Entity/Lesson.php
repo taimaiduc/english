@@ -44,6 +44,24 @@ class Lesson
      */
     private $position = 0;
 
+    private $timesHasDone;
+
+    /**
+     * @return mixed
+     */
+    public function getTimesHasDone()
+    {
+        return $this->timesHasDone;
+    }
+
+    /**
+     * @param mixed $timesHasDone
+     */
+    public function setTimesHasDone($timesHasDone)
+    {
+        $this->timesHasDone = $timesHasDone;
+    }
+
     /**
      * @return mixed
      */

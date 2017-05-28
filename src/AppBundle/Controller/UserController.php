@@ -45,27 +45,10 @@ class UserController extends BaseController
      * @return Response
      *
      * This function only accepts ajax requests from logged in users.
-     * Cases may happen:
-     * -----the user saves the lesson without doing any sentences-----
-     * $_POST_Example = [
-     *      'lessonId' => 1,
-     *      'isLessonDone' => 0
-     * ]
-     *
-     * -----the user saves the lesson-----
-     * $_POST_Example = [
-     *      'lessonId' => 1,
-     *      'isLessonDone' => 0
-     *      'doneSentences' => [0, 1, 2, 3, 4, 5, 6, 10 ,20]
-     * ]
-     * As the sentence indexes start from 1,
-     * if a user wants to save a lesson but has not done any sentences,
-     * $_POST_Example['doneSentences'] = [0]
-     *
-     * -----the user finished the lesson-----
-     * $_POST_Example = [
-     *      'lessonId' => 1
-     *      'isLessonDone' => 1
+     * $requestData = [
+     *      lessonId = int
+     *      isLessonDone = boolean
+     *      doneSentences = array[sentence indexes] | null
      * ]
      *
      */
@@ -79,77 +62,42 @@ class UserController extends BaseController
             throw new AccessDeniedException();
         }
 
-        $em = $this->getDoctrine()->getManager();
+        $requestData = json_decode($request->getContent(), true);
 
-        $lessonId = $request->request->get('lessonId');
+        /** @var int $lessonId */
+        $lessonId = isset($requestData['lessonId']) ? $requestData['lessonId'] : 0;
+
+        $em = $this->getDoctrine()->getManager();
 
         if (!$lesson = $em->getRepository('AppBundle:Lesson')->find($lessonId)) {
             throw new NotFoundHttpException();
         }
 
-        /** @var String|boolean $isLessonDone */
-        $isLessonDone = $request->request->get('isLessonDone');
+        /** @var boolean $isLessonDone */
+        $isLessonDone = isset($requestData['isLessonDone']) ? $requestData['isLessonDone'] : false;
 
         /** @var array|null $doneSentences */
-        $doneSentences = $request->request->get('doneSentences');
+        $doneSentences = isset($requestData['doneSentences']) ? $requestData['doneSentences'] : null;
 
-        $updatedData = $this->updateUserProgress($em, $user, $lesson, $isLessonDone, $doneSentences);
+        $this->updateUserStats($em, $user, $lesson, $isLessonDone, $doneSentences);
 
 //        $leaderBoard = $em->getRepository('AppBundle:Ranking')->findAll()[0];
 //        $this->updateLeaderBoard($userCurrentProgress, $leaderBoard);
 
-        return new JsonResponse($updatedData);
+        $data = array(
+            'todayProgress' => $user->getTodayProgress()
+        );
+
+        return new JsonResponse($data);
     }
 
-    private function updateUserProgress(ObjectManager $em, User $user, Lesson $lesson, $isLessonDone, $doneSentences = null)
+    private function updateUserStats(ObjectManager $em, User $user, Lesson $lesson, $isLessonDone, $doneSentences = null)
     {
-        /*
-        Assume that the date today is 2017-05-10:
-
-        If a user has never done any lessons:
-        $user = [
-            'started_date' => null,
-            'last_active' => null,
-            'progress' => null
-        ];
-
-        If that user has done only one lesson on 2017-05-06:
-        $user = [
-            'stated_date' => '2017-05-06',
-            'last_active' => '2017-05-06 17:43:32',
-            'progress'  => [
-                0 => 300 (300 words)
-            ]
-        ];
-
-        If the user has done some lessons later on:
-        $user = [
-            'stated_date' => '2017-05-06',
-            'last_active' => '2017-05-10 10:21:02',
-            'progress'  => [
-                0 => 300 (He got 300 words on his started day, 2017-05-06),
-                1 => 200 (He got 200 words on the day right after his started day, 2017-05-07),
-                4 => 400 (He didn't do anything on 2017-05-08 and 2017-05-09, and got 400 words on 2017-05-10)
-            ]
-        ]
-        */
         $timeNow = new \DateTime();
+        $firstActiveDate = $user->getFirstActiveDate();
+        $today = $timeNow->diff($firstActiveDate)->format('%a');
 
-        // if the user hasn't started any lesson (all three values above were set to null as default values)
-        // $today = the number of days after the first active day.
-        if (!$firstActiveDate = $user->getFirstActiveDate()) {
-            $user->setFirstActiveDate($timeNow);
-
-            // to prevent validationWordCount returns 0
-            $lastActiveTime = new \DateTime();
-            $user->setLastActiveTime($lastActiveTime->modify('-1 hour'));
-
-            $progress = array();
-            $today = 0;
-        } else {
-            $progress = $user->getProgress();
-            $today = $timeNow->diff($firstActiveDate)->format('%a');
-        }
+        $progress = $user->getProgress();
 
         // if this is the first lesson that the user has done today
         // set to 0 to prevent undefined error
@@ -157,17 +105,11 @@ class UserController extends BaseController
             $progress[$today] = 0;
         }
 
-        // if $doneSentences == []; Symfony sets it to null, we set it to [] again.
-        if (!$isLessonDone && $doneSentences === null) {
-            $doneSentences = [];
-        }
-
         $lessonId = $lesson->getId();
         $savedLessons = $user->getSavedLessons();
 
         // if lesson had been saved
         if (isset($savedLessons[$lessonId])) {
-
             if ($isLessonDone) {
                 $doneSentences = array_diff(array_keys($lesson->getSentences()), $savedLessons[$lessonId]);
                 unset($savedLessons[$lessonId]);
@@ -177,14 +119,11 @@ class UserController extends BaseController
                     $savedLessons[$lessonId] = array_merge($savedLessons[$lessonId], $doneSentences);
                 }
             }
-
         }
         else {
-
             if (!$isLessonDone) {
                 $savedLessons[$lessonId] = $doneSentences;
             }
-
         }
 
         $totalWords = $this->validateWordCount(
@@ -194,15 +133,15 @@ class UserController extends BaseController
         );
         $progress[$today] += $totalWords;
 
+        if ($isLessonDone) {
+            $user->addDoneLesson($lessonId);
+        } else {
+            $user->setSavedLessons($savedLessons);
+        }
         $user->setLastActiveTime($timeNow);
-        $user->setSavedLessons($savedLessons);
         $user->setProgress($progress);
         $em->persist($user);
         $em->flush();
-
-        return [
-            'todayProgress' => $user->getTodayProgress(),
-        ];
     }
 
     /**

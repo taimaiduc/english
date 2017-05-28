@@ -20,7 +20,35 @@ class LessonController extends BaseController
         $categories = $this->getDoctrine()->getRepository('AppBundle:Category')
             ->findAll();
 
-        return $this->render('lesson/list.html.twig', ['categories' => $categories]);
+        $data = array(
+            'categories' => $categories
+        );
+
+        $cond = array(11, 12);
+
+        /** @var User $user */
+        $user = $this->getUser();
+        if ($user) {
+            $lessons = $this->getDoctrine()->getRepository('AppBundle:Lesson');
+
+            $doneLessonArr = $user->getDoneLessons() ?: array();
+            $doneLessons = $lessons->findBy(['id' => array_keys($doneLessonArr)]);
+            foreach ($doneLessons as $doneLesson) {
+                if (in_array($doneLesson->getId(), array_keys($doneLessonArr))) {
+                    $doneLesson->setTimesHasDone($doneLessonArr[$doneLesson->getId()]);
+                }
+            }
+            $savedLessonArr = $user->getSavedLessons() ?: array();
+            $savedLessons = $lessons->findBy(['id' => array_keys($savedLessonArr)]);
+
+            $data['doneLessonIds'] = array_keys($doneLessonArr);
+            $data['doneLessons'] = $doneLessons;
+
+            $data['savedLessonIds'] = array_keys($user->getSavedLessons());
+            $data['savedLessons'] = $savedLessons;
+        }
+
+        return $this->render('lesson/list.html.twig', $data);
     }
 
     /**
