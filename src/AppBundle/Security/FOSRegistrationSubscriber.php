@@ -9,15 +9,33 @@
 namespace AppBundle\Security;
 
 
+use FOS\UserBundle\Event\FilterUserResponseEvent;
 use FOS\UserBundle\Event\FormEvent;
 use FOS\UserBundle\FOSUserEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 class FOSRegistrationSubscriber implements EventSubscriberInterface
 {
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+    /**
+     * @var FlashBagInterface
+     */
+    private $flashBag;
+
+    public function __construct(RouterInterface $router, FlashBagInterface $flashBag)
+    {
+        $this->router = $router;
+        $this->flashBag = $flashBag;
+    }
+
     public function onRegistrationFailure(FormEvent $event)
     {
         // if it's not an ajax call, let the fos bundle handle its work
@@ -61,11 +79,12 @@ class FOSRegistrationSubscriber implements EventSubscriberInterface
 
     public function onRegistrationSuccess(FormEvent $event)
     {
-        if (!$event->getRequest()->isXmlHttpRequest()) {
-            return;
+        if ($event->getRequest()->isXmlHttpRequest()) {
+            $response = new JsonResponse("success");
+        } else {
+            $url = $this->router->generate('lessons_list');
+            $response = new RedirectResponse($url);
         }
-
-        $response = new JsonResponse("success");
 
         $event->setResponse($response);
     }
