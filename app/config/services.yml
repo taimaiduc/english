@@ -18,3 +18,7 @@ services:
         arguments: ['@router', '@session.flash_bag']
         tags:
             - { name: kernel.event_subscriber }
+
+    logout_listener:
+        class: AppBundle\Security\LogoutListener
+        autowire: ['@router']
