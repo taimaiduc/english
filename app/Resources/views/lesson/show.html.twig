@@ -40,7 +40,7 @@
                     <button class="btn btn-default js-btn-play" onclick="toggleAudio({{ index }})" type="button">
                         <i class="glyphicon glyphicon-volume-up"></i>
                     </button>
-                    <audio class="hidden" id="audio{{ index }}">
+                    <audio class="hidden" id="audio{{ index }}" preload="none">
                         {% set audioIndex = index+1 %}
                         <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~audioIndex~'.mp3') }}">
                     </audio>
@@ -124,25 +124,32 @@
 
     <script>
         function updateUserStats() {
-            $.ajax({
+            return $.ajax({
                 url: '{{ path('user_update_progress') }}',
                 method: 'post',
                 data: JSON.stringify(getUserAnswersData())
-            }).then(function (data) {
-                if (isLessonDone()) {
-                    removeSaveProgressButton();
-                }
+            })
+                .then(function (data) {
+                    if (isLessonDone()) {
+                        removeSaveProgressButton();
+                    }
 
-                swal({
-                    type: 'success',
-                    showCloseButton: true,
-                    showConfirmButton: false,
-                    html: getAlertContent(),
+                    swal({
+                        type: 'success',
+                        showCloseButton: true,
+                        showConfirmButton: false,
+                        html: getAlertContent(),
+                    })
+                        .catch( function () {
+                            renderTodayProgress(data.todayProgress.point, data.todayProgress.percentage);
+                        });
+            })
+                .catch(function (error) {
+                    if (error.status === 403) {
+                        showLoginForm();
+                    }
                 })
-                    .catch( function () {
-                        renderTodayProgress(data.todayProgress.point, data.todayProgress.percentage);
-                    });
-            });
+            ;
         }
 
         function getLessonId() {
@@ -261,14 +268,8 @@
 
                 {# try to update user's stats if all the sentences are done #}
                 if (isLessonDone()) {
-                    isUserLoggedIn()
-                        .then(function () {
-                            updateUserStats();
-                        })
-                        .catch(function () {
-                            getSaveProgressButton().html('<i class="glyphicon glyphicon-check"></i> Lưu kết quả')
-                        })
-                    ;
+                    updateUserStats();
+                    getSaveProgressButton().html('<i class="glyphicon glyphicon-check"></i> Lưu kết quả');
                 }
             }
         }
@@ -351,11 +352,6 @@
         }
 
         function isUserLoggedIn() {
-            if (readCookie('logged_in')) {
-                return new Promise((resolve, reject) => {
-                    resolve();
-                });
-            }
             return $.ajax({
                 url: "{{ path("user_show") }}"
             });
@@ -493,27 +489,6 @@
                 method: 'post'
             });
         }
-
-        function createCookie(name,value,days) {
-            var expires = "";
-            if (days) {
-                var date = new Date();
-                date.setTime(date.getTime() + (days*24*60*60*1000));
-                expires = "; expires=" + date.toUTCString();
-            }
-            document.cookie = name + "=" + value + expires + "; path=/";
-        }
-
-        function readCookie(name) {
-            var nameEQ = name + "=";
-            var ca = document.cookie.split(';');
-            for(var i=0;i < ca.length;i++) {
-                var c = ca[i];
-                while (c.charAt(0)==' ') c = c.substring(1,c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-            }
-            return null;
-        }
     </script>
 
     <script>
@@ -527,13 +502,7 @@
             $('#js-update-users-stats').on('click', function () {
                 spinButton($(this));
 
-                isUserLoggedIn()
-                    .then(function () {
-                        updateUserStats();
-                    })
-                    .catch(function () {
-                        showLoginForm();
-                    });
+                updateUserStats();
             });
 
             renderTodayProgress();

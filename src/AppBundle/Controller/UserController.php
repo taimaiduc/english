@@ -59,7 +59,8 @@ class UserController extends BaseController
         }
 
         if (!$user = $this->getUser()) {
-            throw new AccessDeniedException();
+            throw new HttpException(403, 'Access Denied');
+            // throw new AccessDeniedException();
         }
 
         $requestData = json_decode($request->getContent(), true);
@@ -135,9 +136,9 @@ class UserController extends BaseController
 
         if ($isLessonDone) {
             $user->addDoneLesson($lessonId);
-        } else {
-            $user->setSavedLessons($savedLessons);
         }
+
+        $user->setSavedLessons($savedLessons);
         $user->setLastActiveTime($timeNow);
         $user->setProgress($progress);
         $em->persist($user);
@@ -185,15 +186,17 @@ class UserController extends BaseController
      * @param integer $wordCount
      * @return integer validatedWordCount;
      */
-    private function validateWordCount(\DateTime $lastActiveTime = null, \DateTime $timeNow, $wordCount)
+    private function validateWordCount(\DateTime $lastActiveTime, \DateTime $timeNow, $wordCount)
     {
-        if (!$wordCount || !$lastActiveTime) {
+        if ($wordCount === 0) {
             return 0;
         }
 
-        // if a user types faster than 1 word/second, he's probably cheating
-        $seconds = $timeNow->getTimestamp() - $lastActiveTime->getTimestamp();
+        return $wordCount;
 
-        return $seconds/$wordCount > 1 ? $wordCount : 0;
+        // if a user types faster than 1 word/second, he's probably cheating
+        // $seconds = $timeNow->getTimestamp() - $lastActiveTime->getTimestamp();
+
+        // return $seconds/$wordCount > 1 ? $wordCount : 0;
     }
 }
