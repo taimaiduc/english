@@ -18,9 +18,9 @@
 <div class="row">
     <div class="col-xs-12">
         <div
-                id="progress-wrapper"
-                data-progress-point="{{ progressPoint }}"
-                data-progress-percentage="{{ progressPercentage }}"
+            id="progress-wrapper"
+            data-progress-point="{{ progressPoint }}"
+            data-progress-percentage="{{ progressPercentage }}"
         ></div>
     </div>
 </div>
@@ -222,8 +222,7 @@
         }
 
         function toggleAuthForms($form) {
-            let $authFormWrapper = $('#authModal');
-            $authFormWrapper.find('.modal-body').addClass('hidden');
+            $('#authModal').find('.modal-body').addClass('hidden');
 
             $form.removeClass('hidden');
         }
@@ -364,8 +363,8 @@
                 if (indexes.includes(i)) {
                     $('#input'+i).val($('#answer'+i).html());
                     $('#btn-check'+i).click();
-                } else if (!firstUndoneSentenceIndex && !indexes.includes(i)) {
-
+                }
+                else if (!firstUndoneSentenceIndex && !indexes.includes(i)) {
                     firstUndoneSentenceIndex = i;
                     $('#input'+firstUndoneSentenceIndex).focus();
                 }

@@ -4,3 +4,6 @@ app:
 
 fos_user:
     resource: "@FOSUserBundle/Resources/config/routing/all.xml"
+
+static_pages:
+    resource: 'routing_static_pages.yml'
