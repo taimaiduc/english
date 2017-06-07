@@ -259,10 +259,10 @@
             // if user's answer is not correct
             if (resultContent.indexOf('text-danger') !== -1) {
                 $btnCheck.html('<b class="glyphicon glyphicon-remove text-danger"></b>');
-                $resultElement.html(resultContent);
+                $resultElement.show().html(resultContent);
             } else {
                 $btnCheck.html('<b class="glyphicon glyphicon-ok text-success"></b>');
-                $resultElement.html('');
+                $resultElement.remove();
                 $inputElement.val($answerElement.html()).addClass('done');
 
                 {# try to update user's stats if all the sentences are done #}
@@ -293,10 +293,16 @@
 
         function handleInputOnKeyDown(index, event) {
 
+            if (event.ctrlKey) {
+                {# Ctrl + Space = toggleAudio() #}
+                if (event.keyCode === 32) {
+                    toggleAudio(index);
+                }
 
-            {# Ctrl + Space = toggleAudio() #}
-            if (event.ctrlKey && event.keyCode === 32) {
-                toggleAudio(index);
+                {# Ctrl + Enter = Hide result #}
+                if (event.keyCode === 10 || event.keyCode === 13) {
+                    document.getElementById('result'+index).style.display = 'none';
+                }
             }
 
             {# Enter = Compare input & answer #}
@@ -304,12 +310,7 @@
                 checkAnswer(index);
             }
 
-            {# Ctrl + Enter = Hide result #}
-            else if (event.ctrlKey && event.keyCode === 13) {
-                document.getElementById('result'+index).style.display = 'none';
-            }
-
-           {# Tab or Down arrow key = next sentence || Up arrow key = previous sentence #}
+            {# Tab or Down arrow key = next sentence || Up arrow key = previous sentence #}
             else if (event.keyCode === 9 || event.keyCode === 40 || event.keyCode === 38) {
                 event.preventDefault();
                 let inputs = document.querySelectorAll('[tabindex]');
@@ -492,6 +493,9 @@
 
     <script>
         $(document).ready(function(){
+            renderTodayProgress();
+            setDoneSentences(getSavedSentenceIndexes());
+
             $("body").animate({scrollTop: 0}, 100);
 
             $(".input").focus(function(){
@@ -504,9 +508,7 @@
                 updateUserStats();
             });
 
-            renderTodayProgress();
 
-            setDoneSentences(getSavedSentenceIndexes());
 
 //            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21]);
 
