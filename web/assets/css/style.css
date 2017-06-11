@@ -1,6 +1,5 @@
-html {
-    overflow: -moz-scrollbars-vertical;
-    overflow-y: scroll;
+body > .container {
+    margin-top: 70px;
 }
 
 .result {
@@ -36,6 +35,10 @@ html {
     margin-right: 15px;
 }
 
+.lesson-name {
+    margin-top: 0;
+}
+
 .lessons-wrapper {
     max-height: 358px;
     overflow: hidden;
@@ -48,6 +51,30 @@ html {
     position:relative;
     white-space: nowrap;
     -webkit-mask-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 1) 80%, rgba(0, 0, 0, 0) 100%);
+}
+
+.form-group a:hover {
+    text-decoration: none;
+}
+
+.sentences-wrapper {
+    padding: 20px 10px 15px 20px;
+    max-height: 410px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.sentences-wrapper span.text-danger {
+    color: red;
+}
+
+.shortcut-help {
+    position: absolute;
+    top: -20px;
+    right: 25px;
+}
+.shortcut-help:hover {
+    cursor: pointer;
 }
 
 .text-bold {
@@ -67,26 +94,20 @@ html {
     transform-origin: 48% 50%;
 }
 
-.affix-top {
+.btn {
+    white-space: normal;
 }
 
-.affix {
-    position: fixed;
-    top: 0;
-    padding-top: 20px;
-    background: #fff;
-    z-index: 10;
-    width: 20.5%;
+@media(min-width: 768px) {
 }
 
-.sticky-sidebar-wrapper {
-    min-height: 100px;
-}
+@media(max-width: 768px) {
+    .lesson-wrapper .col-sm-3 {
+        padding-left: 0;
+    }
 
-@media(max-width:991px){
-    .affix {
-        position: static;
-        width: auto;
+    .lesson-wrapper .col-sm-9 {
+        padding-right: 0;
     }
 }
 

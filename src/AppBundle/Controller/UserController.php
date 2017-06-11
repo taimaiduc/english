@@ -82,7 +82,7 @@ class UserController extends BaseController
 
         $this->updateUserStats($em, $user, $lesson, $isLessonDone, $doneSentences);
 
-//        $leaderBoard = $em->getRepository('AppBundle:Ranking')->findAll()[0];
+//        $leaderBoard = $em->getRepository('AppBundle:Leader')->findAll()[0];
 //        $this->updateLeaderBoard($userCurrentProgress, $leaderBoard);
 
         $data = array(
@@ -137,10 +137,10 @@ class UserController extends BaseController
         if ($isLessonDone) {
             $user->addDoneLesson($lessonId);
         }
-
         $user->setSavedLessons($savedLessons);
         $user->setLastActiveTime($timeNow);
         $user->setProgress($progress);
+        $user->addTotalPoint($totalWords);
         $em->persist($user);
         $em->flush();
     }

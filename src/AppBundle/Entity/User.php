@@ -6,7 +6,7 @@ use FOS\UserBundle\Model\User as BaseUser;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @ORM\Table(name="fos_user")
  */
 class User extends BaseUser
@@ -43,13 +43,18 @@ class User extends BaseUser
      */
     private $progress;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $totalPoint = 0;
+
     public function __construct()
     {
         $this->firstActiveDate = new \DateTime();
         $this->lastActiveTime = new \DateTime('-1 hour');
         $this->savedLessons = '[]';
         $this->doneLessons = '[]';
-        $this->progress = '[0]';
+        $this->progress = '[]';
 
         parent::__construct();
     }
@@ -149,7 +154,7 @@ class User extends BaseUser
      */
     public function setSavedLessons(array $lessons)
     {
-        if (count($lessons) > 2) {
+        if (count($lessons) > 5) {
             $lessons = array_slice($lessons, -2, null, true);
         }
 
@@ -187,7 +192,7 @@ class User extends BaseUser
         $todayPoint = $progress[max(array_keys($progress))];
 
         $todayProgress['point'] = $todayPoint;
-        $todayProgress['percentage'] = $todayPoint/$highestPoint*100;
+        $todayProgress['percentage'] = round($todayPoint/$highestPoint*100);
 
         return $todayProgress;
     }
@@ -207,10 +212,23 @@ class User extends BaseUser
             $detailedProgress[] = array(
                 'date' => $firstActiveDate->add(new \DateInterval('P'.$dayOffset.'D'))->format('Y-m-d'),
                 'point' => $point,
-                'percentage' => $point/$highestPoint*100
+                'percentage' => round($point/$highestPoint*100)
             );
         }
 
         return $detailedProgress;
+    }
+
+    /**
+     * @param $point
+     */
+    public function addTotalPoint($point)
+    {
+        $this->totalPoint += $point;
+    }
+
+    public function getTotalPoint()
+    {
+        return $this->totalPoint;
     }
 }

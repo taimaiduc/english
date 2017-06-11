@@ -1,0 +1,24 @@
+{% extends 'layout.html.twig' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-4">
+            <table class="table text-center">
+                <thead>
+                    <tr class="text-bold">
+                        <td>Nickname</td>
+                        <td>Điểm</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in leaders %}
+                        <tr>
+                            <td>{{ user.username }}</td>
+                            <td>{{ user.totalPoint }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

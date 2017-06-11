@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
         <div class="row">
             <div class="col-xs-12">
@@ -17,9 +17,9 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li class=""><a href="{{ path('lessons_list') }}">Luyện nghe</a></li>
-                        <li class=""><a href="{{ path('guidance') }}">Hướng dẫn</a></li>
-                        <li class=""><a href="{{ path('speaking') }}">Học nói</a></li>
-                        {#<li class=""><a href="">Xếp hạng</a></li>#}
+                        {#<li class=""><a href="{{ path('guidance') }}">Hướng dẫn</a></li>#}
+                        {#<li class=""><a href="{{ path('speaking') }}">Học nói</a></li>#}
+                        <li class=""><a href="{{ path('leader_list') }}">Xếp hạng</a></li>
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right {% if not app.user %}hidden{% endif %}" id="js-navbar-logged-in">
@@ -34,8 +34,8 @@
                                 Tài khoản <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="">Thống kê</a></li>
-                                <li><a href="">Đổi mật khẩu</a></li>
+                                <li><a href="{{ path('fos_user_profile_show') }}">Thống kê</a></li>
+                                <li><a href="{{ path('fos_user_change_password') }}">Đổi mật khẩu</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{{ path('fos_user_security_logout') }}">Thoát</a></li>
                             </ul>

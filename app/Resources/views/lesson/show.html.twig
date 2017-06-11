@@ -7,14 +7,6 @@
             {{ flash_message }}
         </div>
     {% endfor %}#}
-{% if app.user and app.user.todayProgress.point and app.user.todayProgress.percentage %}
-    {% set progressPoint = app.user.todayProgress.point %}
-    {% set progressPercentage = app.user.todayProgress.percentage %}
-{% else %}
-    {% set progressPoint = 0 %}
-    {% set progressPercentage = 0 %}
-{% endif %}
-
 <div class="row">
     <div class="col-xs-12">
         <div
@@ -23,17 +15,89 @@
             data-progress-percentage="{{ progressPercentage }}"
         ></div>
     </div>
+
+    <div id="authModal" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body hidden" id="js-modal-body-login"></div>
+                <div class="modal-body" id="js-modal-body-register"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-
-{{ breadCrumb.create(category, lesson) }}
-
-<div class="row lesson-wrapper"
+<div class="row"
      id="lesson-wrapper"
      data-lesson-id="{{ lesson.id }}"
      data-update-users-progress-url="{{ path("user_update_progress") }}"
 >
-    <div class="col-md-9">
+
+    <div class="col-sm-4 col-md-3">
+        <div class="well">
+            <div class="row text-center">
+                <div class="col-xs-12">
+                    <div class="form-group">
+                        <h4 class="text-muted lesson-name">{{ lesson.position }}. {{ lesson.name }}</h4>
+                    </div>
+                    <div class="form-group">
+                        <button
+                                id="js-update-users-stats"
+                                class="btn btn-lg btn-block btn-success"
+                                data-target="#authModal"
+                        >
+                            Tạm lưu
+                        </button>
+                    </div>
+                    <div class="form-group row">
+                        {% if lesson.previousLessonPosision and lesson.nextLessonPosition %}
+                            {% set class = 'col-sm-6' %}
+                        {% else %}
+                            {% set class = 'col-sm-12' %}
+                        {% endif %}
+                        {% if lesson.previousLessonPosision %}
+                            <div class="{{ class }} form-group">
+                                <a href="{{ path('lessons_show', {'categorySlug': category.slug, 'position': lesson.previousLessonPosision}) }}" class="text-muted js-previous-lesson-link"><button class="btn btn-block">Bài {{ lesson.previousLessonPosision }}</button></a>
+                            </div>
+                        {% endif %}
+                        {% if lesson.nextLessonPosition %}
+                            <div class="{{ class }} form-group">
+                                <a href="{{ path('lessons_show', {'categorySlug': category.slug, 'position': lesson.nextLessonPosition }) }}" class="text-muted js-next-lesson-link"><button class="btn btn-block">Bài {{ lesson.nextLessonPosition }}</button></a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-group form-group">
+                <input type="text" class="form-control" placeholder="Cambridge Dictionary">
+                <span class="input-group-btn">
+                    <a data-href="http://dictionary.cambridge.org/dictionary/english/" type="submit" class="btn btn-default js-dictionary" target="_blank"><i class="glyphicon glyphicon-search"></i></a>
+                </span>
+            </div>
+
+            <div class="input-group form-group">
+                <input class="form-control" placeholder="Google Translate">
+                <span class="input-group-btn">
+                    <a data-href="https://translate.google.com/#en/vi/" target="_blank" class="btn btn-default js-dictionary"><i class="glyphicon glyphicon-search"></i></a>
+                </span>
+            </div>
+
+            <div class="input-group form-group">
+                <input class="form-control" placeholder="Google Image">
+                <span class="input-group-btn">
+                    <a data-href="https://www.google.com/search?tbm=isch&q=" target="_blank" class="btn btn-default js-dictionary"><i class="glyphicon glyphicon-search"></i></a>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-8 col-md-9">
+        <p class="shortcut-help text-muted" data-toggle="modal" data-target="#shortcutModal">Phím tắt <i class="glyphicon glyphicon-question-sign"></i></p>
+
+        <div class="well sentences-wrapper">
+
         {% for index, sentence in lesson.sentences %}
             <div class="row">
                 <div class="col-xs-2 col-sm-1 col-md-1">
@@ -53,7 +117,8 @@
                                 id="input{{ index }}"
                                 placeholder="{{ audioIndex }}."
                                 onkeydown="handleInputOnKeyDown({{ index }}, event)"
-                                tabindex="{{ index }}"
+                                tabindex="{{ audioIndex }}"
+                                data-sentence-index="{{ index }}"
                         >
                         {% set engViet = sentence|split('|') %}
                         <p class="text-left hidden" id="answer{{ index }}">{{ engViet[0] }}</p>
@@ -68,52 +133,53 @@
                 </div>
             </div>
         {% endfor %}
-    </div>
-
-    <div class="col-md-3">
-        <div class="sticky-sidebar-wrapper">
-            <div class="row" data-spy="affix" data-offset-top="105">
-                <div class="col-xs-12 form-group">
-                    <button
-                            id="js-update-users-stats"
-                            class="btn btn-lg btn-success btn-block"
-                            data-target="#authModal"
-                    >
-                        <i class="glyphicon glyphicon-ok glyphicon-paperclip"></i>
-                        Tạm lưu làm sau
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        {{ breadCrumb.create(category, lesson, 'hidden-md hidden-lg') }}
-
-        <div class="row">
-            <div class="col-xs-12">
-                <h4>Helpful links</h4>
-                <ul>
-                    <li><a href="#">Hoc tieng anh</a></li>
-                    <li><a href="#">Hoc tieng anh</a></li>
-                    <li><a href="#">Hoc tieng anh</a></li>
-                    <li><a href="#">Hoc tieng anh</a></li>
-                    <li><a href="#">Hoc tieng anh</a></li>
-                </ul>
-            </div>
         </div>
     </div>
+
 </div>
-
-{{ breadCrumb.create(category, lesson, 'hidden-sm hidden-xs') }}
-
-<div id="authModal" class="modal fade" role="dialog">
+<div id="shortcutModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
+        <!-- Modal content-->
         <div class="modal-content">
-            <div class="modal-body hidden" id="js-modal-body-login"></div>
-            <div class="modal-body" id="js-modal-body-register"></div>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title">Phím tắt khi học <small>(click chuột vào ô nhập câu trả lời trước)</small></h3>
+            </div>
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Phím</th>
+                        <th>Chức năng</th>
+                    </tr>
+                    </thead>
+                    <tr>
+                        <td><b>Ctrl + space: </b></td>
+                        <td>Nghe</td>
+                    </tr>
+                    <tr>
+                        <td><b>Enter: </b></td>
+                        <td>Kiểm tra đáp án</td>
+                    </tr>
+                    <tr>
+                        <td><b>Ctrl + enter: </b></td>
+                        <td>Ẩn câu trả lời</td>
+                    </tr>
+                    <tr>
+                        <td><b>Tab hoặc mũi tên xuống: </b></td>
+                        <td>Qua câu tiếp theo</td>
+                    </tr>
+                    <tr>
+                        <td><b>Phím mũi tên lên: </b></td>
+                        <td>Quay lại câu trước</td>
+                    </tr>
+                </table>
+            </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
             </div>
         </div>
+
     </div>
 </div>
 {% endblock %}
@@ -134,16 +200,16 @@
                         removeSaveProgressButton();
                     }
 
+                    $('input.done:not(.saved)').addClass('saved');
+                    renderTodayProgress(data.todayProgress.point, data.todayProgress.percentage);
+
                     swal({
                         type: 'success',
                         showCloseButton: true,
                         showConfirmButton: false,
                         html: getAlertContent(),
-                    })
-                        .catch( function () {
-                            renderTodayProgress(data.todayProgress.point, data.todayProgress.percentage);
-                        });
-            })
+                    });
+                })
                 .catch(function (error) {
                     if (error.status === 403) {
                         showLoginForm();
@@ -176,7 +242,7 @@
             let sentences = [];
 
             $('.done').each(function () {
-                sentences.push($(this).attr('tabindex'));
+                sentences.push(parseInt($(this).attr('data-sentence-index')));
             });
 
             return sentences;
@@ -239,7 +305,12 @@
                 }
             }
 
-            currentAudio.paused ? currentAudio.play() : currentAudio.pause();
+            if (currentAudio.paused) {
+                currentAudio.play();
+            } else {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
         }
 
         function checkAnswer(index) {
@@ -260,10 +331,11 @@
             if (resultContent.indexOf('text-danger') !== -1) {
                 $btnCheck.html('<b class="glyphicon glyphicon-remove text-danger"></b>');
                 $resultElement.show().html(resultContent);
+                $inputElement.css('border-color', 'red');
             } else {
                 $btnCheck.html('<b class="glyphicon glyphicon-ok text-success"></b>');
                 $resultElement.remove();
-                $inputElement.val($answerElement.html()).addClass('done');
+                $inputElement.val($answerElement.html()).addClass('done').css('border-color', '');
 
                 {# try to update user's stats if all the sentences are done #}
                 if (isLessonDone()) {
@@ -310,15 +382,15 @@
                 checkAnswer(index);
             }
 
-            {# Tab or Down arrow key = next sentence || Up arrow key = previous sentence #}
-            else if (event.keyCode === 9 || event.keyCode === 40 || event.keyCode === 38) {
+            {# Up arrow key = previous sentence #}
+            else if (event.keyCode === 40 || event.keyCode === 38) {
                 event.preventDefault();
                 let inputs = document.querySelectorAll('[tabindex]');
                 let currentInputIndex = document.activeElement.getAttribute('tabindex');
 
-                {# Down arrow key || Tab = focus next input #}
-                if (event.keyCode === 40 || event.keyCode === 9) {
-                    let nextInputIndex = parseInt(currentInputIndex) + 1;
+                {# Down arrow key #}
+                if (event.keyCode === 40) {
+                    let nextInputIndex = parseInt(currentInputIndex);
                     let nextInput = inputs[nextInputIndex] ;
                     if(nextInput !== undefined) {
                         nextInput.focus();
@@ -327,7 +399,7 @@
 
                 {# Up arrow key = focus previous input #}
                 else {
-                    let previousInputIndex = parseInt(currentInputIndex) - 1;
+                    let previousInputIndex = parseInt(currentInputIndex) - 2;
                     let previousInput = inputs[previousInputIndex];
                     if (previousInput !== undefined) {
                         previousInput.focus();
@@ -411,7 +483,7 @@
             let indexes = [];
 
             $('input.saved').each(function () {
-                indexes.push(parseInt($(this).attr('tabindex')));
+                indexes.push(parseInt($(this).attr('data-sentence-index')));
             });
 
             return indexes;
@@ -463,6 +535,7 @@
             }
 
             let nextLinkHref = $('.js-next-lesson-link').attr('href');
+            console.log(nextLinkHref);
             if (nextLinkHref) {
                 nextLessonLink = `<a href="${nextLinkHref}" class="btn btn-link btn-block btn-lg">Bài tiếp theo</a>`;
             }
@@ -496,10 +569,8 @@
             renderTodayProgress();
             setDoneSentences(getSavedSentenceIndexes());
 
-            $("body").animate({scrollTop: 0}, 100);
+            $('.input').focus(function(){
 
-            $(".input").focus(function(){
-                $("body").animate({scrollTop: $(this).offset().top - 100}, 200);
             });
 
             $('#js-update-users-stats').on('click', function () {
@@ -507,8 +578,6 @@
 
                 updateUserStats();
             });
-
-
 
 //            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21]);
 
@@ -538,6 +607,18 @@
             $authModal.on('click', '#js-btn-show-login-form', function (e) {
                 e.preventDefault();
                 showLoginForm();
+            });
+
+            $('.js-dictionary').on('click', function () {
+                let self = $(this);
+                let href = self.attr('data-href') + self.closest('.input-group').find('input').val();
+                self.attr('href', href);
+            });
+
+            $(window).bind('beforeunload', function(){
+                if ($('.done:not(.saved)').length > 0) {
+                    return false;
+                }
             });
         });
     </script>

@@ -24,8 +24,6 @@ class LessonController extends BaseController
             'categories' => $categories
         );
 
-        $cond = array(11, 12);
-
         /** @var User $user */
         $user = $this->getUser();
         if ($user) {
@@ -78,7 +76,9 @@ class LessonController extends BaseController
         $data = array(
             'category' => $category,
             'lesson' => $lesson,
-            'savedSentences' => array()
+            'savedSentences' => array(),
+            'progressPoint' => 0,
+            'progressPercentage' => 0
         );
 
         /** @var User $user */
@@ -89,6 +89,10 @@ class LessonController extends BaseController
             if (isset($savedLessons[$lesson->getId()])) {
                 $data['savedSentences'] = $savedLessons[$lesson->getId()];
             }
+
+            $progress = $user->getTodayProgress();
+            $data['progressPoint'] = $progress['point'];
+            $data['progressPercentage'] = $progress['percentage'];
         }
 
         return $this->render('lesson/show.html.twig', $data);

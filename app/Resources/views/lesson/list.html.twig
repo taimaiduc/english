@@ -3,34 +3,37 @@
 {% block content %}
     <div class="row">
         {% if app.user %}
-            {% if savedLessons|length > 0 or doneLessons|length > 0 %}
-            <div class="col-sm-4 col-md-3">
-                <div class="category-wrapper">
-                    <h3 class="category-name">Bài đã lưu<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
-                    <div class="lessons-wrapper">
-                        {% for lesson in savedLessons %}
-                            <p>
-                                <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">
-                                    {{ lesson.name }}
-                                </a>
-                            </p>
-                        {% endfor %}
-                    </div>
-                </div>
+            {% if savedLessons or doneLessons %}
+                <div class="col-sm-4 col-md-3">
+                    {% if savedLessons %}
+                        <div class="category-wrapper">
+                            <h3 class="category-name">Bài đã lưu<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
+                            <div class="lessons-wrapper">
+                                {% for lesson in savedLessons %}
+                                    <p>
+                                        <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">
+                                            {{ lesson.name }}
+                                        </a>
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
 
-                <div class="category-wrapper">
-                    <h3 class="category-name">Bài đã làm<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
-                    <div class="lessons-wrapper">
-                        {% for lesson in doneLessons|reverse %}
-                            <p>
-                                <span>{{ lesson.timesHasDone }} -- </span>
-                                <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">{{ lesson.name }}</a>
-                            </p>
-                        {% endfor %}
-                    </div>
+                    {% if doneLessons %}
+                        <div class="category-wrapper">
+                            <h3 class="category-name">Bài đã làm<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
+                            <div class="lessons-wrapper">
+                                {% for lesson in doneLessons|reverse %}
+                                    <p>
+                                        <span>{{ lesson.timesHasDone }} -- </span>
+                                        <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">{{ lesson.name }}</a>
+                                    </p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
-            </div>
-
             {{ '<div class="col-sm-8 col-md-9">' }}
             {% endif %}
         {% else %}

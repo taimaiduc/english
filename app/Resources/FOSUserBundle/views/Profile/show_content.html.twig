@@ -1,12 +1,35 @@
 {% trans_default_domain 'FOSUserBundle' %}
 
-{% for flash_message in app.session.flashBag.get('success') %}
-    <div class="alert alert-success">
-        {{ flash_message }}
+<div class="row text-center">
+    {% if user.progressWithDetails %}
+    <div class="col-xs-12">
+        <h3>Thống kê</h3>
     </div>
-{% endfor %}
-
-<div class="fos_user_user_show">
-    <p>{{ 'profile.show.username'|trans }}: {{ user.username }}</p>
-    <p>{{ 'profile.show.email'|trans }}: {{ user.email }}</p>
+    <table class="table">
+        <thead>
+            <tr class="row text-bold">
+                <td class="col-sm-2 col-xs-3">Ngày</td>
+                <td class="col-sm-1 col-xs-2">Điểm</td>
+                <td class="col-sm-9 col-xs-6">%</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for progress in user.progressWithDetails|reverse %}
+                <tr class="row">
+                    <td class="col-sm-2">{{ progress.date }}</td>
+                    <td class="col-sm-1">{{ progress.point }}</td>
+                    <td class="col-sm-9">
+                        <div class="progress">
+                            <div class="progress-bar  progress-bar-striped {% if loop.index == 1 %}active{% else %}progress-bar-success{% endif %}" role="progressbar" aria-valuenow="{{ progress.percentage }}" aria-valuemin="0" aria-valuemax="100" style="width:{{ progress.percentage }}%">
+                                {{ progress.percentage }}%
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <h4>Bạn chưa học bài nào!</h4>
+    {% endif %}
 </div>
