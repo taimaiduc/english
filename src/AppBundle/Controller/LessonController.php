@@ -21,7 +21,11 @@ class LessonController extends BaseController
             ->findAll();
 
         $data = array(
-            'categories' => $categories
+            'categories' => $categories,
+            'doneLessons' => array(),
+            'doneLessonIds' => array(),
+            'savedLessons' => array(),
+            'savedLessonIds' => array()
         );
 
         /** @var User $user */

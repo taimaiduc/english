@@ -2,44 +2,42 @@
 
 {% block content %}
     <div class="row">
-        {% if app.user %}
-            {% if savedLessons or doneLessons %}
-                <div class="col-sm-4 col-md-3">
-                    {% if savedLessons %}
-                        <div class="category-wrapper">
-                            <h3 class="category-name">Bài đã lưu<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
-                            <div class="lessons-wrapper">
-                                {% for lesson in savedLessons %}
-                                    <p>
-                                        <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">
-                                            {{ lesson.name }}
-                                        </a>
-                                    </p>
-                                {% endfor %}
-                            </div>
+        {% if savedLessons or doneLessons %}
+            <div class="col-sm-4 col-md-3">
+                {% if savedLessons %}
+                    <div class="category-wrapper">
+                        <h3 class="category-name">Bài đã lưu<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
+                        <div class="lessons-wrapper">
+                            {% for lesson in savedLessons %}
+                                <p>
+                                    <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">
+                                        {{ lesson.name }}
+                                    </a>
+                                </p>
+                            {% endfor %}
                         </div>
-                    {% endif %}
+                    </div>
+                {% endif %}
 
-                    {% if doneLessons %}
-                        <div class="category-wrapper">
-                            <h3 class="category-name">Bài đã làm<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
-                            <div class="lessons-wrapper">
-                                {% for lesson in doneLessons|reverse %}
-                                    <p>
-                                        <span>{{ lesson.timesHasDone }} -- </span>
-                                        <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">{{ lesson.name }}</a>
-                                    </p>
-                                {% endfor %}
-                            </div>
+                {% if doneLessons %}
+                    <div class="category-wrapper">
+                        <h3 class="category-name">Bài đã làm<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
+                        <div class="lessons-wrapper">
+                            {% for lesson in doneLessons|reverse %}
+                                <p>
+                                    <span>{{ lesson.timesHasDone }} -- </span>
+                                    <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">{{ lesson.name }}</a>
+                                </p>
+                            {% endfor %}
                         </div>
-                    {% endif %}
-                </div>
-            {{ '<div class="col-sm-8 col-md-9">' }}
-            {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-sm-8 col-md-9">
         {% else %}
             <div class="col-xs-12">
         {% endif %}
-
+        
             <div class="row">
                 {% for category in categories %}
                     <div class="category-wrapper">
@@ -52,12 +50,10 @@
                                 <div class="col-sm-4 {% if loop.index > 3 %}hidden{% else %}shown{% endif %}  page-{{ (loop.index/3)|round(0, 'ceil') }}">
                                     {% for lesson in lessons %}
                                         {% set fontWeight = "" %}
-                                        {% if app.user %}
-                                            {% if lesson.id in savedLessonIds %}
-                                                {% set fontWeight = 'text-bold' %}
-                                            {% elseif lesson.id in doneLessonIds %}
-                                                {% set fontWeight = 'text-muted' %}
-                                            {% endif %}
+                                        {% if lesson.id in savedLessonIds %}
+                                            {% set fontWeight = 'text-bold' %}
+                                        {% elseif lesson.id in doneLessonIds %}
+                                            {% set fontWeight = 'text-muted' %}
                                         {% endif %}
                                         <p>
                                         <a

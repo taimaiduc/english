@@ -64,6 +64,31 @@ body > .container {
     overflow-x: hidden;
 }
 
+.sentences-wrapper > div {
+    clear: both;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.sentences-wrapper button{
+    float: left;
+    width: 40px;
+    height: 35px;
+    padding: 5px;
+}
+
+.sentences-wrapper .input-answer-wrapper{
+    float: left;
+    display: inline-block;
+    margin: 0 10px;
+    width: calc(100% - 100px);
+
+}
+
+.sentences-wrapper .result {
+    margin-bottom: 0;
+}
+
 .sentences-wrapper span.text-danger {
     color: red;
 }

@@ -99,38 +99,32 @@
         <div class="well sentences-wrapper">
 
         {% for index, sentence in lesson.sentences %}
-            <div class="row">
-                <div class="col-xs-2 col-sm-1 col-md-1">
-                    <button class="btn btn-default js-btn-play" onclick="toggleAudio({{ index }})" type="button">
-                        <i class="glyphicon glyphicon-volume-up"></i>
-                    </button>
-                    <audio class="hidden" id="audio{{ index }}" preload="none">
+            <div>
+                <button class="btn btn-default js-btn-play" onclick="toggleAudio({{ index }})" type="button">
+                    <i class="glyphicon glyphicon-volume-up"></i>
+                    <audio class="hidden" id="audio{{ index }}">
                         {% set audioIndex = index+1 %}
                         <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~audioIndex~'.mp3') }}">
                     </audio>
+                </button>
+
+                <div class="input-answer-wrapper">
+                    <input
+                            class="form-control input{% if index in savedSentences %} saved{% endif %}"
+                            id="input{{ index }}"
+                            placeholder="{{ audioIndex }}."
+                            onkeydown="handleInputOnKeyDown({{ index }}, event)"
+                            tabindex="{{ audioIndex }}"
+                            data-sentence-index="{{ index }}"
+                    >
+                    {% set engViet = sentence|split('|') %}
+                    <p class="text-left hidden" id="answer{{ index }}">{{ engViet[0] }}</p>
+                    <p class="text-left result" id="result{{ index }}"></p>
                 </div>
 
-                <div class="col-xs-7 col-sm-9 col-md-10">
-                    <div class="form-group">
-                        <input
-                                class="form-control input{% if index in savedSentences %} saved{% endif %}"
-                                id="input{{ index }}"
-                                placeholder="{{ audioIndex }}."
-                                onkeydown="handleInputOnKeyDown({{ index }}, event)"
-                                tabindex="{{ audioIndex }}"
-                                data-sentence-index="{{ index }}"
-                        >
-                        {% set engViet = sentence|split('|') %}
-                        <p class="text-left hidden" id="answer{{ index }}">{{ engViet[0] }}</p>
-                        <p class="text-left result" id="result{{ index }}"></p>
-                    </div>
-                </div>
-
-                <div class="col-xs-2 col-sm-1 col-md-1">
-                    <button class="btn btn-default" id="btn-check{{ index }}" onclick="checkAnswer({{ index }})" type="button">
-                        <i class="glyphicon glyphicon-question-sign text-mute"></i>
-                    </button>
-                </div>
+                <button class="btn btn-default" id="btn-check{{ index }}" onclick="checkAnswer({{ index }})" type="button">
+                    <i class="glyphicon glyphicon-question-sign text-mute"></i>
+                </button>
             </div>
         {% endfor %}
         </div>
@@ -339,8 +333,10 @@
 
                 {# try to update user's stats if all the sentences are done #}
                 if (isLessonDone()) {
+                    $saveProgressButton = getSaveProgressButton();
+                    $saveProgressButton.html('<i class="glyphicon glyphicon-check"></i> Lưu kết quả');
+                    spinButton($saveProgressButton);
                     updateUserStats();
-                    getSaveProgressButton().html('<i class="glyphicon glyphicon-check"></i> Lưu kết quả');
                 }
             }
         }
@@ -460,7 +456,6 @@
             $button.css('pointer-events', 'none');
             $oldHtml = $button.html();
 
-
             let spinClass = 'glyphicon glyphicon-refresh glyphicon-spin';
 
             if (!text) {
@@ -569,8 +564,16 @@
             renderTodayProgress();
             setDoneSentences(getSavedSentenceIndexes());
 
-            $('.input').focus(function(){
-
+            $('.input').focus(function(e){
+                const $self = $(this);
+                const $parent = $self.closest('.sentences-wrapper');
+                const distance = $self.position().top;
+                const scrollTop = $parent.scrollTop();
+                if (distance > 340) {
+                    $parent.animate({
+                        scrollTop: scrollTop + 300
+                    }, 200);
+                }
             });
 
             $('#js-update-users-stats').on('click', function () {
@@ -579,7 +582,7 @@
                 updateUserStats();
             });
 
-//            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21]);
+            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21]);
 
             let $authModal = getAuthModal();
 
