@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: huynguyen
- * Date: 4/23/17
- * Time: 10:29 AM
- */
 
 namespace AppBundle\Security;
 
