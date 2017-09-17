@@ -85,9 +85,9 @@ class FOSRegistrationSubscriber implements EventSubscriberInterface
 
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             FOSUserEvents::REGISTRATION_FAILURE => 'onRegistrationFailure',
             FOSUserEvents::REGISTRATION_SUCCESS => 'onRegistrationSuccess'
-        );
+        ];
     }
 }

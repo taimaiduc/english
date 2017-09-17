@@ -4,6 +4,8 @@ namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Tools\Pagination\Paginator;
+use Pagerfanta\Pagerfanta;
 
 /**
  * @ORM\Entity
@@ -34,14 +36,19 @@ class Category
     private $lessons;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="smallint")
      */
     private $totalLessons = 0;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="smallint")
      */
     private $position = 0;
+
+    /**
+     * @var Pagerfanta
+     */
+    private $pager;
 
     public function __construct()
     {
@@ -105,9 +112,9 @@ class Category
     }
 
     /**
-     * @param mixed $lessons
+     * @param Lesson[] $lessons
      */
-    public function setLessons($lessons)
+    public function setLessons(array $lessons)
     {
         $this->lessons = $lessons;
     }
@@ -142,6 +149,22 @@ class Category
     public function setPosition($position)
     {
         $this->position = $position;
+    }
+
+    /**
+     * @return Pagerfanta
+     */
+    public function getPager()
+    {
+        return $this->pager;
+    }
+
+    /**
+     * @param Pagerfanta $pager
+     */
+    public function setPager(Pagerfanta $pager)
+    {
+        $this->pager = $pager;
     }
 
     public function __toString()

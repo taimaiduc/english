@@ -1,0 +1,17 @@
+{% set columnPerPage = 3 %}
+{% set perColumn = lessons|length/columnPerPage %}
+{% for lessons in lessons|batch(perColumn) %}
+    <div class="col-sm-4 js-lesson-list" data-category-slug="{{ category.slug }}" data-page="{{ page|default(1) }}">
+        <ul class="list-group">
+        {% for lesson in lessons %}
+            <li class="list-group-item text-left">
+                <span class="label label-info ">{{ lesson.position }}</span>
+                <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">
+                    {{ lesson.name }}
+                </a>
+                <span class="glyphicon glyphicon-star-empty pull-right"></span>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endfor %}

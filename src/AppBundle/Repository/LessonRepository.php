@@ -16,4 +16,11 @@ class LessonRepository extends EntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+    public function findOneByCategoryQueryBuilder(Category $category)
+    {
+        return $this->createQueryBuilder('lesson')
+            ->andWhere('lesson.category = :category')
+            ->setParameter('category', $category)
+        ;
+    }
 }

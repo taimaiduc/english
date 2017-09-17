@@ -10,16 +10,16 @@
                         <span class="icon-bar"></span>
                     </button>
                     <a href="{{ path('lessons_list') }}" class="navbar-brand">
-                        <b>{{ app.request.host|replace({'www.': ''}) }}</b>
+                        <b class=" text-info"><span class="glyphicon glyphicon-education"></span> {{ app.request.host|replace({'www.': ''}) }}</b>
                     </a>
                 </div>
 
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
-                        <li class=""><a href="{{ path('lessons_list') }}">Luyện nghe</a></li>
+                        <li class=""><a href="{{ path('lessons_list') }}"><i class="glyphicon glyphicon-headphones"></i> Luyện nghe</a></li>
                         {#<li class=""><a href="{{ path('guidance') }}">Hướng dẫn</a></li>#}
                         {#<li class=""><a href="{{ path('speaking') }}">Học nói</a></li>#}
-                        <li class=""><a href="{{ path('leader_list') }}">Xếp hạng</a></li>
+                        <li class=""><a href="{{ path('leader_list') }}"><i class="glyphicon glyphicon-th-list"></i> Xếp hạng</a></li>
                     </ul>
 
                     <ul class="nav navbar-nav navbar-right {% if not app.user %}hidden{% endif %}" id="js-navbar-logged-in">
@@ -42,8 +42,8 @@
                         </li>
                     </ul>
                     <ul class="nav navbar-nav navbar-right {% if app.user %}hidden{% endif %}">
-                        <li><a href="{{ path('fos_user_security_login') }}">Đăng nhập</a></li>
-                        <li><a href="{{ path('fos_user_registration_register') }}">Đăng kí</a></li>
+                        <li><a href="{{ path('fos_user_security_login') }}"> <i class="glyphicon glyphicon-log-in"></i> Đăng nhập</a></li>
+                        <li><a href="{{ path('fos_user_registration_register') }}"><i class="glyphicon glyphicon-edit"></i> Đăng kí</a></li>
                     </ul>
                 </div>
             </div>

@@ -3,8 +3,9 @@
 namespace AppBundle\Controller;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
-class LeaderController extends BaseController
+class LeaderController extends Controller
 {
     /**
      * @Route("/leaders", name="leader_list")

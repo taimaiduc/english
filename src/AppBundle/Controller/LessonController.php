@@ -4,7 +4,6 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Lesson;
-use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -20,35 +19,17 @@ class LessonController extends BaseController
         $categories = $this->getDoctrine()->getRepository('AppBundle:Category')
             ->findAll();
 
-        $data = array(
-            'categories' => $categories,
-            'doneLessons' => array(),
-            'doneLessonIds' => array(),
-            'savedLessons' => array(),
-            'savedLessonIds' => array()
-        );
-
-        /** @var User $user */
-        $user = $this->getUser();
-        if ($user) {
-            $lessons = $this->getDoctrine()->getRepository('AppBundle:Lesson');
-
-            $doneLessonArr = $user->getDoneLessons() ?: array();
-            $doneLessons = $lessons->findBy(['id' => array_keys($doneLessonArr)]);
-            foreach ($doneLessons as $doneLesson) {
-                if (in_array($doneLesson->getId(), array_keys($doneLessonArr))) {
-                    $doneLesson->setTimesHasDone($doneLessonArr[$doneLesson->getId()]);
-                }
-            }
-            $savedLessonArr = $user->getSavedLessons() ?: array();
-            $savedLessons = $lessons->findBy(['id' => array_keys($savedLessonArr)]);
-
-            $data['doneLessonIds'] = array_keys($doneLessonArr);
-            $data['doneLessons'] = $doneLessons;
-
-            $data['savedLessonIds'] = array_keys($user->getSavedLessons());
-            $data['savedLessons'] = $savedLessons;
+        foreach ($categories as $category) {
+            $qb = $this->getDoctrine()->getRepository('AppBundle:Lesson')
+                ->findOneByCategoryQueryBuilder($category);
+            $pagerfanta = $this->getPagerfanta($qb, 30);
+            $category->setPager($pagerfanta);
+            $category->setLessons((array) $pagerfanta->getCurrentPageResults());
         }
+
+        $data = [
+            'categories' => $categories,
+        ];
 
         return $this->render('lesson/list.html.twig', $data);
     }
@@ -77,27 +58,13 @@ class LessonController extends BaseController
             throw new NotFoundHttpException();
         }
 
-        $data = array(
+        $data = [
             'category' => $category,
             'lesson' => $lesson,
-            'savedSentences' => array(),
+            'savedSentences' => [],
             'progressPoint' => 0,
             'progressPercentage' => 0
-        );
-
-        /** @var User $user */
-        $user = $this->getUser();
-        if ($user) {
-            $savedLessons = $user->getSavedLessons() ? $user->getSavedLessons() : array();
-
-            if (isset($savedLessons[$lesson->getId()])) {
-                $data['savedSentences'] = $savedLessons[$lesson->getId()];
-            }
-
-            $progress = $user->getTodayProgress();
-            $data['progressPoint'] = $progress['point'];
-            $data['progressPercentage'] = $progress['percentage'];
-        }
+        ];
 
         return $this->render('lesson/show.html.twig', $data);
     }

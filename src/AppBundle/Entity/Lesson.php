@@ -29,47 +29,21 @@ class Lesson
     private $name;
 
     /**
-     * @ORM\Column(type="text")
+     * @ORM\OneToMany(targetEntity="Sentence", mappedBy="lesson")
      */
     private $sentences;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ORM\Column(type="smallint")
      */
     private $position = 0;
 
-    private $timesHasDone;
-
     /**
-     * @return mixed
-     */
-    public function getTimesHasDone()
-    {
-        return $this->timesHasDone;
-    }
-
-    /**
-     * @param mixed $timesHasDone
-     */
-    public function setTimesHasDone($timesHasDone)
-    {
-        $this->timesHasDone = $timesHasDone;
-    }
-
-    /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
         return $this->id;
-    }
-
-    /**
-     * @param mixed $id
-     */
-    public function setId($id)
-    {
-        $this->id = $id;
     }
 
     /**
@@ -83,13 +57,13 @@ class Lesson
     /**
      * @param Category $category
      */
-    public function setCategory($category)
+    public function setCategory(Category $category)
     {
         $this->category = $category;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -97,7 +71,7 @@ class Lesson
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
     public function setName($name)
     {
@@ -105,19 +79,19 @@ class Lesson
     }
 
     /**
-     * @return array
+     * @return Sentence[]
      */
     public function getSentences()
     {
-        return json_decode($this->sentences, true);
+        return $this->sentences;
     }
 
     /**
-     * @param array $sentences
+     * @param Sentence $sentence
      */
-    public function setSentences(array $sentences)
+    public function addSentence(Sentence $sentence)
     {
-        $this->sentences = json_encode($sentences);
+        $this->sentences[] = $sentence;
     }
 
     /**
@@ -134,47 +108,5 @@ class Lesson
     public function setPosition($position)
     {
         $this->position = $position;
-    }
-
-    /**
-     * @param array|null $doneSentences
-     * @return int $totalWords
-     */
-    public function getTotalWords($doneSentences = null)
-    {
-        $totalWords = 0;
-
-        $lessonSentences = $this->getSentences();
-
-        if (is_array($doneSentences)) {
-            foreach ($doneSentences as $index) {
-                $totalWords += count(explode(' ', $lessonSentences[$index]));
-            }
-        }
-        else if ($doneSentences === null){
-            foreach ($lessonSentences as $sentence) {
-                $totalWords += count(explode(' ', $sentence));
-            }
-        }
-
-        return $totalWords;
-    }
-
-    public function getNextLessonPosition()
-    {
-        if ($this->position >= $this->getCategory()->getTotalLessons()) {
-            return null;
-        }
-
-        return $this->position + 1;
-    }
-
-    public function getPreviousLessonPosision()
-    {
-        if ($this->position <= 1) {
-            return null;
-        }
-
-        return $this->position - 1;
     }
 }

@@ -1,120 +1,44 @@
 {% extends 'layout.html.twig' %}
 
 {% block content %}
-    <div class="row">
-        {% if savedLessons or doneLessons %}
-            <div class="col-sm-4 col-md-3">
-                {% if savedLessons %}
-                    <div class="category-wrapper">
-                        <h3 class="category-name">Bài đã lưu<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
-                        <div class="lessons-wrapper">
-                            {% for lesson in savedLessons %}
-                                <p>
-                                    <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">
-                                        {{ lesson.name }}
-                                    </a>
-                                </p>
-                            {% endfor %}
-                        </div>
+<div class="row">
+    <div class=" col-sm-12 col-md-10">
+        <ul class="nav nav-tabs" role="tablist">
+            {% for category in categories if category.lessons|length > 0 %}
+                <li role="presentation" class="{% if loop.index == 1 %}active{% endif %}"><a href="#{{ category.slug }}" aria-controls="{{ category.slug }}" role="tab" data-toggle="tab">{{ category.name }}</a></li>
+            {% endfor %}
+        </ul>
+
+        <div class="tab-content">
+            {% for category in categories %}
+                <div class="row tab-pane {% if loop.index == 1 %}active{% endif %}" id="{{ category.slug }}">
+                    <div class="js-lesson-list-wrapper" data-category-slug="{{ category.slug }}">
+                        {% include 'lesson/_list.html.twig' with {'category': category, 'lessons': category.lessons} %}
                     </div>
-                {% endif %}
 
-                {% if doneLessons %}
-                    <div class="category-wrapper">
-                        <h3 class="category-name">Bài đã làm<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
-                        <div class="lessons-wrapper">
-                            {% for lesson in doneLessons|reverse %}
-                                <p>
-                                    <span>{{ lesson.timesHasDone }} -- </span>
-                                    <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}">{{ lesson.name }}</a>
-                                </p>
+                    <div class="col-xs-12">
+                        <ul class="pagination">
+                            {% for pageNum in 1..category.pager.nbPages %}
+                                <li class="{% if pageNum == category.pager.currentPage %}active{% endif %}">
+                                    <a href="#" class="page" data-category-slug="{{ category.slug }}">{{ pageNum }}</a>
+                                </li>
                             {% endfor %}
-                        </div>
+                        </ul>
                     </div>
-                {% endif %}
-            </div>
-            <div class="col-sm-8 col-md-9">
-        {% else %}
-            <div class="col-xs-12">
-        {% endif %}
-        
-            <div class="row">
-                {% for category in categories %}
-                    <div class="category-wrapper">
-                        {% if category.lessons|length > 0 %}
-                            <h3 class="category-name category-name-mg">{{ category.name }}<small class="glyphicon glyphicon-menu-up toggle-lessons"></small></h3>
-                        {% endif %}
-
-                        <div class="lessons-wrapper">
-                            {% for lessons in category.lessons|batch(10) %}
-                                <div class="col-sm-4 {% if loop.index > 3 %}hidden{% else %}shown{% endif %}  page-{{ (loop.index/3)|round(0, 'ceil') }}">
-                                    {% for lesson in lessons %}
-                                        {% set fontWeight = "" %}
-                                        {% if lesson.id in savedLessonIds %}
-                                            {% set fontWeight = 'text-bold' %}
-                                        {% elseif lesson.id in doneLessonIds %}
-                                            {% set fontWeight = 'text-muted' %}
-                                        {% endif %}
-                                        <p>
-                                        <a
-                                            href="{{ path('lessons_show', {'categorySlug': category.slug ,'position': lesson.position}) }}"
-                                            title="{{ lesson.name }}"
-                                            class="{{ fontWeight }}"
-                                        >
-                                            {{ lesson.position }}. {{ lesson.name }}
-                                        </a>
-                                        </p>
-                                    {% endfor %}
-                                </div>
-                            {% endfor %}
-                        </div>
-
-                        <div class="col-xs-12">
-                            {% set totalLessons = category.lessons|length %}
-                            {% set totalPages = (totalLessons/30)|round(0, 'ceil') %}
-                            <ul class="pagination">
-                                {% for i in 1..totalPages if totalPages > 1%}
-                                    <li class="{% if i == 1 %}active{% endif %}">
-                                        <a href="#" class="page">{{ i }}</a>
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-
+                </div>
+            {% endfor %}
         </div>
+        <hr>
     </div>
+</div>
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
     <script>
-        function showPage($button) {
-            var $pageWrapper = $button.closest('.category-wrapper');
-            $pageWrapper.find('.shown').removeClass('shown').addClass('hidden');
-
-            var pageNum = $button.html();
-            $pageWrapper.find('.page-'+pageNum).removeClass('hidden').addClass('shown');
-
-            $pageWrapper.find('li.active').removeClass('active');
-            $button.closest('li').addClass('active');
-        }
-        
-        $(document).ready(function () {
-            $('.pagination a').on('click', function (e) {
-                e.preventDefault();
-                showPage($(this));
-            });
-
-            $('.toggle-lessons').on('click', function () {
-                $toggleButton = $(this);
-                $toggleButton.toggleClass('flip');
-                $wrapper = $toggleButton.closest('.category-wrapper');
-                $wrapper.find('.lessons-wrapper').slideToggle();
-                $wrapper.find('.pagination').toggle();
-            });
-        });
+        var app = {
+            ajaxListUrl: '{{ path('ajax_lesson_list') }}'
+        };
     </script>
+    {{ parent() }}
+    <script src="{{ asset('assets/js/list.js') }}"></script>
 {% endblock %}
