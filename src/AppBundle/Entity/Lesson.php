@@ -39,6 +39,21 @@ class Lesson
     private $position = 0;
 
     /**
+     * @ORM\Column(type="boolean")
+     */
+    private $isActive = true;
+
+    /**
+     * @var Lesson
+     */
+    private $previousLesson;
+
+    /**
+     * @var Lesson
+     */
+    private $nextLesson;
+
+    /**
      * @return int
      */
     public function getId()
@@ -108,5 +123,53 @@ class Lesson
     public function setPosition($position)
     {
         $this->position = $position;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getisActive()
+    {
+        return $this->isActive;
+    }
+
+    /**
+     * @param bool $isActive
+     */
+    public function setIsActive($isActive)
+    {
+        $this->isActive = $isActive;
+    }
+
+    /**
+     * @return Lesson
+     */
+    public function getPreviousLesson()
+    {
+        return $this->previousLesson;
+    }
+
+    /**
+     * @param Lesson $previousLesson
+     */
+    public function setPreviousLesson($previousLesson)
+    {
+        $this->previousLesson = $previousLesson;
+    }
+
+    /**
+     * @return Lesson
+     */
+    public function getNextLesson()
+    {
+        return $this->nextLesson;
+    }
+
+    /**
+     * @param Lesson $nextLesson
+     */
+    public function setNextLesson($nextLesson)
+    {
+        $this->nextLesson = $nextLesson;
     }
 }

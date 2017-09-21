@@ -2,17 +2,12 @@
 {% import 'macros/breadcrumb.html.twig' as breadCrumb %}
 
 {% block content %}
-    {#{% for flash_message in app.session.flashBag.get('success') %}
-        <div class="alert alert-success">
-            {{ flash_message }}
-        </div>
-    {% endfor %}#}
 <div class="row">
     <div class="col-xs-12">
         <div
             id="progress-wrapper"
-            data-progress-point="{{ progressPoint }}"
-            data-progress-percentage="{{ progressPercentage }}"
+            data-progress-point=""
+            data-progress-percentage=""
         ></div>
     </div>
 
@@ -29,67 +24,40 @@
     </div>
 </div>
 
-<div class="row"
-     id="lesson-wrapper"
-     data-lesson-id="{{ lesson.id }}"
-     data-update-users-progress-url="{{ path("user_update_progress") }}"
->
-
+<div class="row">
     <div class="col-sm-4 col-md-3">
         <div class="well">
             <div class="row text-center">
                 <div class="col-xs-12">
                     <div class="form-group">
-                        <h4 class="text-muted lesson-name">{{ lesson.position }}. {{ lesson.name }}</h4>
+                        <h4 class="text-muted lesson-name">{{ lesson.position ~ '. ' ~ lesson.name }}</h4>
                     </div>
                     <div class="form-group">
-                        <button
-                                id="js-update-users-stats"
+                        <button id="js-update-users-stats"
                                 class="btn btn-lg btn-block btn-success"
-                                data-target="#authModal"
-                        >
+                                data-target="#authModal">
                             Tạm lưu
+                            <i class="glyphicon glyphicon-refresh glyphicon-spin hidden"></i>
                         </button>
                     </div>
                     <div class="form-group row">
-                        {% if lesson.previousLessonPosision and lesson.nextLessonPosition %}
+                        {% if lesson.previousLesson and lesson.nextLesson %}
                             {% set class = 'col-sm-6' %}
                         {% else %}
                             {% set class = 'col-sm-12' %}
                         {% endif %}
-                        {% if lesson.previousLessonPosision %}
+                        {% if lesson.previousLesson %}
                             <div class="{{ class }} form-group">
-                                <a href="{{ path('lessons_show', {'categorySlug': category.slug, 'position': lesson.previousLessonPosision}) }}" class="text-muted js-previous-lesson-link"><button class="btn btn-block">Bài {{ lesson.previousLessonPosision }}</button></a>
+                                <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.previousLesson.position}) }}" class="text-muted js-previous-lesson-link"><button class="btn btn-block">Bài {{ lesson.previousLesson.position }}</button></a>
                             </div>
                         {% endif %}
-                        {% if lesson.nextLessonPosition %}
+                        {% if lesson.nextLesson %}
                             <div class="{{ class }} form-group">
-                                <a href="{{ path('lessons_show', {'categorySlug': category.slug, 'position': lesson.nextLessonPosition }) }}" class="text-muted js-next-lesson-link"><button class="btn btn-block">Bài {{ lesson.nextLessonPosition }}</button></a>
+                                <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.nextLesson.position }) }}" class="text-muted js-next-lesson-link"><button class="btn btn-block">Bài {{ lesson.nextLesson.position }}</button></a>
                             </div>
                         {% endif %}
                     </div>
                 </div>
-            </div>
-
-            <div class="input-group form-group">
-                <input type="text" class="form-control" placeholder="Cambridge Dictionary">
-                <span class="input-group-btn">
-                    <a data-href="http://dictionary.cambridge.org/dictionary/english/" type="submit" class="btn btn-default js-dictionary" target="_blank"><i class="glyphicon glyphicon-search"></i></a>
-                </span>
-            </div>
-
-            <div class="input-group form-group">
-                <input class="form-control" placeholder="Google Translate">
-                <span class="input-group-btn">
-                    <a data-href="https://translate.google.com/#en/vi/" target="_blank" class="btn btn-default js-dictionary"><i class="glyphicon glyphicon-search"></i></a>
-                </span>
-            </div>
-
-            <div class="input-group form-group">
-                <input class="form-control" placeholder="Google Image">
-                <span class="input-group-btn">
-                    <a data-href="https://www.google.com/search?tbm=isch&q=" target="_blank" class="btn btn-default js-dictionary"><i class="glyphicon glyphicon-search"></i></a>
-                </span>
             </div>
         </div>
     </div>
@@ -97,32 +65,22 @@
         <p class="shortcut-help text-muted" data-toggle="modal" data-target="#shortcutModal">Phím tắt <i class="glyphicon glyphicon-question-sign"></i></p>
 
         <div class="well sentences-wrapper">
-
-        {% for index, sentence in lesson.sentences %}
-            <div>
-                <button class="btn btn-default js-btn-play" onclick="toggleAudio({{ index }})" type="button">
+        {% for sentence in lesson.sentences %}
+            <div class="js-sentence">
+                <button class="btn btn-default js-play-audio-btn" type="button">
                     <i class="glyphicon glyphicon-volume-up"></i>
-                    <audio class="hidden" id="audio{{ index }}">
-                        {% set audioIndex = index+1 %}
-                        <source src="{{ asset('/assets/mp3/'~category.slug~'/'~lesson.position~'/'~audioIndex~'.mp3') }}">
+                    <audio class="hidden">
+                        <source src="{{ asset('/assets/mp3/'~lesson.category.slug~'/'~lesson.position~'/'~sentence.position~'.mp3') }}">
                     </audio>
                 </button>
 
                 <div class="input-answer-wrapper">
-                    <input
-                            class="form-control input{% if index in savedSentences %} saved{% endif %}"
-                            id="input{{ index }}"
-                            placeholder="{{ audioIndex }}."
-                            onkeydown="handleInputOnKeyDown({{ index }}, event)"
-                            tabindex="{{ audioIndex }}"
-                            data-sentence-index="{{ index }}"
-                    >
-                    {% set engViet = sentence|split('|') %}
-                    <p class="text-left hidden" id="answer{{ index }}">{{ engViet[0] }}</p>
-                    <p class="text-left result" id="result{{ index }}"></p>
+                    <input class="form-control js-input" placeholder="{{ sentence.position ~ '.' }}" tabindex="{{ sentence.position }}">
+                    <p class="text-left hidden js-answer">{{ sentence.content }}</p>
+                    <p class="text-left js-result"></p>
                 </div>
 
-                <button class="btn btn-default" id="btn-check{{ index }}" onclick="checkAnswer({{ index }})" type="button">
+                <button class="btn btn-default js-check-answer-btn" type="button">
                     <i class="glyphicon glyphicon-question-sign text-mute"></i>
                 </button>
             </div>
@@ -181,7 +139,15 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.js"></script>
-
+    <script>
+        const app = {
+            lesson: {
+                answers: JSON.parse("[[\"First\", \"snowfall\"],[\"Today\", \"is\", \"November\", [\"26th\", \"twenty-sixth\", \"26\"]]]")
+            }
+        };
+    </script>
+    <script src="{{ asset('assets/js/lesson.js') }}"></script>
+<!--
     <script>
         function updateUserStats() {
             return $.ajax({
@@ -439,7 +405,7 @@
                 }
             }
         }
-        
+
         function getSaveProgressButton() {
             return $('#js-update-users-stats');
         }
@@ -451,7 +417,7 @@
         function getAuthModal() {
             return $('#authModal');
         }
-        
+
         function spinButton($button, text) {
             $button.css('pointer-events', 'none');
             $oldHtml = $button.html();
@@ -473,7 +439,7 @@
                 $button.css('pointer-events', 'auto');
             }, 2500);
         }
-        
+
         function getSavedSentenceIndexes() {
             let indexes = [];
 
@@ -483,7 +449,7 @@
 
             return indexes;
         }
-        
+
         function updateLoggedInNavBar() {
             if ($('#js-navbar-logged-in').hasClass('hidden')) {
                 $('.navbar-right').toggleClass('hidden');
@@ -625,6 +591,7 @@
             });
         });
     </script>
+-->
 {% endblock %}
 
 {% block css %}

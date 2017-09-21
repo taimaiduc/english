@@ -30,13 +30,14 @@ class LoadLessonData implements FixtureInterface
     {
         for ($position = 1; $position < 200; $position++) {
             $lesson = new Lesson();
-            $lesson->setName($category->getName() . $category->getName() . $position);
+            $lesson->setName($category->getName() .' '. $category->getName() . $position);
             $lesson->setCategory($category);
             $lesson->setPosition($position);
+            $lesson->setIsActive((bool) rand(0,1));
 
             $sentences = [
                 "First Snowfall",
-                "Today is November 26th.",
+                "[\"Today\", \"is,\", \"November\", [\"26th\", \"twenty-sixth\", \"26\"]]",
                 "It snowed all day today.",
                 "The snow is beautiful.",
                 "The snow finally stopped.",

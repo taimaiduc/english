@@ -51,19 +51,18 @@ class LessonController extends BaseController
         }
 
         /** @var Lesson $lesson */
-        $lesson = $this->getDoctrine()->getRepository('AppBundle:Lesson')
-            ->findOneBy(['category' => $category, 'position' => $position]);
+        $lessonRepo = $this->getDoctrine()->getRepository('AppBundle:Lesson');
+        $lesson = $lessonRepo->findOneBy(['category' => $category, 'position' => $position]);
 
         if (!$lesson) {
             throw new NotFoundHttpException();
         }
 
+        $lesson->setNextLesson($lessonRepo->findNextLesson($lesson));
+        $lesson->setPreviousLesson($lessonRepo->findPreviousLesson($lesson));
+
         $data = [
-            'category' => $category,
-            'lesson' => $lesson,
-            'savedSentences' => [],
-            'progressPoint' => 0,
-            'progressPercentage' => 0
+            'lesson' => $lesson
         ];
 
         return $this->render('lesson/show.html.twig', $data);

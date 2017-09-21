@@ -30,9 +30,9 @@ class SavedLesson
     private $lesson;
 
     /**
-     * @ORM\Column(type="string")
+     * @ORM\Column(type="json_array")
      */
-    private $sentences;
+    private $sentences = [];
 
     /**
      * @return Lesson
@@ -51,7 +51,7 @@ class SavedLesson
     }
 
     /**
-     * @return Sentence
+     * @return Sentence[]
      */
     public function getSentences()
     {
@@ -59,10 +59,10 @@ class SavedLesson
     }
 
     /**
-     * @param Sentence $sentences
+     * @param Sentence[] $sentences
      */
-    public function setSentences(Sentence $sentences)
+    public function setSentences(array $sentences)
     {
-        $this->sentences = $sentences;
+        $this->sentences = array_merge($this->sentences, $sentences);
     }
 }
