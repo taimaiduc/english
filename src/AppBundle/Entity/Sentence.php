@@ -5,7 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\SentenceRepository")
  * @ORM\Table(name="sentence")
  */
 class Sentence
@@ -29,9 +29,27 @@ class Sentence
     private $content;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $point;
+
+    /**
      * @ORM\Column(type="smallint")
      */
     private $position;
+
+    /**
+     * @var bool
+     */
+    private $wasSaved;
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * @return Lesson
@@ -66,6 +84,22 @@ class Sentence
     }
 
     /**
+     * @return mixed
+     */
+    public function getPoint()
+    {
+        return $this->point;
+    }
+
+    /**
+     * @param mixed $point
+     */
+    public function setPoint($point)
+    {
+        $this->point = $point;
+    }
+
+    /**
      * @return int
      */
     public function getPosition()
@@ -79,5 +113,21 @@ class Sentence
     public function setPosition($position)
     {
         $this->position = $position;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getWasSaved()
+    {
+        return $this->wasSaved;
+    }
+
+    /**
+     * @param bool $wasSaved
+     */
+    public function setWasSaved($wasSaved)
+    {
+        $this->wasSaved = $wasSaved;
     }
 }

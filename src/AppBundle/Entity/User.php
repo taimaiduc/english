@@ -98,11 +98,16 @@ class User extends BaseUser
     }
 
     /**
-     * @param SavedLesson $savedLessons
+     * @param mixed $savedLessons
      */
-    public function setSavedLessons(SavedLesson $savedLessons)
+    public function setSavedLessons($savedLessons)
     {
         $this->savedLessons = $savedLessons;
+    }
+
+    public function addSavedLesson(SavedLesson $saveLesson)
+    {
+        $this->savedLessons[] = $saveLesson;
     }
 
     /**

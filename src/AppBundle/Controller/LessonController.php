@@ -61,6 +61,18 @@ class LessonController extends BaseController
         $lesson->setNextLesson($lessonRepo->findNextLesson($lesson));
         $lesson->setPreviousLesson($lessonRepo->findPreviousLesson($lesson));
 
+        $user = $this->getUser();
+        if ($user) {
+            $wasSaved = $this->getDoctrine()->getRepository('AppBundle:SavedLesson')
+                ->wasLessonSaved($user, $lesson);
+
+            $lesson->setWasSaved($wasSaved);
+
+            if ($wasSaved) {
+
+            }
+        }
+
         $data = [
             'lesson' => $lesson
         ];

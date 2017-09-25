@@ -5,7 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\SavedLessonRepository")
  * @ORM\Table(name="saved_lesson")
  */
 class SavedLesson
@@ -30,9 +30,32 @@ class SavedLesson
     private $lesson;
 
     /**
-     * @ORM\Column(type="json_array")
+     * @ORM\OneToMany(targetEntity="SavedSentence", mappedBy="savedLesson")
+     * @ORM\JoinColumn(nullable=false)
      */
-    private $sentences = [];
+    private $savedSentences;
+
+    public function __construct(User $user, Lesson $lesson)
+    {
+        $this->user = $user;
+        $this->lesson = $lesson;
+    }
+
+    /**
+     * @param mixed $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
 
     /**
      * @return Lesson
@@ -43,26 +66,26 @@ class SavedLesson
     }
 
     /**
-     * @param Lesson $lesson
+     * @param mixed $lesson
      */
-    public function setLesson(Lesson $lesson)
+    public function setLesson($lesson)
     {
         $this->lesson = $lesson;
     }
 
     /**
-     * @return Sentence[]
+     * @return SavedSentence[]
      */
-    public function getSentences()
+    public function getSavedSentences()
     {
-        return $this->sentences;
+        return $this->savedSentences;
     }
 
     /**
-     * @param Sentence[] $sentences
+     * @param mixed $savedSentences
      */
-    public function setSentences(array $sentences)
+    public function setSavedSentences($savedSentences)
     {
-        $this->sentences = array_merge($this->sentences, $sentences);
+        $this->savedSentences = $savedSentences;
     }
 }

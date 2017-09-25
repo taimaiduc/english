@@ -7,8 +7,8 @@
         <div
             id="progress-wrapper"
             data-progress-point=""
-            data-progress-percentage=""
-        ></div>
+            data-progress-percentage="">
+        </div>
     </div>
 
     <div id="authModal" class="modal fade" role="dialog">
@@ -33,18 +33,16 @@
                         <h4 class="text-muted lesson-name">{{ lesson.position ~ '. ' ~ lesson.name }}</h4>
                     </div>
                     <div class="form-group">
-                        <button id="js-update-users-stats"
-                                class="btn btn-lg btn-block btn-success"
+                        <button class="btn btn-lg btn-block btn-success js-update-user-progress"
                                 data-target="#authModal">
                             Tạm lưu
                             <i class="glyphicon glyphicon-refresh glyphicon-spin hidden"></i>
                         </button>
                     </div>
                     <div class="form-group row">
+                        {% set class = 'col-sm-12' %}
                         {% if lesson.previousLesson and lesson.nextLesson %}
                             {% set class = 'col-sm-6' %}
-                        {% else %}
-                            {% set class = 'col-sm-12' %}
                         {% endif %}
                         {% if lesson.previousLesson %}
                             <div class="{{ class }} form-group">
@@ -66,7 +64,7 @@
 
         <div class="well sentences-wrapper">
         {% for sentence in lesson.sentences %}
-            <div class="js-sentence">
+            <div class="js-sentence" data-sentence-id="{{ sentence.id }}">
                 <button class="btn btn-default js-play-audio-btn" type="button">
                     <i class="glyphicon glyphicon-volume-up"></i>
                     <audio class="hidden">
@@ -81,7 +79,7 @@
                 </div>
 
                 <button class="btn btn-default js-check-answer-btn" type="button">
-                    <i class="glyphicon glyphicon-question-sign text-mute"></i>
+                    <i class="glyphicon glyphicon-send text-mute"></i>
                 </button>
             </div>
         {% endfor %}
@@ -139,13 +137,6 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.js"></script>
-    <script>
-        const app = {
-            lesson: {
-                answers: JSON.parse("[[\"First\", \"snowfall\"],[\"Today\", \"is\", \"November\", [\"26th\", \"twenty-sixth\", \"26\"]]]")
-            }
-        };
-    </script>
     <script src="{{ asset('assets/js/lesson.js') }}"></script>
 <!--
     <script>
@@ -597,4 +588,11 @@
 {% block css %}
     {{ parent() }}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.css">
+    <script>
+        window.App = {
+            userLoggedIn: {{ app.user ? 1 : 0 }},
+            saveLessonUrl: '{{ path('ajax_user_save_lesson', {'lesson': lesson.id}) }}',
+            completeLessonUrl: '{{ path('ajax_user_complete_lesson', {'lesson': lesson.id}) }}'
+        };
+    </script>
 {% endblock %}

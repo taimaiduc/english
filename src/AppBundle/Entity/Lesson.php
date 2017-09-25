@@ -34,6 +34,11 @@ class Lesson
     private $sentences;
 
     /**
+     * @ORM\Column(type="integer")
+     */
+    private $point;
+
+    /**
      * @ORM\Column(type="smallint")
      */
     private $position = 0;
@@ -52,6 +57,11 @@ class Lesson
      * @var Lesson
      */
     private $nextLesson;
+
+    /**
+     * @var bool
+     */
+    private $wasSaved;
 
     /**
      * @return int
@@ -107,6 +117,22 @@ class Lesson
     public function addSentence(Sentence $sentence)
     {
         $this->sentences[] = $sentence;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPoint()
+    {
+        return $this->point;
+    }
+
+    /**
+     * @param mixed $point
+     */
+    public function setPoint($point)
+    {
+        $this->point = $point;
     }
 
     /**
@@ -171,5 +197,21 @@ class Lesson
     public function setNextLesson($nextLesson)
     {
         $this->nextLesson = $nextLesson;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWasSaved()
+    {
+        return $this->wasSaved;
+    }
+
+    /**
+     * @param bool $wasSaved
+     */
+    public function setWasSaved($wasSaved)
+    {
+        $this->wasSaved = $wasSaved;
     }
 }
