@@ -68,7 +68,7 @@ class SavedSentence
     }
 
     /**
-     * @return mixed
+     * @return Sentence
      */
     public function getSentence()
     {

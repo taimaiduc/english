@@ -91,7 +91,7 @@ $(document).ready(function () {
                     'sentences': sentencesToSave
                 };
             }
-            console.log(sentencesToSave);
+
             return $.post(args)
                 .done(function () {
                     sentencesToSave.length = 0;
@@ -106,6 +106,17 @@ $(document).ready(function () {
 
         const inputOnFocusHandler = function () {
             sentenceIndex = $inputs.index(this);
+
+            const $self = $(this);
+            const $parent = $self.closest('.js-sentences-wrapper');
+            const distance = $self.position().top;
+            const scrollTop = $parent.scrollTop();
+
+            if (distance > 340) {
+                $parent.animate({
+                    scrollTop: scrollTop + 300
+                }, 200);
+            }
         };
 
         const inputOnKeydownHandler = function (e) {
@@ -140,14 +151,20 @@ $(document).ready(function () {
                 $sentence.addClass('done');
                 $(this).find('i')
                     .removeClass('glyphicon-send')
-                    .addClass('glyphicon-ok');
+                    .addClass('glyphicon-check');
                 doneSentences++;
             }
 
-            if (isLessonDone()) {}
+            if (isLessonDone()) {
+                updateUserProgress();
+            }
         };
 
         const updateUserBtnOnClickHandler = function () {
+            if (sentencesToSave.length === 0) {
+                return;
+            }
+
             $updateUserBtns.off('click');
             
             updateUserProgress()
@@ -155,8 +172,6 @@ $(document).ready(function () {
                     $updateUserBtns.on('click', updateUserBtnOnClickHandler)
                 });
         };
-
-
 
         $audioBtns.on('click', audioBtnsOnClickHandler);
         $checkBtns.on('click', checkBtnsOnClickHander);

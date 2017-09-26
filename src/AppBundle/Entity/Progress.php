@@ -33,6 +33,24 @@ class Progress
      */
     private $point;
 
+    private $lastestPoint;
+
+    /**
+     * @param mixed $user
+     */
+    public function setUser($user)
+    {
+        $this->user = $user;
+    }
+
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
     /**
      * @return \DateTime
      */
@@ -62,6 +80,29 @@ class Progress
      */
     public function setPoint($point)
     {
+        $this->lastestPoint = $point;
         $this->point = $point;
+    }
+
+    public function addPoint($point)
+    {
+        $this->lastestPoint = $point;
+        $this->point += $point;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastestPoint()
+    {
+        return $this->lastestPoint;
+    }
+
+    /**
+     * @param int $lastestPoint
+     */
+    public function setLastestPoint($lastestPoint)
+    {
+        $this->lastestPoint = $lastestPoint;
     }
 }

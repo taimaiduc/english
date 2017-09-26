@@ -4,6 +4,7 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Lesson;
+use AppBundle\Entity\SavedSentence;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -63,15 +64,27 @@ class LessonController extends BaseController
 
         $user = $this->getUser();
         if ($user) {
-            $wasSaved = $this->getDoctrine()->getRepository('AppBundle:SavedLesson')
-                ->wasLessonSaved($user, $lesson);
+            $savedLesson = $this->getDoctrine()->getRepository('AppBundle:SavedLesson')
+                ->findOneBy(['user' => $user, 'lesson' => $lesson]);
 
-            $lesson->setWasSaved($wasSaved);
+            if ($savedLesson) {
+                $lesson->setWasSaved(true);
 
-            if ($wasSaved) {
+                $savedSentences = [];
+                foreach ($savedLesson->getSavedSentences() as $savedSentence) {
+                    /** @var SavedSentence $savedSentence */
+                    $savedSentences[] = $savedSentence->getSentence();
+                }
 
+                foreach ($lesson->getSentences() as $sentence) {
+                    if (in_array($sentence, $savedSentences)) {
+                        $sentence->setWasSaved(true);
+                    }
+                }
             }
         }
+
+
 
         $data = [
             'lesson' => $lesson

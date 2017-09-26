@@ -2,6 +2,7 @@
 
 namespace AppBundle\Repository;
 
+use AppBundle\Entity\SavedLesson;
 use Doctrine\ORM\EntityRepository;
 
 class SentenceRepository extends EntityRepository

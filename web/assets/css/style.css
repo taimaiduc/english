@@ -92,6 +92,11 @@ body > .container {
     color: red;
 }
 
+.done input, .done .btn {
+    color: green;
+    border-color: green;
+}
+
 .shortcut-help {
     position: absolute;
     top: -20px;

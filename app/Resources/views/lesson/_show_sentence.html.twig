@@ -1,0 +1,26 @@
+<div class="well sentences-wrapper js-sentences-wrapper">
+    {% for sentence in lesson.sentences %}
+        <div class="js-sentence{{ sentence.wasSaved ? ' saved done' : '' }}"
+             data-sentence-id="{{ sentence.id }}">
+            <button class="btn btn-default js-play-audio-btn" type="button">
+                <i class="glyphicon glyphicon-volume-up"></i>
+                <audio class="hidden">
+                    <source src="{{ asset('/assets/mp3/'~lesson.category.slug~'/'~lesson.position~'/'~sentence.position~'.mp3') }}">
+                </audio>
+            </button>
+
+            <div class="input-answer-wrapper">
+                <input class="form-control js-input"
+                       placeholder="{{ sentence.position ~ '.' }}"
+                       tabindex="{{ sentence.position }}"
+                       value="{{ sentence.wasSaved ? sentence.content : sentence.content }}">
+                <p class="text-left hidden js-answer">{{ sentence.wasSaved ? '' : sentence.content }}</p>
+                <p class="text-left result js-result"></p>
+            </div>
+
+            <button class="btn btn-default js-check-answer-btn" type="button">
+                <i class="glyphicon glyphicon-{{ sentence.wasSaved ? 'check' : 'send' }} text-mute"></i>
+            </button>
+        </div>
+    {% endfor %}
+</div>

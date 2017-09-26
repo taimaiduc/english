@@ -3,6 +3,7 @@
 namespace AppBundle\Controller\AjaxController;
 
 use AppBundle\Entity\Lesson;
+use AppBundle\Entity\Progress;
 use AppBundle\Entity\SavedLesson;
 use AppBundle\Entity\SavedSentence;
 use AppBundle\Entity\User;
@@ -11,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class AjaxUserController extends Controller
 {
@@ -23,6 +25,11 @@ class AjaxUserController extends Controller
      */
     public function ajaxSaveLessonAction(Lesson $lesson, Request $request)
     {
+        /** @var User $user */
+        if (!$user = $this->getUser()) {
+            throw new AccessDeniedException();
+        }
+
         if (!$lesson) {
             throw new \InvalidArgumentException();
         }
@@ -31,7 +38,6 @@ class AjaxUserController extends Controller
             throw new \InvalidArgumentException();
         }
 
-        $user     = $this->getUser();
         $doctrine = $this->getDoctrine();
         $em       = $doctrine->getManager();
 
@@ -50,14 +56,29 @@ class AjaxUserController extends Controller
             throw new \InvalidArgumentException('Sentences have already been saved!');
         }
 
-        $sentences = $doctrine->getRepository('AppBundle:Sentence')
-            ->findBy(['id' => $sentenceIds]);
+        $sentenceRepo = $doctrine->getRepository('AppBundle:Sentence');
+        $sentences = $sentenceRepo->findBy(['id' => $sentenceIds]);
 
         foreach ($sentences as $sentence) {
             $savedSentence = new SavedSentence($savedLesson, $sentence);
             $em->persist($savedSentence);
         }
 
+        $point = $sentenceRepo->getTotalPoint($sentences);
+        $now = new \DateTime();
+        $progress = $doctrine->getRepository('AppBundle:Progress')
+            ->findOneBy(['user' => $user, 'date' => $now]);
+
+        if ($progress) {
+            $progress->addPoint($point);
+        } else {
+            $progress = new Progress();
+            $progress->setUser($user);
+            $progress->setDate($now);
+            $progress->setPoint($point);
+        }
+
+        $em->persist($progress);
         $em->flush();
 
         return new JsonResponse();
@@ -94,6 +115,17 @@ class AjaxUserController extends Controller
             $em->remove($savedLesson);
         }
 
+        $now = new \DateTime();
+        $progress = $doctrine->getRepository('AppBundle:Progress')
+            ->findOneBy(['user' => $user, 'date' => $now]);
+
+        if ($progress) {
+            $progress->addPoint($point);
+        } else {
+            $progress = new Progress($user, $now, $point);
+        }
+
+        $em->persist($progress);
         $em->flush();
 
         return new JsonResponse("<html><body></body></html>");

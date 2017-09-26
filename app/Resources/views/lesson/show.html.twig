@@ -3,135 +3,19 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-xs-12">
-        <div
-            id="progress-wrapper"
-            data-progress-point=""
-            data-progress-percentage="">
-        </div>
-    </div>
-
-    <div id="authModal" class="modal fade" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-body hidden" id="js-modal-body-login"></div>
-                <div class="modal-body" id="js-modal-body-register"></div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-sm btn-default" data-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
     <div class="col-sm-4 col-md-3">
-        <div class="well">
-            <div class="row text-center">
-                <div class="col-xs-12">
-                    <div class="form-group">
-                        <h4 class="text-muted lesson-name">{{ lesson.position ~ '. ' ~ lesson.name }}</h4>
-                    </div>
-                    <div class="form-group">
-                        <button class="btn btn-lg btn-block btn-success js-update-user-progress"
-                                data-target="#authModal">
-                            Tạm lưu
-                            <i class="glyphicon glyphicon-refresh glyphicon-spin hidden"></i>
-                        </button>
-                    </div>
-                    <div class="form-group row">
-                        {% set class = 'col-sm-12' %}
-                        {% if lesson.previousLesson and lesson.nextLesson %}
-                            {% set class = 'col-sm-6' %}
-                        {% endif %}
-                        {% if lesson.previousLesson %}
-                            <div class="{{ class }} form-group">
-                                <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.previousLesson.position}) }}" class="text-muted js-previous-lesson-link"><button class="btn btn-block">Bài {{ lesson.previousLesson.position }}</button></a>
-                            </div>
-                        {% endif %}
-                        {% if lesson.nextLesson %}
-                            <div class="{{ class }} form-group">
-                                <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.nextLesson.position }) }}" class="text-muted js-next-lesson-link"><button class="btn btn-block">Bài {{ lesson.nextLesson.position }}</button></a>
-                            </div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include 'lesson/_show_nav.html.twig' %}
     </div>
     <div class="col-sm-8 col-md-9">
         <p class="shortcut-help text-muted" data-toggle="modal" data-target="#shortcutModal">Phím tắt <i class="glyphicon glyphicon-question-sign"></i></p>
 
-        <div class="well sentences-wrapper">
-        {% for sentence in lesson.sentences %}
-            <div class="js-sentence" data-sentence-id="{{ sentence.id }}">
-                <button class="btn btn-default js-play-audio-btn" type="button">
-                    <i class="glyphicon glyphicon-volume-up"></i>
-                    <audio class="hidden">
-                        <source src="{{ asset('/assets/mp3/'~lesson.category.slug~'/'~lesson.position~'/'~sentence.position~'.mp3') }}">
-                    </audio>
-                </button>
-
-                <div class="input-answer-wrapper">
-                    <input class="form-control js-input" placeholder="{{ sentence.position ~ '.' }}" tabindex="{{ sentence.position }}">
-                    <p class="text-left hidden js-answer">{{ sentence.content }}</p>
-                    <p class="text-left js-result"></p>
-                </div>
-
-                <button class="btn btn-default js-check-answer-btn" type="button">
-                    <i class="glyphicon glyphicon-send text-mute"></i>
-                </button>
-            </div>
-        {% endfor %}
-        </div>
-    </div>
-
-</div>
-<div id="shortcutModal" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h3 class="modal-title">Phím tắt khi học <small>(click chuột vào ô nhập câu trả lời trước)</small></h3>
-            </div>
-            <div class="modal-body">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Phím</th>
-                        <th>Chức năng</th>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <td><b>Ctrl + space: </b></td>
-                        <td>Nghe</td>
-                    </tr>
-                    <tr>
-                        <td><b>Enter: </b></td>
-                        <td>Kiểm tra đáp án</td>
-                    </tr>
-                    <tr>
-                        <td><b>Ctrl + enter: </b></td>
-                        <td>Ẩn câu trả lời</td>
-                    </tr>
-                    <tr>
-                        <td><b>Tab hoặc mũi tên xuống: </b></td>
-                        <td>Qua câu tiếp theo</td>
-                    </tr>
-                    <tr>
-                        <td><b>Phím mũi tên lên: </b></td>
-                        <td>Quay lại câu trước</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-
+        {% include 'lesson/_show_sentence.html.twig' %}
     </div>
 </div>
+
+{% include 'lesson/_show_help.html.twig' %}
+{% include 'block/_modal_auth.html.twig' %}
+
 {% endblock %}
 
 {% block javascripts %}
@@ -189,20 +73,6 @@
             return data;
         }
 
-        function getDoneSentences() {
-            let sentences = [];
-
-            $('.done').each(function () {
-                sentences.push(parseInt($(this).attr('data-sentence-index')));
-            });
-
-            return sentences;
-        }
-
-        function isLessonDone() {
-            return $('.input.done').length === $('.input').length ? 1 : 0;
-        }
-
         function showLoginForm() {
             let $form = $('#js-modal-body-login');
 
@@ -244,123 +114,6 @@
             $form.removeClass('hidden');
         }
 
-        function toggleAudio(index) {
-            let audioElements = document.getElementsByTagName('audio');
-            let currentAudio = document.getElementById('audio'+index);
-
-            {# if there's another audio playing, stop it. #}
-            for (let i = 0; i < audioElements.length; i++) {
-                if (audioElements[i] !== currentAudio && !audioElements[i].paused) {
-                    audioElements[i].pause();
-                    break;
-                }
-            }
-
-            if (currentAudio.paused) {
-                currentAudio.play();
-            } else {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
-            }
-        }
-
-        function checkAnswer(index) {
-            let $inputElement = $('#input'+index);
-            let $answerElement = $('#answer'+index);
-            let $btnCheck = $('#btn-check'+index);
-
-            // if the sentence is already done
-            if ($inputElement.hasClass('done')) {
-                $inputElement.val($answerElement.html());
-                return;
-            }
-
-            let resultContent = compareAnswers($inputElement, $answerElement);
-            let $resultElement = $("#result"+index);
-
-            // if user's answer is not correct
-            if (resultContent.indexOf('text-danger') !== -1) {
-                $btnCheck.html('<b class="glyphicon glyphicon-remove text-danger"></b>');
-                $resultElement.show().html(resultContent);
-                $inputElement.css('border-color', 'red');
-            } else {
-                $btnCheck.html('<b class="glyphicon glyphicon-ok text-success"></b>');
-                $resultElement.remove();
-                $inputElement.val($answerElement.html()).addClass('done').css('border-color', '');
-
-                {# try to update user's stats if all the sentences are done #}
-                if (isLessonDone()) {
-                    $saveProgressButton = getSaveProgressButton();
-                    $saveProgressButton.html('<i class="glyphicon glyphicon-check"></i> Lưu kết quả');
-                    spinButton($saveProgressButton);
-                    updateUserStats();
-                }
-            }
-        }
-
-        function compareAnswers($inputElement, $answerElement) {
-            let input = $inputElement.val().trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
-            let answer = $answerElement.html().trim().toLowerCase().replace(/[^\w\s-]*/g, '').replace(/  /g, ' ').split(" ");
-            let result = $answerElement.html().split(' '); // the result after comparing input and answer
-
-            for (let i = 0; i < result.length; i++) {
-                if (answer[i] !== input[i]){
-                    result[i] = "<span class='text-danger'>"+result[i]+"</span>";
-                }
-            }
-
-            if (input.length > answer.length) {
-                result[result.length - 1] = "<span class='text-danger'>"+result[result.length - 1]+"</span>";
-            }
-
-            return result.join(" ");
-        }
-
-        function handleInputOnKeyDown(index, event) {
-
-            if (event.ctrlKey) {
-                {# Ctrl + Space = toggleAudio() #}
-                if (event.keyCode === 32) {
-                    toggleAudio(index);
-                }
-
-                {# Ctrl + Enter = Hide result #}
-                if (event.keyCode === 10 || event.keyCode === 13) {
-                    document.getElementById('result'+index).style.display = 'none';
-                }
-            }
-
-            {# Enter = Compare input & answer #}
-            else if (event.keyCode === 13) {
-                checkAnswer(index);
-            }
-
-            {# Up arrow key = previous sentence #}
-            else if (event.keyCode === 40 || event.keyCode === 38) {
-                event.preventDefault();
-                let inputs = document.querySelectorAll('[tabindex]');
-                let currentInputIndex = document.activeElement.getAttribute('tabindex');
-
-                {# Down arrow key #}
-                if (event.keyCode === 40) {
-                    let nextInputIndex = parseInt(currentInputIndex);
-                    let nextInput = inputs[nextInputIndex] ;
-                    if(nextInput !== undefined) {
-                        nextInput.focus();
-                    }
-                }
-
-                {# Up arrow key = focus previous input #}
-                else {
-                    let previousInputIndex = parseInt(currentInputIndex) - 2;
-                    let previousInput = inputs[previousInputIndex];
-                    if (previousInput !== undefined) {
-                        previousInput.focus();
-                    }
-                }
-            }
-        }
-
         function mapErrorsToForm($form, errors) {
             let html = '';
 
@@ -376,172 +129,16 @@
             $form.find('.js-modal-form-error').html(html);
         }
 
-        function isUserLoggedIn() {
-            return $.ajax({
-                url: "{{ path("user_show") }}"
-            });
-        }
-
-        function setDoneSentences(indexes) {
-            let firstUndoneSentenceIndex;
-
-            for (let i = 0;  i <= Math.max(...indexes); i++) {
-                if (indexes.includes(i)) {
-                    $('#input'+i).val($('#answer'+i).html());
-                    $('#btn-check'+i).click();
-                }
-                else if (!firstUndoneSentenceIndex && !indexes.includes(i)) {
-                    firstUndoneSentenceIndex = i;
-                    $('#input'+firstUndoneSentenceIndex).focus();
-                }
-            }
-        }
-
-        function getSaveProgressButton() {
-            return $('#js-update-users-stats');
-        }
-
-        function removeSaveProgressButton() {
-            getSaveProgressButton().closest('.sticky-sidebar-wrapper').remove();
-        }
-
-        function getAuthModal() {
-            return $('#authModal');
-        }
-
-        function spinButton($button, text) {
-            $button.css('pointer-events', 'none');
-            $oldHtml = $button.html();
-
-            let spinClass = 'glyphicon glyphicon-refresh glyphicon-spin';
-
-            if (!text) {
-                if ($button.find('i').length > 0) {
-                    $button.find('i').attr('class', spinClass);
-                } else {
-                    $button.prepend('<i class="'+spinClass+'"></i> ');
-                }
-            } else {
-                $button.html('<i class="'+spinClass+'"></i> ' + text);
-            }
-
-            setTimeout(function () {
-                $button.html($oldHtml);
-                $button.css('pointer-events', 'auto');
-            }, 2500);
-        }
-
-        function getSavedSentenceIndexes() {
-            let indexes = [];
-
-            $('input.saved').each(function () {
-                indexes.push(parseInt($(this).attr('data-sentence-index')));
-            });
-
-            return indexes;
-        }
-
         function updateLoggedInNavBar() {
             if ($('#js-navbar-logged-in').hasClass('hidden')) {
                 $('.navbar-right').toggleClass('hidden');
             }
         }
-
-        function renderTodayProgress(point, percentage) {
-            let $progressWrapper = $('#progress-wrapper');
-
-            // when page loads first time
-            if (!point || !percentage) {
-                point = $progressWrapper.attr('data-progress-point');
-                percentage = $progressWrapper.attr('data-progress-percentage');
-                if (point === 'undefined' || percentage === 'undefined') {
-                    return;
-                }
-            }
-
-            if (parseInt(point) === 0) {
-                return;
-            }
-
-            let html = `
-            <div class="progress">
-            <div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100" style="width:${percentage}%"></div>
-            <p class="text-center"><b class="">${point} diem</b></p>
-            </div>
-            `;
-
-            $progressWrapper.html(html);
-        }
-
-        function getAlertContent() {
-            let title, cancelButton;
-            let previousLessonLink = '';
-            let nextLessonLink = '';
-
-            if (isLessonDone()) {
-                title = 'Bạn đã hoàn thành bài này';
-                cancelButton = '<a href="" class="btn btn-link btn-block btn-lg">Lại bài này</a>';
-            } else {
-                title = 'Lưu bài thành công';
-                cancelButton = '<a href="#" onclick="event.preventDefault(); swal.clickCancel()" class="btn btn-link btn-block btn-lg">Tiếp bài này</a>';
-            }
-
-            let nextLinkHref = $('.js-next-lesson-link').attr('href');
-            console.log(nextLinkHref);
-            if (nextLinkHref) {
-                nextLessonLink = `<a href="${nextLinkHref}" class="btn btn-link btn-block btn-lg">Bài tiếp theo</a>`;
-            }
-
-            let previousLinkHref= $('.js-previous-lesson-link').attr('href');
-            if (previousLinkHref) {
-                previousLessonLink = `<a href="${previousLinkHref}" class="btn btn-link btn-block btn-lg">Bài trước</a>`;
-            }
-
-            return `
-                <h2>${title}</h2><hr/>
-                <div class="row">
-                    <div class="col-sm-4">${nextLessonLink}</div>
-                    <div class="col-sm-4">${previousLessonLink}</div>
-                    <div class="col-sm-4">${cancelButton}</div>
-                </div>
-            `;
-        }
-
-        function ajaxSubmitForm($form) {
-            return $.ajax({
-                url: $form.attr('action'),
-                data: $form.serialize(),
-                method: 'post'
-            });
-        }
     </script>
 
     <script>
         $(document).ready(function(){
-            renderTodayProgress();
             setDoneSentences(getSavedSentenceIndexes());
-
-            $('.input').focus(function(e){
-                const $self = $(this);
-                const $parent = $self.closest('.sentences-wrapper');
-                const distance = $self.position().top;
-                const scrollTop = $parent.scrollTop();
-                if (distance > 340) {
-                    $parent.animate({
-                        scrollTop: scrollTop + 300
-                    }, 200);
-                }
-            });
-
-            $('#js-update-users-stats').on('click', function () {
-                spinButton($(this));
-
-                updateUserStats();
-            });
-
-//            setDoneSentences([0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20, 21]);
-
-            let $authModal = getAuthModal();
 
             $authModal.on('submit', 'form', function (e) {
                 e.preventDefault();
@@ -557,28 +154,6 @@
                     .catch(function (jqXHR) {
                         mapErrorsToForm($self, jqXHR.responseJSON);
                     });
-            });
-
-            $authModal.on('click', '#js-btn-show-register-form', function (e) {
-                e.preventDefault();
-                showRegistrationForm();
-            });
-
-            $authModal.on('click', '#js-btn-show-login-form', function (e) {
-                e.preventDefault();
-                showLoginForm();
-            });
-
-            $('.js-dictionary').on('click', function () {
-                let self = $(this);
-                let href = self.attr('data-href') + self.closest('.input-group').find('input').val();
-                self.attr('href', href);
-            });
-
-            $(window).bind('beforeunload', function(){
-                if ($('.done:not(.saved)').length > 0) {
-                    return false;
-                }
             });
         });
     </script>
