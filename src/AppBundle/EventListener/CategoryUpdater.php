@@ -5,7 +5,9 @@ namespace AppBundle\EventListener;
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Lesson;
 use AppBundle\Entity\Progress;
+use AppBundle\Entity\Sentence;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CategoryUpdater
 {
@@ -14,15 +16,30 @@ class CategoryUpdater
 
         if ($entity instanceof Lesson) {
             $this->addTotalLesson($args, $entity);
-        } elseif ($entity instanceof Progress) {
+        }
+
+        if ($entity instanceof Progress) {
             $this->addTotalPoint($args, $entity);
         }
+
+        if ($entity instanceof Sentence) {
+            $this->setLessonPoint($args, $entity);
+        }
+    }
+
+    private function setLessonPoint(LifecycleEventArgs $args, Sentence $entity) {
+        $em = $args->getEntityManager();
+        $lesson = $entity->getLesson();
+        $lesson->setPoint($lesson->getPoint() + $entity->getPoint());
+
+        $em->persist($lesson);
+        $em->flush();
     }
 
     private function addTotalPoint(LifecycleEventArgs $args, Progress $entity) {
         $em = $args->getEntityManager();
-        die('aa');
         $user = $entity->getUser();
+
         $user->addTotalPoint($entity->getLastestPoint());
 
         $em->persist($user);

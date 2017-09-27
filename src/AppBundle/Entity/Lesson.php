@@ -36,7 +36,7 @@ class Lesson
     /**
      * @ORM\Column(type="integer")
      */
-    private $point;
+    private $point = 0;
 
     /**
      * @ORM\Column(type="smallint")

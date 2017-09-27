@@ -81,6 +81,7 @@ $(document).ready(function () {
         };
 
         const updateUserProgress = function () {
+            $updateUserBtns.addClass('in-progress');
             const args = {};
             
             if (isLessonDone()) {
@@ -95,7 +96,12 @@ $(document).ready(function () {
             return $.post(args)
                 .done(function () {
                     sentencesToSave.length = 0;
-                    console.log(sentencesToSave);
+                    $updateUserBtns.find('span')
+                        .fadeIn().delay(2000).fadeOut(500);
+                })
+                .always(function () {
+                    $updateUserBtns.removeClass('in-progress');
+                    $updateUserBtns.on('click', updateUserBtnOnClickHandler);
                 });
         };
 
@@ -167,10 +173,7 @@ $(document).ready(function () {
 
             $updateUserBtns.off('click');
             
-            updateUserProgress()
-                .always(function () {
-                    $updateUserBtns.on('click', updateUserBtnOnClickHandler)
-                });
+            updateUserProgress();
         };
 
         $audioBtns.on('click', audioBtnsOnClickHandler);
@@ -178,5 +181,11 @@ $(document).ready(function () {
         $inputs.on('focus', inputOnFocusHandler)
             .on('keydown', inputOnKeydownHandler);
         $updateUserBtns.on('click', updateUserBtnOnClickHandler);
+
+        $(window).bind('beforeunload', function(){
+            if (sentencesToSave.length > 0) {
+                return false;
+            }
+        });
     })();
 });

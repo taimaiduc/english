@@ -114,6 +114,14 @@ body > .container {
     margin-bottom: 5px;
 }
 
+.update-user-progress i, .update-user-progress span{
+    display: none;
+}
+
+.in-progress i {
+    display: inline-block;
+}
+
 .glyphicon-refresh.spinning {
     transform-origin: 48% 50%;
 }

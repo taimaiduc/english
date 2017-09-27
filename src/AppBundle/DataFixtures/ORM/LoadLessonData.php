@@ -28,7 +28,7 @@ class LoadLessonData implements FixtureInterface
 
     private function loadLessons(Category $category, ObjectManager $manager)
     {
-        for ($position = 1; $position < 200; $position++) {
+        for ($position = 1; $position < 34; $position++) {
             $lesson = new Lesson();
             $lesson->setName($category->getName() .' '. $category->getName() . $position);
             $lesson->setCategory($category);
@@ -37,7 +37,7 @@ class LoadLessonData implements FixtureInterface
 
             $sentences = [
                 "First Snowfall",
-                "[\"Today\", \"is,\", \"November\", [\"26th\", \"twenty-sixth\", \"26\"]]",
+                "Today is November 26th",
                 "It snowed all day today.",
                 "The snow is beautiful.",
                 "The snow finally stopped.",
@@ -64,6 +64,7 @@ class LoadLessonData implements FixtureInterface
                 $sentence = new Sentence();
                 $sentence->setLesson($lesson);
                 $sentence->setContent($content);
+                $sentence->setPoint(str_word_count($content));
                 $sentence->setPosition($i+1);
                 $manager->persist($sentence);
                 $lesson->addSentence($sentence);
