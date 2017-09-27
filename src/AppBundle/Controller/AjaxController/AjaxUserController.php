@@ -44,30 +44,32 @@ class AjaxUserController extends Controller
         $savedLesson = $doctrine->getRepository('AppBundle:SavedLesson')
             ->findOneBy(['user' => $user, 'lesson' => $lesson]);
 
-        if (!$savedLesson) {
+        if ($savedLesson) {
+            $savedSentences = $doctrine->getRepository('AppBundle:SavedSentence')
+                ->findBy(['savedLesson' => $savedLesson, 'sentence' => $sentenceIds]);
+
+            if ($savedSentences) {
+                throw new \InvalidArgumentException('Sentences have already been saved!');
+            }
+        } else {
             $savedLesson = new SavedLesson($user, $lesson);
-            $em->persist($savedLesson);
+
         }
 
-        $savedSentences = $doctrine->getRepository('AppBundle:SavedSentence')
-            ->findBy(['savedLesson' => $savedLesson, 'sentence' => $sentenceIds]);
-
-        if ($savedSentences) {
-            throw new \InvalidArgumentException('Sentences have already been saved!');
-        }
-
-        $sentenceRepo = $doctrine->getRepository('AppBundle:Sentence');
-        $sentences = $sentenceRepo->findBy(['id' => $sentenceIds]);
+        $point = 0;
+        $sentences = $doctrine->getRepository('AppBundle:Sentence')
+            ->findBy(['id' => $sentenceIds]);
 
         foreach ($sentences as $sentence) {
+            $point += $sentence->getPoint();
             $savedSentence = new SavedSentence($savedLesson, $sentence);
             $em->persist($savedSentence);
         }
 
-        $point = $sentenceRepo->getTotalPoint($sentences);
+        $savedLesson->addPoint($point);
+        $em->persist($savedLesson);
 
         $this->updateUserProgress($em, $user, $point);
-        $em->flush();
 
         return new JsonResponse();
     }
@@ -80,12 +82,15 @@ class AjaxUserController extends Controller
      */
     public function ajaxCompleteLessonAction(Lesson $lesson)
     {
+        /** @var User $user */
+        if (!$user = $this->getUser()) {
+            throw new AccessDeniedException();
+        }
+
         if (!$lesson) {
             throw new \InvalidArgumentException();
         }
 
-        /** @var User $user */
-        $user     = $this->getUser();
         $doctrine = $this->getDoctrine();
         $em       = $doctrine->getManager();
         $point    = $lesson->getPoint();
@@ -94,19 +99,11 @@ class AjaxUserController extends Controller
             ->findOneBy(['user' => $user, 'lesson' => $lesson]);
 
         if ($savedLesson) {
-            $sentences = [];
-            foreach ($savedLesson->getSavedSentences() as $savedSentence) {
-                /** @var SavedSentence $savedSentence */
-                $sentences[] = $savedSentence->getSentence();
-            }
-            $savedPoint = $doctrine->getRepository('AppBundle:Sentence')
-                ->getTotalPoint($sentences);
-            $point -= $savedPoint;
+            $point -= $savedLesson->getPoint();
             $em->remove($savedLesson);
         }
 
         $this->updateUserProgress($em, $user, $point);
-        $em->flush();
 
         return new JsonResponse("<html><body></body></html>");
     }
@@ -114,7 +111,6 @@ class AjaxUserController extends Controller
     private function updateUserProgress(ObjectManager $em, User $user, $point)
     {
         $now = new \DateTime();
-
         $progress = $this->getDoctrine()->getRepository('AppBundle:Progress')
             ->findOneBy(['user' => $user, 'date' => $now]);
 
@@ -127,9 +123,10 @@ class AjaxUserController extends Controller
             $progress->setDate($now);
         }
 
-        $em->persist($progress);
-
         $user->addPoint($point);
         $em->persist($user);
+        $em->persist($progress);
+
+        $em->flush();
     }
 }

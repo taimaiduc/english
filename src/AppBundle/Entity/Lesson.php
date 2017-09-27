@@ -130,9 +130,9 @@ class Lesson
     /**
      * @param mixed $point
      */
-    public function setPoint($point)
+    public function addPoint($point)
     {
-        $this->point = $point;
+        $this->point += $point;
     }
 
     /**

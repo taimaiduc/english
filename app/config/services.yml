@@ -4,11 +4,6 @@ parameters:
     #parameter_name: value
 
 services:
-    insert_lesson_listener:
-        class: AppBundle\EventListener\CategoryUpdater
-        tags:
-            - { name: doctrine.event_listener, event: postPersist }
-
     authentication_handler:
         class:  AppBundle\Security\FOSAuthenticationHandler
         arguments:  ['@router']

@@ -130,9 +130,9 @@ class Category
     /**
      * @param mixed $totalLessons
      */
-    public function setTotalLessons($totalLessons)
+    public function addTotalLessons($totalLessons)
     {
-        $this->totalLessons = $totalLessons;
+        $this->totalLessons += $totalLessons;
     }
 
     /**

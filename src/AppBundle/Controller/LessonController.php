@@ -68,13 +68,7 @@ class LessonController extends BaseController
                 ->findOneBy(['user' => $user, 'lesson' => $lesson]);
 
             if ($savedLesson) {
-                $lesson->setWasSaved(true);
-
-                $savedSentences = [];
-                foreach ($savedLesson->getSavedSentences() as $savedSentence) {
-                    /** @var SavedSentence $savedSentence */
-                    $savedSentences[] = $savedSentence->getSentence();
-                }
+                $savedSentences = $savedLesson->getSavedSentences();
 
                 foreach ($lesson->getSentences() as $sentence) {
                     if (in_array($sentence, $savedSentences)) {

@@ -35,6 +35,11 @@ class SavedLesson
      */
     private $savedSentences;
 
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $point = 0;
+
     public function __construct(User $user, Lesson $lesson)
     {
         $this->user = $user;
@@ -74,11 +79,18 @@ class SavedLesson
     }
 
     /**
-     * @return SavedSentence[]
+     * @return Sentence[]
      */
     public function getSavedSentences()
     {
-        return $this->savedSentences;
+        $sentences = [];
+
+        foreach ($this->savedSentences as $savedSentence) {
+            /** @var SavedSentence $savedSentence */
+            $sentences[] = $savedSentence->getSentence();
+        }
+
+        return $sentences;
     }
 
     /**
@@ -87,5 +99,21 @@ class SavedLesson
     public function setSavedSentences($savedSentences)
     {
         $this->savedSentences = $savedSentences;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getPoint()
+    {
+        return $this->point;
+    }
+
+    /**
+     * @param mixed $point
+     */
+    public function addPoint($point)
+    {
+        $this->point += $point;
     }
 }

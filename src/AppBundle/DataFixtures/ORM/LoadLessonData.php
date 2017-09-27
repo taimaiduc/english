@@ -28,7 +28,9 @@ class LoadLessonData implements FixtureInterface
 
     private function loadLessons(Category $category, ObjectManager $manager)
     {
-        for ($position = 1; $position < 34; $position++) {
+        $totalLesson = 300;
+
+        for ($position = 1; $position <= $totalLesson; $position++) {
             $lesson = new Lesson();
             $lesson->setName($category->getName() .' '. $category->getName() . $position);
             $lesson->setCategory($category);
@@ -60,17 +62,23 @@ class LoadLessonData implements FixtureInterface
                 "We go inside for hot chocolate."
             ];
 
+            $points = 0;
             foreach ($sentences as $i => $content) {
+                $point = str_word_count($content);
+                $points += $point;
                 $sentence = new Sentence();
                 $sentence->setLesson($lesson);
                 $sentence->setContent($content);
-                $sentence->setPoint(str_word_count($content));
+                $sentence->setPoint($point);
                 $sentence->setPosition($i+1);
                 $manager->persist($sentence);
-                $lesson->addSentence($sentence);
             }
 
+            $lesson->addPoint($points);
             $manager->persist($lesson);
         }
+
+        $category->addTotalLessons($totalLesson);
+        $manager->persist($category);
     }
 }
