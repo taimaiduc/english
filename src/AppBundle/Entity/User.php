@@ -36,7 +36,7 @@ class User extends BaseUser
     /**
      * @ORM\Column(type="integer")
      */
-    private $totalPoint = 0;
+    private $point = 0;
 
     /**
      * @ORM\Column(type="date")
@@ -113,17 +113,17 @@ class User extends BaseUser
     /**
      * @param int $point
      */
-    public function addTotalPoint($point)
+    public function addPoint($point)
     {
-        $this->totalPoint += $point;
+        $this->point += $point;
     }
 
     /**
      * @return int
      */
-    public function getTotalPoint()
+    public function getPoint()
     {
-        return $this->totalPoint;
+        return $this->point;
     }
 
     /**

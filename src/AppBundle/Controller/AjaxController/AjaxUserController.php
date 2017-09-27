@@ -7,6 +7,7 @@ use AppBundle\Entity\Progress;
 use AppBundle\Entity\SavedLesson;
 use AppBundle\Entity\SavedSentence;
 use AppBundle\Entity\User;
+use Doctrine\Common\Persistence\ObjectManager;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -64,20 +65,8 @@ class AjaxUserController extends Controller
         }
 
         $point = $sentenceRepo->getTotalPoint($sentences);
-        $now = new \DateTime();
-        $progress = $doctrine->getRepository('AppBundle:Progress')
-            ->findOneBy(['user' => $user, 'date' => $now]);
 
-        if ($progress) {
-            $progress->addPoint($point);
-        } else {
-            $progress = new Progress();
-            $progress->setUser($user);
-            $progress->setDate($now);
-            $progress->setPoint($point);
-        }
-
-        $em->persist($progress);
+        $this->updateUserProgress($em, $user, $point);
         $em->flush();
 
         return new JsonResponse();
@@ -95,6 +84,7 @@ class AjaxUserController extends Controller
             throw new \InvalidArgumentException();
         }
 
+        /** @var User $user */
         $user     = $this->getUser();
         $doctrine = $this->getDoctrine();
         $em       = $doctrine->getManager();
@@ -115,19 +105,31 @@ class AjaxUserController extends Controller
             $em->remove($savedLesson);
         }
 
+        $this->updateUserProgress($em, $user, $point);
+        $em->flush();
+
+        return new JsonResponse("<html><body></body></html>");
+    }
+
+    private function updateUserProgress(ObjectManager $em, User $user, $point)
+    {
         $now = new \DateTime();
-        $progress = $doctrine->getRepository('AppBundle:Progress')
+
+        $progress = $this->getDoctrine()->getRepository('AppBundle:Progress')
             ->findOneBy(['user' => $user, 'date' => $now]);
 
         if ($progress) {
             $progress->addPoint($point);
         } else {
-            $progress = new Progress($user, $now, $point);
+            $progress = new Progress();
+            $progress->setUser($user);
+            $progress->setPoint($point);
+            $progress->setDate($now);
         }
 
         $em->persist($progress);
-        $em->flush();
 
-        return new JsonResponse("<html><body></body></html>");
+        $user->addPoint($point);
+        $em->persist($user);
     }
 }

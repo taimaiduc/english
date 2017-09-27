@@ -84,8 +84,6 @@ class LessonController extends BaseController
             }
         }
 
-
-
         $data = [
             'lesson' => $lesson
         ];

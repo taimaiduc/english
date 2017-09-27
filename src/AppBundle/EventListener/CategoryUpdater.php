@@ -40,7 +40,7 @@ class CategoryUpdater
         $em = $args->getEntityManager();
         $user = $entity->getUser();
 
-        $user->addTotalPoint($entity->getLastestPoint());
+        $user->addPoint($entity->getLastestPoint());
 
         $em->persist($user);
         $em->flush();
