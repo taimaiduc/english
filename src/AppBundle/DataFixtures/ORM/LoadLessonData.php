@@ -28,11 +28,13 @@ class LoadLessonData implements FixtureInterface
 
     private function loadLessons(Category $category, ObjectManager $manager)
     {
-        $totalLesson = 300;
+        $totalLesson = 2000;
+        $name = 'My sister puts on her hat and mittens';
+        $nameLength = strlen($name);
 
         for ($position = 1; $position <= $totalLesson; $position++) {
             $lesson = new Lesson();
-            $lesson->setName($category->getName() .' '. $category->getName() . $position);
+            $lesson->setName(substr($name, 0, rand(30, $nameLength)) . $position);
             $lesson->setCategory($category);
             $lesson->setPosition($position);
             $lesson->setIsActive((bool) rand(0,1));
