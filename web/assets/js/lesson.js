@@ -1,8 +1,6 @@
 $(document).ready(function () {
     (function () {
-        let sentenceIndex       = 0;
         const $sentences        = $('.js-sentence');
-        let   doneSentences     = $sentences.filter('.done').length;
         const $audios           = $sentences.find('audio');
         const $inputs           = $sentences.find('.js-input');
         const $answers          = $sentences.find('.js-answer');
@@ -13,6 +11,9 @@ $(document).ready(function () {
         const saveLessonUrl     = App.saveLessonUrl;
         const completeLessonUrl = App.completeLessonUrl;
         const sentencesToSave   = [];
+        let sentenceIndex       = 0;
+        let doneSentences       = $sentences.filter('.done').length;
+        let userLoggedIn        = App.userLoggedIn;
 
         const playAudio = function () {
             const audio = $audios[sentenceIndex];
@@ -162,11 +163,19 @@ $(document).ready(function () {
             }
 
             if (isLessonDone()) {
-                updateUserProgress();
+                if (userLoggedIn) {
+                    updateUserProgress();
+                } else {
+                    $updateUserBtns.text('hoan thanh');
+                }
             }
         };
 
         const updateUserBtnOnClickHandler = function () {
+            if (!userLoggedIn) {
+                return;
+            }
+
             if (sentencesToSave.length === 0) {
                 return;
             }
@@ -182,8 +191,8 @@ $(document).ready(function () {
             .on('keydown', inputOnKeydownHandler);
         $updateUserBtns.on('click', updateUserBtnOnClickHandler);
 
-        $(window).bind('beforeunload', function(){
-            if (sentencesToSave.length > 0) {
+        $(window).bind('beforeunload', function() {
+            if (sentencesToSave.length > 0 && userLoggedIn) {
                 return false;
             }
         });

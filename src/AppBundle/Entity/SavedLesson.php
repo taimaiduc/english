@@ -86,7 +86,6 @@ class SavedLesson
         $sentences = [];
 
         foreach ($this->savedSentences as $savedSentence) {
-            /** @var SavedSentence $savedSentence */
             $sentences[] = $savedSentence->getSentence();
         }
 
