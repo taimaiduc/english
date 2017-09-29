@@ -98,7 +98,7 @@ $(document).ready(function () {
             return $.post(args)
                 .done(function () {
                     sentencesToSave.length = 0;
-                    $updateUserBtns.find('span')
+                    $updateUserBtns.find('.success-sign')
                         .fadeIn().delay(2000).fadeOut(500);
                 })
                 .always(function () {
@@ -166,9 +166,9 @@ $(document).ready(function () {
             if (isLessonDone()) {
                 if (userLoggedIn) {
                     updateUserProgress();
-                } else {
-                    $updateUserBtns.text('hoan thanh');
                 }
+
+                $updateUserBtns.addClass('lesson-completed');
             }
         };
 

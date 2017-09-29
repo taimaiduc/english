@@ -206,11 +206,24 @@ body > .container {
     /* don't let button block mouse events from reaching wrapper */
     pointer-events: none;
 }
-.update-user-progress i, .update-user-progress span{
+.update-user-progress .in-progress-sign,
+.update-user-progress .success-sign {
   display: none;
 }
 
-.in-progress i {
+.update-user-progress .button-text {
+    display: inline-block;
+}
+
+.update-user-progress.lesson-completed span {
+    display: none;
+}
+
+.update-user-progress.lesson-completed .button-text:after {
+    content: 'Hoàn thành';
+}
+
+.in-progress .in-progress-sign {
   display: inline-block;
 }
 

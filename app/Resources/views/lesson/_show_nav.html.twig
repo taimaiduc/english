@@ -6,9 +6,9 @@
             </div>
             <div class="form-group tooltip-wrapper"{% if not app.user %} data-toggle="tooltip" data-placement="bottom" title="Đăng nhập mới xài được chức năng này."{% endif %}>
                 <button class="btn btn-lg btn-block btn-success update-user-progress js-update-user-progress"{% if not app.user %} disabled{% endif %}>
-                    Tạm lưu
-                    <i class="glyphicon glyphicon-refresh glyphicon-spin"></i>
-                    <span class="glyphicon glyphicon-check"></span>
+                    <div class="button-text"><span>Tạm lưu</span></div>
+                    <i class="glyphicon glyphicon-refresh glyphicon-spin in-progress-sign"></i>
+                    <span class="glyphicon glyphicon-check success-sign"></span>
                 </button>
             </div>
             <div class="form-group row">
