@@ -198,56 +198,64 @@ body > .container {
     margin-bottom: 5px;
 }
 
+.tooltip-wrapper {
+    cursor: not-allowed;
+}
+
+.tooltip-wrapper .btn[disabled] {
+    /* don't let button block mouse events from reaching wrapper */
+    pointer-events: none;
+}
 .update-user-progress i, .update-user-progress span{
-    display: none;
+  display: none;
 }
 
 .in-progress i {
-    display: inline-block;
+  display: inline-block;
 }
 
 .glyphicon-refresh.spinning {
-    transform-origin: 48% 50%;
+  transform-origin: 48% 50%;
 }
 
 .btn {
-    white-space: normal;
+  white-space: normal;
 }
 
 @media(min-width: 768px) {
 }
 
 @media(max-width: 768px) {
-    .lesson-wrapper .col-sm-3 {
-        padding-left: 0;
-    }
+  .lesson-wrapper .col-sm-3 {
+      padding-left: 0;
+  }
 
-    .lesson-wrapper .col-sm-9 {
-        padding-right: 0;
-    }
+  .lesson-wrapper .col-sm-9 {
+      padding-right: 0;
+  }
 }
 
 .glyphicon-spin {
-    -webkit-animation: spin 1000ms infinite linear;
-    animation: spin 1000ms infinite linear;
+  -webkit-animation: spin 1000ms infinite linear;
+  animation: spin 1000ms infinite linear;
 }
 @-webkit-keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
+  0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+  }
+  100% {
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg);
+  }
 }
 @keyframes spin {
-    0% {
-        -webkit-transform: rotate(0deg);
-        transform: rotate(0deg);
-    }
-    100% {
-        -webkit-transform: rotate(359deg);
-        transform: rotate(359deg);
-    }
+  0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+  }
+  100% {
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg);
+  }
 }

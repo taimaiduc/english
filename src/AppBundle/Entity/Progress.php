@@ -5,7 +5,7 @@ namespace AppBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="AppBundle\Repository\ProgressRepository")
  * @ORM\Table(name="progress")
  */
 class Progress
@@ -33,7 +33,10 @@ class Progress
      */
     private $point;
 
-    private $lastestPoint;
+    /**
+     * @var int
+     */
+    private $percentage;
 
     /**
      * @param mixed $user
@@ -93,16 +96,16 @@ class Progress
     /**
      * @return int
      */
-    public function getLastestPoint()
+    public function getPercentage()
     {
-        return $this->lastestPoint;
+        return $this->percentage;
     }
 
     /**
-     * @param int $lastestPoint
+     * @param int $percentage
      */
-    public function setLastestPoint($lastestPoint)
+    public function setPercentage($percentage)
     {
-        $this->lastestPoint = $lastestPoint;
+        $this->percentage = $percentage;
     }
 }

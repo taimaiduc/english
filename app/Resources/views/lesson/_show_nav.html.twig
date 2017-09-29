@@ -4,9 +4,8 @@
             <div class="form-group">
                 <h4 class="text-muted lesson-name">{{ lesson.position ~ '. ' ~ lesson.name }}</h4>
             </div>
-            <div class="form-group">
-                <button class="btn btn-lg btn-block btn-success update-user-progress js-update-user-progress"
-                        data-target="#authModal">
+            <div class="form-group tooltip-wrapper"{% if not app.user %} data-toggle="tooltip" data-placement="bottom" title="Đăng nhập mới xài được chức năng này."{% endif %}>
+                <button class="btn btn-lg btn-block btn-success update-user-progress js-update-user-progress"{% if not app.user %} disabled{% endif %}>
                     Tạm lưu
                     <i class="glyphicon glyphicon-refresh glyphicon-spin"></i>
                     <span class="glyphicon glyphicon-check"></span>

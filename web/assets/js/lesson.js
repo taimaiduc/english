@@ -11,6 +11,7 @@ $(document).ready(function () {
         const saveLessonUrl     = App.saveLessonUrl;
         const completeLessonUrl = App.completeLessonUrl;
         const sentencesToSave   = [];
+
         let sentenceIndex       = 0;
         let doneSentences       = $sentences.filter('.done').length;
         let userLoggedIn        = App.userLoggedIn;
@@ -189,7 +190,8 @@ $(document).ready(function () {
         $checkBtns.on('click', checkBtnsOnClickHander);
         $inputs.on('focus', inputOnFocusHandler)
             .on('keydown', inputOnKeydownHandler);
-        $updateUserBtns.on('click', updateUserBtnOnClickHandler);
+        $updateUserBtns.on('click', updateUserBtnOnClickHandler)
+            .parent().tooltip();
 
         $(window).bind('beforeunload', function() {
             if (sentencesToSave.length > 0 && userLoggedIn) {
