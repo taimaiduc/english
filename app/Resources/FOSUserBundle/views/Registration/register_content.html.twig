@@ -4,16 +4,18 @@
     <div class="col-xs-12">
         <h3>Register</h3>
 
-        {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
-            <div class="js-modal-form-error">
-                {% for flashMessage in app.session.flashbag.get('error') %}
-                    <div class="alert alert-danger">{{ flashMessage }}</div>
-                {% endfor %}
-            </div>
+        <div>
+            {% for flashMessage in app.session.flashbag.get('error') %}
+                <div class="alert alert-danger">{{ flashMessage }}</div>
+            {% endfor %}
+        </div>
 
+        {{ form_start(form, {'method': 'post', 'action': path('fos_user_registration_register'), 'attr': {'class': 'fos_user_registration_register'}}) }}
+            {{ dump(form_errors(form)) }}
             <div class="form-group">
                 {{ form_label(form.username) }}
                 {{ form_widget(form.username, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.username) }}
             </div>
 
             <div class="form-group">
@@ -25,7 +27,6 @@
                 {{ form_label(form.plainPassword.first) }}
                 {{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
             </div>
-
 
             <div class="form-group">
                 {{ form_label(form.plainPassword.second) }}

@@ -5,12 +5,12 @@
     <div class=" col-sm-12 col-md-10">
         <ul class="nav nav-tabs" role="tablist">
             {% for category in categories if category.lessons|length > 0 %}
-                <li role="presentation" class="{% if loop.index == 1 %}active{% endif %}"><a href="#{{ category.slug }}" aria-controls="{{ category.slug }}" role="tab" data-toggle="tab">{{ category.name }}</a></li>
+                <li role="presentation" class="{% if loop.index == 1 %}active{% endif %}"><a href="#{{ category.slug }}" aria-controls="{{ category.slug }}" role="tab" data-toggle="tab"><b>{{ category.name }}</b></a></li>
             {% endfor %}
         </ul>
 
         <div class="tab-content">
-            {% for category in categories %}
+            {% for category in categories if category.lessons|length > 0 %}
                 <div class="row tab-pane {% if loop.index == 1 %}active{% endif %}" id="{{ category.slug }}">
                     <div class="js-lesson-list-wrapper" data-category-slug="{{ category.slug }}">
                         {% include 'lesson/_list.html.twig' with {'category': category, 'lessons': category.lessons} %}
@@ -34,11 +34,11 @@
 {% endblock %}
 
 {% block javascripts %}
+    {{ parent() }}
     <script>
-        var app = {
+        window.App = {
             ajaxListUrl: '{{ path('ajax_lesson_list') }}'
         };
     </script>
-    {{ parent() }}
     <script src="{{ asset('assets/js/list.js') }}"></script>
 {% endblock %}

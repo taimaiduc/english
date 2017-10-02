@@ -4,6 +4,7 @@ namespace AppBundle\Repository;
 
 use AppBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 
 class ProgressRepository extends EntityRepository
 {
@@ -15,5 +16,22 @@ class ProgressRepository extends EntityRepository
             ->setParameter('user', $user)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function findLeadersToday()
+    {
+        $today = (new \DateTime())->format('Y-m-d');
+
+        return $this->createQueryBuilder('p')
+            ->select('p.point')
+            ->andWhere('p.date = :today')
+            ->setParameter('today', $today)
+            ->leftJoin('p.user', 'u')
+            ->andWhere('p.user = u')
+            ->addSelect('u.username')
+            ->orderBy('p.point', 'DESC')
+            ->setMaxResults(10)
+            ->getQuery()
+            ->execute();
     }
 }

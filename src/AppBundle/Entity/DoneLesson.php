@@ -81,4 +81,12 @@ class DoneLesson
     {
         $this->count = $count;
     }
+
+    /**
+     * @param int $count
+     */
+    public function addCount($count = 0)
+    {
+        $this->count += $count ? $count : 1;
+    }
 }

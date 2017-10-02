@@ -2,6 +2,7 @@
 
 namespace AppBundle\Controller\AjaxController;
 
+use AppBundle\Entity\DoneLesson;
 use AppBundle\Entity\Lesson;
 use AppBundle\Entity\Progress;
 use AppBundle\Entity\SavedLesson;
@@ -91,17 +92,30 @@ class AjaxUserController extends Controller
             throw new \InvalidArgumentException();
         }
 
-        $doctrine = $this->getDoctrine();
-        $em       = $doctrine->getManager();
-        $point    = $lesson->getPoint();
+        $doctrine   = $this->getDoctrine();
+        $em         = $doctrine->getManager();
+        $point      = $lesson->getPoint();
+        $userLesson = ['user' => $user, 'lesson' => $lesson];
 
         $savedLesson = $doctrine->getRepository('AppBundle:SavedLesson')
-            ->findOneBy(['user' => $user, 'lesson' => $lesson]);
+            ->findOneBy($userLesson);
 
         if ($savedLesson) {
             $point -= $savedLesson->getPoint();
             $em->remove($savedLesson);
         }
+
+        $doneLesson = $doctrine->getRepository('AppBundle:DoneLesson')
+            ->findOneBy($userLesson);
+
+        if (!$doneLesson) {
+            $doneLesson = new DoneLesson();
+            $doneLesson->setUser($user);
+            $doneLesson->setLesson($lesson);
+        }
+
+        $doneLesson->addCount();
+        $em->persist($doneLesson);
 
         $this->updateUserProgress($em, $user, $point);
 

@@ -32,23 +32,6 @@ class FOSRegistrationSubscriber implements EventSubscriberInterface
 
     public function onRegistrationFailure(FormEvent $event)
     {
-        // if it's not an ajax call, let the fos bundle handle its work
-        if (!$event->getRequest()->isXmlHttpRequest()) {
-            return null;
-        }
-
-        $form = $event->getForm();
-
-        if (!$form->getErrors()) {
-            $event->setResponse(new JsonResponse());
-        } else {
-            // There is some errors, prepare a failure response
-            $errors = $this->getFormErrors($form);
-
-            // Set the status to Bad Request in order to grab it in front (i.e $.ajax({ ...}).error(...))
-            $response = new JsonResponse($errors, 400);
-            $event->setResponse($response);
-        }
     }
 
     private function getFormErrors(FormInterface $form)

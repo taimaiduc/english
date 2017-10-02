@@ -3,6 +3,7 @@
 namespace AppBundle\Controller\AjaxController;
 
 use AppBundle\Controller\BaseController;
+use AppBundle\Entity\Lesson;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -33,9 +34,23 @@ class AjaxLessonController extends BaseController
             ->findOneByCategoryQueryBuilder($category);
         $pagerfanta = $this->getPagerfanta($qb, 30, $page);
 
-        $lessons = [];
-        foreach ($pagerfanta->getCurrentPageResults() as $lesson) {
-            $lessons[] = $lesson;
+        $lessons = (array) $pagerfanta->getCurrentPageResults();
+
+        if ($user = $this->getUser()) {
+            $lessonRepo = $this->getDoctrine()->getRepository('AppBundle:Lesson');
+            $savedLessons = $lessonRepo->findSavedLessons($user);
+            $doneLessons = $lessonRepo->findDoneLessons($user);
+
+            foreach ($lessons as $lesson) {
+                /** @var Lesson $lesson */
+                if (in_array($lesson, $savedLessons)) {
+                    $lesson->setWasSaved(true);
+                }
+
+                if (isset($doneLessons[$lesson->getId()])) {
+                    $lesson->setNumberOfTimesDone($doneLessons[$lesson->getId()]);
+                }
+            }
         }
 
         return $this->render('lesson/_list.html.twig', [

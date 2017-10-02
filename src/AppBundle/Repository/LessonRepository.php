@@ -3,7 +3,10 @@
 namespace AppBundle\Repository;
 
 use AppBundle\Entity\Category;
+use AppBundle\Entity\DoneLesson;
 use AppBundle\Entity\Lesson;
+use AppBundle\Entity\SavedLesson;
+use AppBundle\Entity\User;
 use Doctrine\ORM\EntityRepository;
 
 class LessonRepository extends EntityRepository
@@ -54,5 +57,47 @@ class LessonRepository extends EntityRepository
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @param User $user
+     * @return Lesson[]
+     */
+    public function findSavedLessons(User $user)
+    {
+        return $this->createQueryBuilder('l')
+            ->innerJoin('AppBundle:SavedLesson', 'sl', 'WITH', 'l.id = sl.lesson AND sl.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * Return an array
+     * [
+     *      lessonId => numberOfTimesDone,
+     *      anotherId => anotherNumber
+     * ]
+     *
+     * @param User $user
+     * @return array
+     */
+    public function findDoneLessons(User $user)
+    {
+        $lessons = $this->createQueryBuilder('l')
+            ->select('l.id')
+            ->innerJoin('AppBundle:DoneLesson', 'dl', 'WITH', 'l.id = dl.lesson AND dl.user = :user')
+            ->setParameter('user', $user)
+            ->addSelect('dl.count')
+            ->getQuery()
+            ->execute();
+
+        $result = [];
+
+        foreach ($lessons as $key => $lesson) {
+            $result[$lesson['id']] = $lesson['count'];
+        }
+
+        return $result;
     }
 }

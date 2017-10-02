@@ -11,10 +11,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for user in leaders %}
+                    {% for leader in leaders %}
                         <tr>
-                            <td>{{ user.username }}</td>
-                            <td>{{ user.totalPoint }}</td>
+                            <td>{{ leader.username }}</td>
+                            <td>{{ leader.point }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

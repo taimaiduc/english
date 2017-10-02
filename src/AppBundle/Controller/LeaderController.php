@@ -12,8 +12,8 @@ class LeaderController extends Controller
      */
     public function indexAction()
     {
-        $leaders = $this->getDoctrine()->getRepository('AppBundle:User')
-            ->findAllLeaderUsers();
+        $leaders = $this->getDoctrine()->getRepository('AppBundle:Progress')
+            ->findLeadersToday();
 
         return $this->render('leader/index.html.twig', [
             'leaders' => $leaders

@@ -64,6 +64,13 @@ class Lesson
     private $wasSaved;
 
     /**
+     * Number of times this lesson has been done
+     *
+     * @var int
+     */
+    private $numberOfTimesDone = 0;
+
+    /**
      * @return int
      */
     public function getId()
@@ -213,5 +220,21 @@ class Lesson
     public function setWasSaved($wasSaved)
     {
         $this->wasSaved = $wasSaved;
+    }
+
+    /**
+     * @return int
+     */
+    public function getNumberOfTimesDone()
+    {
+        return $this->numberOfTimesDone;
+    }
+
+    /**
+     * @param int $numberOfTimesDone
+     */
+    public function setNumberOfTimesDone($numberOfTimesDone)
+    {
+        $this->numberOfTimesDone = $numberOfTimesDone;
     }
 }

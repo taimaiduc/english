@@ -4,7 +4,7 @@ $(document).ready(function () {
 
         const getLessons = function (categorySlug, page) {
             return $.ajax({
-                url: app.ajaxListUrl,
+                url: App.ajaxListUrl,
                 data: 'categorySlug='+categorySlug+'&page='+page,
                 method: 'get'
             })
@@ -12,11 +12,15 @@ $(document).ready(function () {
 
         const paginationHandler = function ($el, categorySlug, lessonList) {
             const $lessonListWrapper = $('.js-lesson-list-wrapper[data-category-slug="'+categorySlug+'"]');
+            const $pagination = $('.pagination a[data-category-slug="'+categorySlug+'"]');
+
             $lessonListWrapper.children().hide();
+
             if (lessonList) {
                 $lessonListWrapper.append(lessonList);
             }
-            const $pagination = $('.pagination a[data-category-slug="'+categorySlug+'"]');
+
+
             $pagination.parent().removeClass('active');
             $el.parent().addClass('active');
         };

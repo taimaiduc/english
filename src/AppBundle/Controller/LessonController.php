@@ -20,12 +20,33 @@ class LessonController extends BaseController
         $categories = $this->getDoctrine()->getRepository('AppBundle:Category')
             ->findAll();
 
+        $lessonRepo = $qb = $this->getDoctrine()->getRepository('AppBundle:Lesson');
+
         foreach ($categories as $category) {
-            $qb = $this->getDoctrine()->getRepository('AppBundle:Lesson')
+            $qb = $lessonRepo
                 ->findOneByCategoryQueryBuilder($category);
             $pagerfanta = $this->getPagerfanta($qb, 30);
             $category->setPager($pagerfanta);
-            $category->setLessons((array) $pagerfanta->getCurrentPageResults());
+
+            $lessons = (array) $pagerfanta->getCurrentPageResults();
+
+            if ($user = $this->getUser()) {
+                $savedLessons = $lessonRepo->findSavedLessons($user);
+                $doneLessons = $lessonRepo->findDoneLessons($user);
+
+                foreach ($lessons as $lesson) {
+                    /** @var Lesson $lesson */
+                    if (in_array($lesson, $savedLessons)) {
+                        $lesson->setWasSaved(true);
+                    }
+
+                    if (isset($doneLessons[$lesson->getId()])) {
+                        $lesson->setNumberOfTimesDone($doneLessons[$lesson->getId()]);
+                    }
+                }
+            }
+
+            $category->setLessons($lessons);
         }
 
         $data = [
