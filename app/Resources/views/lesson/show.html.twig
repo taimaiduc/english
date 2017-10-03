@@ -78,7 +78,7 @@
 
             if ($form.is(':empty')) {
                 $.ajax({
-                    url: "{{ path('fos_user_security_login') }}"
+                    url: ""
                 }).then(function (data) {
                     $form.html(data);
                     toggleAuthForms($form);
@@ -97,7 +97,7 @@
 
             if ($form.is(':empty')) {
                 $.ajax({
-                    url: "{{ path('fos_user_registration_register') }}",
+                    url: "",
                     method: 'get'
                 }).then(function (data) {
                     $form.html(data);

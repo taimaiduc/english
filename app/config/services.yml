@@ -4,16 +4,12 @@ parameters:
     #parameter_name: value
 
 services:
-    authentication_handler:
-        class:  AppBundle\Security\FOSAuthenticationHandler
-        arguments:  ['@router']
+    app.security.login_form_authenticator:
+        class: AppBundle\Security\LoginFormAuthenticator
+        autowire: true
 
-    registration_subscriber:
-        class: AppBundle\Security\FOSRegistrationSubscriber
-        arguments: ['@router', '@session.flash_bag']
+    app.doctrine.hash_password_listener:
+        class: AppBundle\Doctrine\HashPasswordListener
+        autowire: true
         tags:
-            - { name: kernel.event_subscriber }
-
-    logout_listener:
-        class: AppBundle\Security\LogoutListener
-        autowire: ['@router']
+            - { name: doctrine.event_subscriber }

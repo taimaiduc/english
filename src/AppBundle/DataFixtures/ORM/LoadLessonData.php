@@ -44,10 +44,10 @@ class LoadLessonData implements FixtureInterface
 
                     $sentencePos++;
                 }
-                $manager->persist($lesson);
 
                 $lesson->addPoint($sentencesPoint);
                 $lessonPos++;
+                $manager->persist($lesson);
             }
 
             $category->addTotalLessons($lessonPos-1);

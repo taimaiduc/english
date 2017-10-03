@@ -2,36 +2,28 @@
 # http://symfony.com/doc/current/security.html
 security:
     encoders:
-        FOS\UserBundle\Model\UserInterface: bcrypt
+        AppBundle\Entity\User: bcrypt
 
     role_hierarchy:
         ROLE_ADMIN:       ROLE_USER
         ROLE_SUPER_ADMIN: ROLE_ADMIN
 
     providers:
-        fos_userbundle:
-            id: fos_user.user_provider.username_email
+        user_provider: #just a name, could be anything
+            entity: { class: AppBundle\Entity\User, property: email }
 
     firewalls:
-        main:
-            pattern: ^/
-            form_login:
-                provider: fos_userbundle
-                csrf_token_generator: security.csrf.token_manager
-                success_handler: authentication_handler
-                failure_handler: authentication_handler
-                # if you are using Symfony < 2.8, use the following config instead:
-                # csrf_provider: form.csrf_provider
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
 
+        main:
+            anonymous: ~
+            guard:
+                authenticators:
+                    - app.security.login_form_authenticator
             logout:
-                success_handler: logout_listener
-            anonymous:    true
-            remember_me:
-                secret:      "%secret%"
-                lifetime: 2592000
-                path:     /
-                domain:   ~
-                user_provider: fos_userbundle
+                path: /logout
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }

@@ -69,14 +69,6 @@ swiftmailer:
     password: '%mailer_password%'
     spool: { type: memory }
 
-fos_user:
-    db_driver: orm
-    user_class: AppBundle\Entity\User
-    firewall_name: main
-    from_email:
-        address: "%mailer_user%"
-        sender_name: "%mailer_user%"
-
 doctrine_migrations:
     dir_name: "%kernel.root_dir%/DoctrineMigrations"
     namespace: Application\Migrations
