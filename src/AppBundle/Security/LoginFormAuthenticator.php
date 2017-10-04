@@ -8,6 +8,8 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
@@ -82,27 +84,33 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
         return false;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null)
-    {
-        // TODO: Implement start() method.
-    }
+    public function start(Request $request, AuthenticationException $authException = null){}
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {
-        $loginUrl = $this->router->generate('security_login');
+        /** @var FlashBagInterface $flashBag */
+        $flashBag = $request->getSession()->getBag('flashes');
+        $flashBag->set('error', ['Authentication failed']);
 
-        return new RedirectResponse($loginUrl);
+        return new RedirectResponse($this->router->generate('security_login'));
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $referer = $request->headers->get('referer');
+        $sesion = $request->getSession();
 
-        return new RedirectResponse($referer);
+        if ($sesion->has('last_visited_lesson_url')) {
+            $route = $sesion->get('last_visited_lesson_url');
+            $sesion->remove('last_visited_lesson_url');
+        } else {
+            $route = $this->router->generate('lessons_list');
+        }
+
+        return new RedirectResponse($route);
     }
 
     public function supportsRememberMe()
     {
-        // TODO: Implement supportsRememberMe() method.
+        return true;
     }
 }

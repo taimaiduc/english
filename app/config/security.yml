@@ -22,8 +22,12 @@ security:
             guard:
                 authenticators:
                     - app.security.login_form_authenticator
+            remember_me:
+                secret: '%secret%'
+                remember_me_parameter: _remember_me
             logout:
                 path: /logout
+                success_handler: app.security.logout_handler
 
     access_control:
         - { path: ^/login$, role: IS_AUTHENTICATED_ANONYMOUSLY }

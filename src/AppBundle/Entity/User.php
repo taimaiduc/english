@@ -3,11 +3,15 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
  * @ORM\Table(name="user")
+ * @UniqueEntity(fields={"email"}, message="register.email.unique")
+ * @UniqueEntity(fields={"username"}, message="register.username.unique")
  */
 class User implements UserInterface
 {
@@ -20,11 +24,18 @@ class User implements UserInterface
 
     /**
      * @ORM\Column(type="string", unique=true)
+     * @Assert\NotBlank()
+     * @Assert\Regex(
+     *     pattern="/[a-zA-Z0-9]/",
+     *     match=false,
+     *     message="register.username.regex"
+     * )
      */
     private $username;
 
     /**
      * @ORM\Column(type="string", unique=true)
+     * @Assert\NotBlank()
      */
     private $email;
 
@@ -70,6 +81,7 @@ class User implements UserInterface
 
     /**
      * @var string
+     * @Assert\NotBlank(groups={"Registration"})
      */
     private $plainPassword;
 
@@ -117,7 +129,7 @@ class User implements UserInterface
 
     public function getPassword()
     {
-        return $this->getPassword();
+        return $this->password;
     }
 
     public function getSalt()

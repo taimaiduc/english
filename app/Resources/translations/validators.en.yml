@@ -1,0 +1,3 @@
+register.username.regex: Username can only contain letters and numbers.
+register.email.unique: Email has already been used.
+register.username.unique: Username has already been taken.

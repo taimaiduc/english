@@ -8,6 +8,9 @@ services:
         class: AppBundle\Security\LoginFormAuthenticator
         autowire: true
 
+    app.security.logout_handler:
+        class: AppBundle\Security\LogoutHandler
+
     app.doctrine.hash_password_listener:
         class: AppBundle\Doctrine\HashPasswordListener
         autowire: true

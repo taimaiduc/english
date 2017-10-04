@@ -138,6 +138,7 @@ class AjaxUserController extends Controller
         }
 
         $user->addPoint($point);
+        $user->setUpdatedAt($now);
         $em->persist($user);
         $em->persist($progress);
 

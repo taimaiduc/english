@@ -6,6 +6,7 @@ use AppBundle\Entity\Category;
 use AppBundle\Entity\Lesson;
 use AppBundle\Entity\SavedSentence;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -62,7 +63,7 @@ class LessonController extends BaseController
      * @return Response
      * @Route("/lessons/{categorySlug}/{position}", name="lessons_show")
      */
-    public function showAction($categorySlug, $position)
+    public function showAction(Request $request, $categorySlug, $position)
     {
         /** @var Category $category */
         $category = $this->getDoctrine()->getRepository('AppBundle:Category')
@@ -97,6 +98,8 @@ class LessonController extends BaseController
                     }
                 }
             }
+        } else {
+            $request->getSession()->set('last_visited_lesson_url', $request->getRequestUri());
         }
 
         $data = [
