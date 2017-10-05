@@ -26,8 +26,8 @@ class User implements UserInterface
      * @ORM\Column(type="string", unique=true)
      * @Assert\NotBlank()
      * @Assert\Regex(
-     *     pattern="/[a-zA-Z0-9]/",
-     *     match=false,
+     *     pattern="/^[a-z\-0-9]+$/",
+     *     match=true,
      *     message="register.username.regex"
      * )
      */

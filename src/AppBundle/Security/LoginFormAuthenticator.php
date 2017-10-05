@@ -18,6 +18,7 @@ use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Guard\AbstractGuardAuthenticator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class LoginFormAuthenticator extends AbstractGuardAuthenticator
 {
@@ -40,13 +41,22 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
      * @var UserPasswordEncoder
      */
     private $passwordEncoder;
+    /**
+     * @var TranslatorInterface
+     */
+    private $translator;
 
-    public function __construct(FormFactoryInterface $formFactory, EntityManager $em, RouterInterface $router, UserPasswordEncoder $passwordEncoder)
+    public function __construct(FormFactoryInterface $formFactory,
+                                EntityManager $em,
+                                RouterInterface $router,
+                                UserPasswordEncoder $passwordEncoder,
+                                TranslatorInterface $translator)
     {
         $this->formFactory = $formFactory;
         $this->em = $em;
         $this->router = $router;
         $this->passwordEncoder = $passwordEncoder;
+        $this->translator = $translator;
     }
 
     public function getCredentials(Request $request)
@@ -90,19 +100,28 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
     {
         /** @var FlashBagInterface $flashBag */
         $flashBag = $request->getSession()->getBag('flashes');
-        $flashBag->set('error', ['Authentication failed']);
+        $flashBag->set('error', [
+            $this->translator->trans('authentication.failed')
+        ]);
 
         return new RedirectResponse($this->router->generate('security_login'));
     }
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, $providerKey)
     {
-        $sesion = $request->getSession();
+        $route = null;
 
-        if ($sesion->has('last_visited_lesson_url')) {
-            $route = $sesion->get('last_visited_lesson_url');
-            $sesion->remove('last_visited_lesson_url');
-        } else {
+        if ($referer = $referer = $request->request->get('_referer')) {
+            $host = $request->getHost();
+            $uri = $request->getRequestUri();
+            $refererUri = parse_url($referer, PHP_URL_PATH);
+
+            if (false !== strpos($referer, $host) && $refererUri != $uri) {
+                $route = $referer;
+            }
+        }
+
+        if (null === $route) {
             $route = $this->router->generate('lessons_list');
         }
 

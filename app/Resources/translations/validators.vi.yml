@@ -1,1 +1,3 @@
-register.username.regex: Biệt danh chứa kí tự đặc biệt hoặc khoảng trắng không được chấp nhận.
+register.username.unique: Biệt danh này có người đặt rồi!!!
+register.username.regex: Biệt danh chứa kí tự đặc biệt hoặc khoảng trắng không được chấp nhận!!
+register.email.unique: Email đã được đăng kí, có thể bạn đã có tài khoản?

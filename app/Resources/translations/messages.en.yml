@@ -1,0 +1,10 @@
+form:
+    login: Login
+    register: Sign up
+    username: Username
+    password: Password
+    repeat_password: Repeat Password
+    submit_login: Login
+    submit_register: Register
+authentication:
+    failed: Authentication failed.

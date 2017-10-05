@@ -45,12 +45,19 @@ class UserController extends Controller
      */
     public function registerAction(Request $request)
     {
-        $form = $this->createForm(RegistrationForm::class);
+        $form = $this->createForm(RegistrationForm::class, [
+            '_referer' => $request->headers->get('referer')
+        ]);
 
         $form->handleRequest($request);
         if ($form->isValid()) {
+            $data = $form->getData();
+
             /** @var User $user */
-            $user = $form->getData();
+            $user = new User();
+            $user->setUsername($data['username']);
+            $user->setEmail($data['email']);
+            $user->setPlainPassword($data['plainPassword']);
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);

@@ -13,7 +13,7 @@ class SecurityController extends Controller
     /**
      * @Route("/login", name="security_login")
      */
-    public function loginAction()
+    public function loginAction(Request $request)
     {
         $authUtils = $this->get('security.authentication_utils');
 
@@ -24,7 +24,8 @@ class SecurityController extends Controller
         $lastUsername = $authUtils->getLastUsername();
 
         $form = $this->createForm(LoginForm::class, [
-            '_username' => $lastUsername
+            '_username' => $lastUsername,
+            '_referer' => $request->headers->get('referer')
         ]);
 
         return $this->render('security/login.html.twig', array(
