@@ -7,5 +7,10 @@ form:
     remember_me: Tự động đăng nhập lần sau
     submit_login: Đăng nhập
     submit_register: Ghi danh
+
 authentication:
     failed: Biệt danh hoặc mật khẩu không đúng!!
+
+email:
+    registration:
+        title:

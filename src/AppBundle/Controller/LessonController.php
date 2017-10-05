@@ -108,4 +108,23 @@ class LessonController extends BaseController
 
         return $this->render('lesson/show.html.twig', $data);
     }
+
+    /**
+     * @Route("/test")
+     */
+    public function testAction()
+    {
+        $mailer = $this->get('mailer');
+        $message = (new \Swift_Message('Hello Email'))
+            ->setFrom('send@example.com')
+            ->setTo('khoa-huy.nguyen@ekino.com')
+            ->setBody(
+                'test',
+                'text/html'
+            );
+
+        $mailer->send($message);
+
+        return new Response('<html><body></body></html>');
+    }
 }

@@ -64,6 +64,7 @@ class UserController extends Controller
             $em->flush();
 
             $this->addFlash('success', 'Welcome '. $user->getUsername() . '!');
+            $this->sendSuccessfulRegistrationEmail($data);
 
             return $this->get('security.authentication.guard_handler')
                 ->authenticateUserAndHandleSuccess(
@@ -77,5 +78,23 @@ class UserController extends Controller
         return $this->render('security/register.html.twig', [
             'form' => $form->createView()
         ]);
+    }
+
+    private function sendSuccessfulRegistrationEmail($data)
+    {
+        $mailer = $this->get('mailer');
+        $translator = $this->get('translator');
+
+        $message = (new \Swift_Message($translator->trans('email.registration.title')))
+            ->setFrom('send@example.com')
+            ->setTo('khoa-huy.nguyen@ekino.com')
+            ->setBody(
+                $this->renderView('email:registration.html.twig'),
+                'text/html'
+            );
+
+        $mailer->send($message);
+
+        return new Response('<html><body></body></html>');
     }
 }

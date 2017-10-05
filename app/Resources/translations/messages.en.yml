@@ -6,5 +6,10 @@ form:
     repeat_password: Repeat Password
     submit_login: Login
     submit_register: Register
+
 authentication:
     failed: Authentication failed.
+
+email:
+    registration:
+        title:
