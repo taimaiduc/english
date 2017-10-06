@@ -1,0 +1,29 @@
+AppBundle\Entity\Category:
+    type: entity
+    table: category
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+    fields:
+        name:
+            type: string
+            length: 100
+        slug:
+            type: string
+            length: 100
+        totalLessons:
+            column: total_lesson
+            type: smallint
+            options:
+                unsigned: true
+                default: 0
+        position:
+            type: smallint
+            options:
+                unsigned: true
+                default: 0
+    oneToMany:
+        lessons:
+            targetEntity: Lesson
+            mappedBy: category

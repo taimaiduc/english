@@ -1,0 +1,35 @@
+AppBundle\Entity\Lesson:
+    type: entity
+    table: lesson
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+    fields:
+        name:
+            type: string
+            length: 100
+        point:
+            type: smallint
+            options:
+                unsigned: true
+                default: 0
+        position:
+            type: smallint
+            options:
+                unsigned: true
+                default: 0
+        isActive:
+            type: boolean
+            options:
+                default: true
+    oneToMany:
+        sentences:
+            targetEntity: Sentence
+            mappedBy: lesson
+    manyToOne:
+        category:
+            targetEntity: Category
+            inversedBy: lessons
+            joinColumn: category_id
+            referencedColumnName: id

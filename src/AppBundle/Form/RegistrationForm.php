@@ -2,6 +2,7 @@
 
 namespace AppBundle\Form;
 
+use AppBundle\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
@@ -27,9 +28,6 @@ class RegistrationForm extends AbstractType
                 'first_options' => ['label' => 'form.password'],
                 'second_options' => ['label' => 'form.repeat_password']
             ])
-            ->add('_referer', HiddenType::class, [
-                'data' => $options['data']['_referer']
-            ])
             ->add('submit', SubmitType::class, [
                 'label' => 'form.submit_register',
                 'attr' => [
@@ -41,6 +39,7 @@ class RegistrationForm extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
+            'data_class' => User::class,
             'validation_group' => ['Default', 'Registration']
         ]);
     }

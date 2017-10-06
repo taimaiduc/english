@@ -11,40 +11,37 @@ use Doctrine\ORM\Mapping as ORM;
 class Lesson
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Category", inversedBy="lessons")
-     * @ORM\JoinColumn(nullable=false)
+     * @var Category
      */
     private $category;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\OneToMany(targetEntity="Sentence", mappedBy="lesson")
+     * @var Sentence[]
      */
     private $sentences;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $point = 0;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @var int
      */
     private $position = 0;
 
     /**
-     * @ORM\Column(type="boolean")
+     * @var bool
      */
     private $isActive = true;
 
@@ -127,7 +124,7 @@ class Lesson
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getPoint()
     {
@@ -135,7 +132,7 @@ class Lesson
     }
 
     /**
-     * @param mixed $point
+     * @param int $point
      */
     public function addPoint($point)
     {
@@ -143,7 +140,7 @@ class Lesson
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getPosition()
     {
@@ -151,7 +148,7 @@ class Lesson
     }
 
     /**
-     * @param mixed $position
+     * @param int $position
      */
     public function setPosition($position)
     {

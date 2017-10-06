@@ -7,6 +7,7 @@ use AppBundle\Form\RegistrationForm;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class UserController extends Controller
@@ -42,29 +43,25 @@ class UserController extends Controller
 
     /**
      * @Route("/register", name="user_register")
+     *
+     * @param Request $request
+     * @return Response
      */
     public function registerAction(Request $request)
     {
-        $form = $this->createForm(RegistrationForm::class, [
-            '_referer' => $request->headers->get('referer')
-        ]);
+        $form = $this->createForm(RegistrationForm::class);
 
         $form->handleRequest($request);
         if ($form->isValid()) {
-            $data = $form->getData();
-
             /** @var User $user */
-            $user = new User();
-            $user->setUsername($data['username']);
-            $user->setEmail($data['email']);
-            $user->setPlainPassword($data['plainPassword']);
+            $user = $form->getData();
 
             $em = $this->getDoctrine()->getManager();
             $em->persist($user);
             $em->flush();
 
             $this->addFlash('success', 'Welcome '. $user->getUsername() . '!');
-            $this->sendSuccessfulRegistrationEmail($data);
+            $this->sendSuccessfulRegistrationEmail($form->getData());
 
             return $this->get('security.authentication.guard_handler')
                 ->authenticateUserAndHandleSuccess(

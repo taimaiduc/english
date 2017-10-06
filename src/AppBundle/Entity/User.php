@@ -3,6 +3,7 @@
 namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use FOS\UserBundle\Model\User as BaseUser;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -13,17 +14,9 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @UniqueEntity(fields={"email"}, message="register.email.unique")
  * @UniqueEntity(fields={"username"}, message="register.username.unique")
  */
-class User implements UserInterface
+class User extends BaseUser implements UserInterface
 {
     /**
-     * @ORM\Id
-     * @ORM\Column(type="integer")
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
-
-    /**
-     * @ORM\Column(type="string", unique=true)
      * @Assert\NotBlank()
      * @Assert\Regex(
      *     pattern="/^[a-z\-0-9]+$/",
@@ -31,23 +24,22 @@ class User implements UserInterface
      *     message="register.username.regex"
      * )
      */
-    private $username;
+    protected $username;
 
     /**
-     * @ORM\Column(type="string", unique=true)
      * @Assert\NotBlank()
      */
-    private $email;
+    protected $email;
 
     /**
      * @ORM\Column(type="string")
      */
-    private $password;
+    protected $password;
 
     /**
      * @ORM\Column(type="json_array")
      */
-    private $roles = [];
+    protected $roles = [];
 
     /**
      * @ORM\OneToMany(targetEntity="SavedLesson", mappedBy="user")
@@ -83,13 +75,15 @@ class User implements UserInterface
      * @var string
      * @Assert\NotBlank(groups={"Registration"})
      */
-    private $plainPassword;
+    protected $plainPassword;
 
     public function __construct()
     {
         $now = new \DateTime();
         $this->createdAt = $now;
         $this->updatedAt = $now;
+
+        parent::__construct();
     }
 
     /**
@@ -98,33 +92,6 @@ class User implements UserInterface
     public function getUsername()
     {
         return $this->username;
-    }
-
-    /**
-     * @param mixed $username
-     */
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
-
-    public function getRoles()
-    {
-        $roles = $this->roles;
-
-        if (!in_array('ROLE_USER', $roles)) {
-            $roles[] = 'ROLE_USER';
-        }
-
-        return $roles;
-    }
-
-    /**
-     * @param mixed $roles
-     */
-    public function setRoles($roles)
-    {
-        $this->roles = $roles;
     }
 
     public function getPassword()
@@ -147,22 +114,6 @@ class User implements UserInterface
     public function getEmail()
     {
         return $this->email;
-    }
-
-    /**
-     * @param mixed $email
-     */
-    public function setEmail($email)
-    {
-        $this->email = $email;
-    }
-
-    /**
-     * @param mixed $password
-     */
-    public function setPassword($password)
-    {
-        $this->password = $password;
     }
 
     /**
@@ -275,7 +226,7 @@ class User implements UserInterface
     }
 
     /**
-     * @param string $plainPassword
+     * {@inheritdoc}
      */
     public function setPlainPassword($plainPassword)
     {

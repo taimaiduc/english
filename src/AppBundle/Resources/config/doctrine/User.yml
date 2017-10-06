@@ -1,0 +1,22 @@
+AppBundle\Entity\User:
+    type: entity
+    fields:
+        point:
+            type: int
+            options:
+                unsigned: true
+                default: 0
+        createdAt:
+            type: date
+        updatedAt:
+            type: datetime
+    oneToMany:
+        savedLessons:
+            targetEntity: SavedLesson
+            mappedBy: user
+        doneLessons:
+            targetEntity: DoneLesson
+            mappedBy: user
+        progress:
+            targetEntity: Progress
+            mappedBy: user

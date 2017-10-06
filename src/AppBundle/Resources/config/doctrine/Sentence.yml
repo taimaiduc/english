@@ -1,0 +1,26 @@
+AppBundle\Entity\Sentence:
+    type: entity
+    table: sentence
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+    fields:
+        content:
+            type: string
+        point:
+            type: smallint
+                options:
+                    unsigned: true
+                    default: 0
+        position:
+            type: smallint
+                options:
+                    unsigned: true
+                    default: 0
+    manyToOne:
+        lesson:
+            targetEntity: Lesson
+            inversedBy: sentences
+            joinColumn: lesson_id
+            referencedColumnName: id

@@ -11,30 +11,27 @@ use Doctrine\ORM\Mapping as ORM;
 class Sentence
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Lesson", inversedBy="sentences")
-     * @ORM\JoinColumn(nullable=false)
+     * @var Lesson
      */
     private $lesson;
 
     /**
-     * @ORM\Column(type="string")
+     * @var string
      */
     private $content;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $point;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @var int
      */
     private $position;
 
@@ -44,7 +41,7 @@ class Sentence
     private $wasSaved;
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
@@ -84,7 +81,7 @@ class Sentence
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getPoint()
     {
@@ -92,7 +89,7 @@ class Sentence
     }
 
     /**
-     * @param mixed $point
+     * @param int $point
      */
     public function setPoint($point)
     {

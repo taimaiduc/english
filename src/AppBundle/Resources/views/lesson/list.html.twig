@@ -1,4 +1,4 @@
-{% extends 'layout.html.twig' %}
+{% extends 'AppBundle:layout.html.twig' %}
 
 {% block content %}
 <div class="row">
@@ -13,7 +13,7 @@
             {% for category in categories if category.lessons|length > 0 %}
                 <div class="row tab-pane {% if loop.index == 1 %}active{% endif %}" id="{{ category.slug }}">
                     <div class="js-lesson-list-wrapper" data-category-slug="{{ category.slug }}">
-                        {% include 'lesson/_list.html.twig' with {'category': category, 'lessons': category.lessons} %}
+                        {% include 'AppBundle:lesson/_list.html.twig' with {'category': category, 'lessons': category.lessons} %}
                     </div>
 
                     <div class="col-xs-12">

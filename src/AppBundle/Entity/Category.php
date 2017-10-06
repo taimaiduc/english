@@ -3,45 +3,37 @@
 namespace AppBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Pagerfanta\Pagerfanta;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="category")
- */
 class Category
 {
     /**
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @var string
      */
     private $name;
 
     /**
-     * @ORM\Column(type="string", length=100)
+     * @var string
      */
     private $slug;
 
     /**
-     * @ORM\OneToMany(targetEntity="Lesson", mappedBy="category")
+     * @var Lesson[]
      */
     private $lessons;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @var int
      */
     private $totalLessons = 0;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @var int
      */
     private $position = 0;
 
@@ -56,7 +48,7 @@ class Category
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {
@@ -64,7 +56,7 @@ class Category
     }
 
     /**
-     * @param mixed $id
+     * @param int $id
      */
     public function setId($id)
     {
@@ -72,7 +64,7 @@ class Category
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getName()
     {
@@ -80,7 +72,7 @@ class Category
     }
 
     /**
-     * @param mixed $name
+     * @param string $name
      */
     public function setName($name)
     {
@@ -88,7 +80,7 @@ class Category
     }
 
     /**
-     * @return mixed
+     * @return string
      */
     public function getSlug()
     {
@@ -96,7 +88,7 @@ class Category
     }
 
     /**
-     * @param mixed $slug
+     * @param string $slug
      */
     public function setSlug($slug)
     {
@@ -104,7 +96,7 @@ class Category
     }
 
     /**
-     * @return ArrayCollection|Lesson[]
+     * @return Lesson[]
      */
     public function getLessons()
     {
@@ -120,7 +112,7 @@ class Category
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getTotalLessons()
     {
@@ -128,15 +120,15 @@ class Category
     }
 
     /**
-     * @param mixed $totalLessons
+     * @param int $totalLessons
      */
-    public function addTotalLessons($totalLessons)
+    public function setTotalLessons($totalLessons)
     {
-        $this->totalLessons += $totalLessons;
+        $this->totalLessons = $totalLessons;
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getPosition()
     {
@@ -144,7 +136,7 @@ class Category
     }
 
     /**
-     * @param mixed $position
+     * @param int $position
      */
     public function setPosition($position)
     {
@@ -162,13 +154,13 @@ class Category
     /**
      * @param Pagerfanta $pager
      */
-    public function setPager(Pagerfanta $pager)
+    public function setPager($pager)
     {
         $this->pager = $pager;
     }
 
     public function __toString()
     {
-        return $this->getSlug();
+        return $this->slug;
     }
 }
