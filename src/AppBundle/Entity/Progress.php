@@ -2,34 +2,25 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Entity(repositoryClass="AppBundle\Repository\ProgressRepository")
- * @ORM\Table(name="progress")
- */
 class Progress
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="progress")
-     * @ORM\JoinColumn(nullable=false)
+     * @var User
      */
     private $user;
 
     /**
-     * @ORM\Column(type="date")
+     * @var \DateTime
      */
     private $date;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $point;
 
@@ -39,7 +30,15 @@ class Progress
     private $percentage;
 
     /**
-     * @param mixed $user
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @param User $user
      */
     public function setUser($user)
     {

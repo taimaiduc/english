@@ -1,5 +1,6 @@
 AppBundle\Entity\Lesson:
     type: entity
+    repositoryClass: AppBundle\Repository\LessonRepository
     table: lesson
     id:
         id:

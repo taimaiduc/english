@@ -2,41 +2,25 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Entity()
- * @ORM\Table(name="saved_sentence")
- */
 class SavedSentence
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="SavedLesson", inversedBy="savedSentences")
-     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
+     * @var SavedLesson
      */
     private $savedLesson;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Sentence")
-     * @ORM\JoinColumn(nullable=false)
+     * @var Sentence
      */
     private $sentence;
 
-    public function __construct(SavedLesson $savedLesson, Sentence $sentence)
-    {
-        $this->savedLesson = $savedLesson;
-        $this->sentence = $sentence;
-    }
-
     /**
-     * @return mixed
+     * @return int
      */
     public function getId()
     {

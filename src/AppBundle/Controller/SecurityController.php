@@ -28,7 +28,7 @@ class SecurityController extends Controller
             '_referer' => $request->headers->get('referer')
         ]);
 
-        return $this->render('security/login.html.twig', array(
+        return $this->render('AppBundle:security/login.html.twig', array(
             'form'  => $form->createView(),
             'error' => $error,
         ));

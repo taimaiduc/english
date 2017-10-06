@@ -1,0 +1,17 @@
+AppBundle\Entity\Progress:
+    type: entity
+    repositoryClass: AppBundle\Repository\ProgressRepository
+    table: progress
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+    fields:
+        date:
+            type: date
+        point:
+            type: smallint
+    manyToOne:
+        user:
+            targetEntity: User
+            inversedBy: progress

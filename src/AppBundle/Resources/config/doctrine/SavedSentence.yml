@@ -1,0 +1,17 @@
+AppBundle\Entity\SavedSentence:
+    type: entity
+    table: saved_sentence
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+    manyToOne:
+        savedLesson:
+            targetEntity: SavedLesson
+            inversedBy: savedSentences
+            joinColumn:
+                name: saved_lesson_id
+                referencedColumnName: id
+                onDelete: CASCADE
+        sentence:
+            targetEntity: Sentence

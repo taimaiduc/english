@@ -4,34 +4,25 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="saved_lesson")
- */
 class SavedLesson
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="savedLessons")
-     * @ORM\JoinColumn(nullable=false)
+     * @var User
      */
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Lesson")
-     * @ORM\JoinColumn(nullable=false)
+     * @var Lesson
      */
     private $lesson;
 
     /**
-     * @ORM\OneToMany(targetEntity="SavedSentence", mappedBy="savedLesson")
-     * @ORM\JoinColumn(nullable=false)
+     * @var SavedSentence
      */
     private $savedSentences;
 
@@ -44,6 +35,14 @@ class SavedLesson
     {
         $this->user = $user;
         $this->lesson = $lesson;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
     }
 
     /**

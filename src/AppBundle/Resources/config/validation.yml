@@ -1,0 +1,17 @@
+AppBundle\Entity\User:
+    properties:
+        username:
+            - NotBlank: ~
+            - Length:
+                min: 5
+                max: 20
+                minMessage: ''
+                maxMessage: ''
+            - Regex:
+                pattern: '/^\w+/'
+                message: ''
+        password:
+            - NotBlank: ~
+            - Length:
+                min: 5
+                minMessage: ''

@@ -15,7 +15,7 @@ class LeaderController extends Controller
         $leaders = $this->getDoctrine()->getRepository('AppBundle:Progress')
             ->findLeadersToday();
 
-        return $this->render('leader/index.html.twig', [
+        return $this->render('AppBundle:leader/index.html.twig', [
             'leaders' => $leaders
         ]);
     }

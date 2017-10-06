@@ -1,0 +1,16 @@
+AppBundle\Entity\DoneLesson:
+    type: entity
+    table: done_lesson
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
+    fields:
+        count:
+            type: smallint
+    manyToOne:
+        user:
+            targetEntity: User
+            inversedBy: doneLessons
+        lesson:
+            targetEntity: Lesson

@@ -2,37 +2,35 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
-/**
- * @ORM\Entity
- * @ORM\Table(name="done_lesson")
- */
 class DoneLesson
 {
     /**
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="User", inversedBy="doneLessons")
-     * @ORM\JoinColumn(nullable=false)
+     * @var User
      */
     private $user;
 
     /**
-     * @ORM\ManyToOne(targetEntity="Lesson")
-     * @ORM\JoinColumn(nullable=false)
+     * @var Lesson
      */
     private $lesson;
 
     /**
-     * @ORM\Column(type="smallint")
+     * @var int
      */
     private $count;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     /**
      * @return User

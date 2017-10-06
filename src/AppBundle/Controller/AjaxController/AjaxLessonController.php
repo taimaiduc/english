@@ -53,7 +53,7 @@ class AjaxLessonController extends BaseController
             }
         }
 
-        return $this->render('lesson/_list.html.twig', [
+        return $this->render('AppBundle:lesson/_list.html.twig', [
             'page' => $page,
             'category' => $category,
             'lessons' => $lessons

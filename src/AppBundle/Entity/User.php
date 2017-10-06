@@ -4,50 +4,17 @@ namespace AppBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * @ORM\Entity(repositoryClass="AppBundle\Repository\UserRepository")
- * @ORM\Table(name="user")
- * @UniqueEntity(fields={"email"}, message="register.email.unique")
- * @UniqueEntity(fields={"username"}, message="register.username.unique")
- */
 class User extends BaseUser implements UserInterface
 {
     /**
-     * @Assert\NotBlank()
-     * @Assert\Regex(
-     *     pattern="/^[a-z\-0-9]+$/",
-     *     match=true,
-     *     message="register.username.regex"
-     * )
-     */
-    protected $username;
-
-    /**
-     * @Assert\NotBlank()
-     */
-    protected $email;
-
-    /**
-     * @ORM\Column(type="string")
-     */
-    protected $password;
-
-    /**
-     * @ORM\Column(type="json_array")
-     */
-    protected $roles = [];
-
-    /**
-     * @ORM\OneToMany(targetEntity="SavedLesson", mappedBy="user")
+     * @var SavedLesson
      */
     private $savedLessons;
 
     /**
-     * @ORM\OneToMany(targetEntity="DoneLesson", mappedBy="user")
+     * @var DoneLesson
      */
     private $doneLessons;
 
@@ -71,12 +38,6 @@ class User extends BaseUser implements UserInterface
      */
     private $updatedAt;
 
-    /**
-     * @var string
-     * @Assert\NotBlank(groups={"Registration"})
-     */
-    protected $plainPassword;
-
     public function __construct()
     {
         $now = new \DateTime();
@@ -84,36 +45,6 @@ class User extends BaseUser implements UserInterface
         $this->updatedAt = $now;
 
         parent::__construct();
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    public function getPassword()
-    {
-        return $this->password;
-    }
-
-    public function getSalt()
-    {
-    }
-
-    public function eraseCredentials()
-    {
-        $this->plainPassword = null;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getEmail()
-    {
-        return $this->email;
     }
 
     /**
@@ -217,20 +148,4 @@ class User extends BaseUser implements UserInterface
         $this->updatedAt = $updatedAt;
     }
 
-    /**
-     * @return string
-     */
-    public function getPlainPassword()
-    {
-        return $this->plainPassword;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setPlainPassword($plainPassword)
-    {
-        $this->plainPassword = $plainPassword;
-        $this->password = null;
-    }
 }

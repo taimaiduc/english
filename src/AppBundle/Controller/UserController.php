@@ -36,7 +36,7 @@ class UserController extends Controller
             $progress->setPercentage($percentage);
         }
 
-        return $this->render('user/progress.html.twig', [
+        return $this->render('AppBundle:user/progress.html.twig', [
             'progressList' => $progressList
         ]);
     }
@@ -72,7 +72,7 @@ class UserController extends Controller
                 );
         }
 
-        return $this->render('security/register.html.twig', [
+        return $this->render('AppBundle:security/register.html.twig', [
             'form' => $form->createView()
         ]);
     }
@@ -86,7 +86,7 @@ class UserController extends Controller
             ->setFrom('send@example.com')
             ->setTo('khoa-huy.nguyen@ekino.com')
             ->setBody(
-                $this->renderView('email:registration.html.twig'),
+                $this->renderView('AppBundle:email:registration.html.twig'),
                 'text/html'
             );
 

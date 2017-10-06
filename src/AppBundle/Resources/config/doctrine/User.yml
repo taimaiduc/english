@@ -1,5 +1,10 @@
 AppBundle\Entity\User:
     type: entity
+    repositoryClass: AppBundle\Repository\UserRepository
+    id:
+        id:
+            type: integer
+            generator: { strategy: AUTO }
     fields:
         point:
             type: int

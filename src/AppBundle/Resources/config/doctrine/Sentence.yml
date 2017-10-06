@@ -1,5 +1,6 @@
 AppBundle\Entity\Sentence:
     type: entity
+    repositoryClass: AppBundle\Repository\SentenceRepository
     table: sentence
     id:
         id:

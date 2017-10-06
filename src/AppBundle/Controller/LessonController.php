@@ -54,7 +54,7 @@ class LessonController extends BaseController
             'categories' => $categories,
         ];
 
-        return $this->render('lesson/list.html.twig', $data);
+        return $this->render('AppBundle:lesson/list.html.twig', $data);
     }
 
     /**
@@ -106,7 +106,7 @@ class LessonController extends BaseController
             'lesson' => $lesson
         ];
 
-        return $this->render('lesson/show.html.twig', $data);
+        return $this->render('AppBundle:lesson/show.html.twig', $data);
     }
 
     /**
