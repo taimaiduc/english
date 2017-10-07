@@ -1,20 +1,20 @@
-{% extends 'AppBundle:layout.html.twig' %}
-{% import 'AppBundle:macros/breadcrumb.html.twig' as breadCrumb %}
+{% extends 'AppBundle::layout.html.twig' %}
+{% import 'AppBundle::macros/breadcrumb.html.twig' as breadCrumb %}
 
 {% block content %}
 <div class="row">
     <div class="col-sm-4 col-md-3">
-        {% include 'AppBundle:lesson/_show_nav.html.twig' %}
+        {% include 'AppBundle::lesson/_show_nav.html.twig' %}
     </div>
     <div class="col-sm-8 col-md-9">
         <p class="shortcut-help text-muted" data-toggle="modal" data-target="#shortcutModal">Phím tắt <i class="glyphicon glyphicon-question-sign"></i></p>
 
-        {% include 'AppBundle:lesson/_show_sentence.html.twig' %}
+        {% include 'AppBundle::lesson/_show_sentence.html.twig' %}
     </div>
 </div>
 
-{% include 'AppBundle:lesson/_show_help.html.twig' %}
-{% include 'AppBundle:block/_modal_auth.html.twig' %}
+{% include 'AppBundle::lesson/_show_help.html.twig' %}
+{% include 'AppBundle::block/_modal_auth.html.twig' %}
 
 {% endblock %}
 

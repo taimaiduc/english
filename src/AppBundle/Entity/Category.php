@@ -128,6 +128,14 @@ class Category
     }
 
     /**
+     * @param int $totalLessons
+     */
+    public function addTotalLessons($totalLessons)
+    {
+        $this->totalLessons += $totalLessons;
+    }
+
+    /**
      * @return int
      */
     public function getPosition()

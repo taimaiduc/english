@@ -36,7 +36,7 @@ class UserController extends Controller
             $progress->setPercentage($percentage);
         }
 
-        return $this->render('AppBundle:user/progress.html.twig', [
+        return $this->render('AppBundle::user/progress.html.twig', [
             'progressList' => $progressList
         ]);
     }
@@ -49,6 +49,10 @@ class UserController extends Controller
      */
     public function registerAction(Request $request)
     {
+        if (null !== $this->getUser()) {
+            return $this->redirectToRoute('lessons_list');
+        }
+
         $form = $this->createForm(RegistrationForm::class);
 
         $form->handleRequest($request);
@@ -60,8 +64,9 @@ class UserController extends Controller
             $em->persist($user);
             $em->flush();
 
-            $this->addFlash('success', 'Welcome '. $user->getUsername() . '!');
-            $this->sendSuccessfulRegistrationEmail($form->getData());
+            $translator = $this->get('translator');
+            $this->addFlash('success', $translator->trans('registration.welcome', ['%user%' => $user->getUsername()]));
+            $this->sendSuccessfulRegistrationEmail($user);
 
             return $this->get('security.authentication.guard_handler')
                 ->authenticateUserAndHandleSuccess(
@@ -72,26 +77,26 @@ class UserController extends Controller
                 );
         }
 
-        return $this->render('AppBundle:security/register.html.twig', [
+        return $this->render('@App/user/register.html.twig', [
             'form' => $form->createView()
         ]);
     }
 
-    private function sendSuccessfulRegistrationEmail($data)
+    private function sendSuccessfulRegistrationEmail(User $user)
     {
         $mailer = $this->get('mailer');
         $translator = $this->get('translator');
 
         $message = (new \Swift_Message($translator->trans('email.registration.title')))
-            ->setFrom('send@example.com')
-            ->setTo('khoa-huy.nguyen@ekino.com')
+            ->setFrom($this->container->getParameter('mailer_user'))
+            ->setTo($user->getEmail())
             ->setBody(
-                $this->renderView('AppBundle:email:registration.html.twig'),
+                $this->renderView('@FOSUser/Registration/email.txt.twig', [
+                    'user' => $user
+                ]),
                 'text/html'
             );
 
         $mailer->send($message);
-
-        return new Response('<html><body></body></html>');
     }
 }

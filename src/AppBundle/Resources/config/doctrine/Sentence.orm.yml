@@ -11,14 +11,14 @@ AppBundle\Entity\Sentence:
             type: string
         point:
             type: smallint
-                options:
-                    unsigned: true
-                    default: 0
+            options:
+                unsigned: true
+                default: 0
         position:
             type: smallint
-                options:
-                    unsigned: true
-                    default: 0
+            options:
+                unsigned: true
+                default: 0
     manyToOne:
         lesson:
             targetEntity: Lesson

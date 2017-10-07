@@ -2,49 +2,49 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
 use FOS\UserBundle\Model\User as BaseUser;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 class User extends BaseUser implements UserInterface
 {
     /**
-     * @var SavedLesson
+     * @var SavedLesson[]
      */
     private $savedLessons;
 
     /**
-     * @var DoneLesson
+     * @var DoneLesson[]
      */
     private $doneLessons;
 
     /**
-     * @ORM\OneToMany(targetEntity="Progress", mappedBy="user")
+     * @var Progress[]
      */
     private $progress;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $point = 0;
 
     /**
-     * @ORM\Column(type="date")
+     * @var \DateTime
      */
     private $createdAt;
 
     /**
-     * @ORM\Column(type="datetime")
+     * @var \DateTime
      */
     private $updatedAt;
 
     public function __construct()
     {
+        parent::__construct();
+
         $now = new \DateTime();
         $this->createdAt = $now;
         $this->updatedAt = $now;
-
-        parent::__construct();
+        $this->enabled = true;
     }
 
     /**

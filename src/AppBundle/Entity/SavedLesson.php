@@ -2,8 +2,6 @@
 
 namespace AppBundle\Entity;
 
-use Doctrine\ORM\Mapping as ORM;
-
 class SavedLesson
 {
     /**
@@ -22,12 +20,12 @@ class SavedLesson
     private $lesson;
 
     /**
-     * @var SavedSentence
+     * @var SavedSentence[]
      */
     private $savedSentences;
 
     /**
-     * @ORM\Column(type="integer")
+     * @var int
      */
     private $point = 0;
 
@@ -46,7 +44,7 @@ class SavedLesson
     }
 
     /**
-     * @param mixed $user
+     * @param User $user
      */
     public function setUser($user)
     {
@@ -54,7 +52,7 @@ class SavedLesson
     }
 
     /**
-     * @return mixed
+     * @return User
      */
     public function getUser()
     {
@@ -70,7 +68,7 @@ class SavedLesson
     }
 
     /**
-     * @param mixed $lesson
+     * @param Lesson $lesson
      */
     public function setLesson($lesson)
     {
@@ -92,7 +90,7 @@ class SavedLesson
     }
 
     /**
-     * @param mixed $savedSentences
+     * @param SavedSentence[] $savedSentences
      */
     public function setSavedSentences($savedSentences)
     {
@@ -100,7 +98,7 @@ class SavedLesson
     }
 
     /**
-     * @return mixed
+     * @return int
      */
     public function getPoint()
     {
@@ -108,7 +106,7 @@ class SavedLesson
     }
 
     /**
-     * @param mixed $point
+     * @param int $point
      */
     public function addPoint($point)
     {

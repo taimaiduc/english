@@ -1,3 +1,11 @@
-register.username.unique: Biệt danh này có người đặt rồi!!!
-register.username.regex: Biệt danh chứa kí tự đặc biệt hoặc khoảng trắng không được chấp nhận!!
-register.email.unique: Email đã được đăng kí, có thể bạn đã có tài khoản?
+notblank: Không được để trống ô này!!!
+
+register:
+    username:
+        length: Biệt danh phải từ 5 đến 20 kí tự!!!
+        unique: Biệt danh này có người đặt rồi!!!
+        regex: Biệt danh chứa kí tự đặc biệt hoặc khoảng trắng không được chấp nhận!!
+    email:
+        unique: Email đã được đăng kí, có thể bạn đã có tài khoản?
+    password:
+        length: Mật khẩu phải từ 5 kí tự trở lên

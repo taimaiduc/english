@@ -7,7 +7,7 @@ AppBundle\Entity\User:
             generator: { strategy: AUTO }
     fields:
         point:
-            type: int
+            type: integer
             options:
                 unsigned: true
                 default: 0

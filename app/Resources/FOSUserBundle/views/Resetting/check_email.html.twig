@@ -1,0 +1,7 @@
+{% extends '@App/layout.html.twig' %}
+
+{% block content %}
+    {% if email is defined %}
+        {{ 'resetting.check_email'|trans({'%email%': email}) }}
+    {% endif %}
+{% endblock %}

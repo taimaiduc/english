@@ -1,17 +1,28 @@
 AppBundle\Entity\User:
+    constraints:
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            fields: username
+            message: 'register.username.unique'
+        - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+            fields: email
+            message: 'register.email.unique'
     properties:
         username:
-            - NotBlank: ~
+            - NotBlank:
+                message: 'register.username.length'
             - Length:
                 min: 5
                 max: 20
-                minMessage: ''
-                maxMessage: ''
+                minMessage: 'register.username.length'
+                maxMessage: 'register.username.length'
             - Regex:
-                pattern: '/^\w+/'
-                message: ''
-        password:
-            - NotBlank: ~
+                pattern: '/^[a-zA-A0-9]+$/'
+                message: 'register.username.regex'
+        email:
+            - NotBlank:
+                message: 'notblank'
+        plainPassword:
+            - NotBlank:
             - Length:
                 min: 5
-                minMessage: ''
+                minMessage: 'register.password.length'

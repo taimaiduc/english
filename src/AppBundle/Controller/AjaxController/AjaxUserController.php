@@ -54,7 +54,6 @@ class AjaxUserController extends Controller
             }
         } else {
             $savedLesson = new SavedLesson($user, $lesson);
-
         }
 
         $point = 0;

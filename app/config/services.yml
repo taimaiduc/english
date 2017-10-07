@@ -11,8 +11,8 @@ services:
     app.security.logout_handler:
         class: AppBundle\Security\LogoutHandler
 
-    app.doctrine.hash_password_listener:
-        class: AppBundle\Doctrine\HashPasswordListener
+    app.fos_user_listener:
+        class: AppBundle\FosUser\FosUserListener
         autowire: true
         tags:
-            - { name: doctrine.event_subscriber }
+            - { name: kernel.event_subscriber }

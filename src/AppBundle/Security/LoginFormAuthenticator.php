@@ -7,9 +7,7 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoder;
@@ -61,7 +59,7 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
 
     public function getCredentials(Request $request)
     {
-        if ($request->getPathInfo() != '/login' || !$request->isMethod('POST')) {
+        if ($request->getPathInfo() != "/login" || !$request->isMethod('POST')) {
             return null;
         }
 
@@ -94,7 +92,10 @@ class LoginFormAuthenticator extends AbstractGuardAuthenticator
         return false;
     }
 
-    public function start(Request $request, AuthenticationException $authException = null){}
+    public function start(Request $request, AuthenticationException $authException = null)
+    {
+        return new RedirectResponse($this->router->generate('security_login'));
+    }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception)
     {

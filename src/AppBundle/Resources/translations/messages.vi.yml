@@ -1,16 +1,33 @@
 form:
     login: Đăng nhập
     register: Đăng kí tài khoản
-    username: Biệt danh
+    change_password: Đổi mật khẩu
+    resetting: Lấy lại mật khẩu
+    forget_password: Quên mật khẩu?
+    username: Nickname hoặc Email
+    email: Email
     password: Mật khẩu
     repeat_password: Gõ lại mật khẩu
     remember_me: Tự động đăng nhập lần sau
+    submit: Gửi
     submit_login: Đăng nhập
     submit_register: Ghi danh
+    submit_change_password: Đổi
+    submit_reset_password: Cập nhật
 
 authentication:
-    failed: Biệt danh hoặc mật khẩu không đúng!!
+    havent_had_an_account: Chưa có tài khoản? Bấm vào đây để đăng kí!
+    failed: Thông tin tài khoản không đúng!!
+
+registration:
+    username: Nickname
+    had_account_already: Đã có tài khoản? Đăng nhập ở đây.
+    welcome: Hế lô %user%, học đi!!!!
 
 email:
     registration:
-        title:
+        title: khoahuy.com | Đăng kí tài khoản thành công
+        subject: Chúc mừng %user%! Bạn đã là thành viên của khoahuy.com. Cố gắng học nhé!!!
+
+resetting:
+    check_email: khoahuy.com đã gửi đến email của bạn (%email%) một đường dẫn để cập nhật lại mật khẩu. Vui lòng kiểm tra và làm theo hướng dẫn.

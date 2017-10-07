@@ -1,3 +1,11 @@
-register.username.unique: Username has already been taken.
-register.username.regex: Username can only contain letters and numbers.
-register.email.unique: Email has already been used.
+notblank: This field can not be left blank.
+
+register:
+    username:
+        length: Username must be between 5 and 20 characters long.
+        unique: Username has already been taken.
+        regex: Username can only contain letters and numbers.
+    email:
+        unique: Email has already been used.
+    password:
+        length: Password must have at least 5 characters.

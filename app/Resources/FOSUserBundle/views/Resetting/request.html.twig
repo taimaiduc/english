@@ -1,0 +1,14 @@
+{% extends '@App/layout.html.twig' %}
+
+{% block content %}
+    <h3>{{ 'form.resetting'|trans }}</h3>
+    <form action="{{ path('fos_user_resetting_send_email') }}" method="POST" class="fos_user_resetting_request">
+        <div class="form-group">
+            <label for="username">{{ 'form.username'|trans }}</label>
+            <input type="text" id="username" name="username" required="required" class="form-control" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="{{ 'form.submit'|trans }}" class="btn btn-success btn-lg"/>
+        </div>
+    </form>
+{% endblock %}

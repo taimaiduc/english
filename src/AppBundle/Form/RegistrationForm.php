@@ -20,9 +20,11 @@ class RegistrationForm extends AbstractType
 
         $builder
             ->add('username', TextType::class, [
-                'label' => 'form.username'
+                'label' => 'registration.username'
             ])
-            ->add('email', EmailType::class)
+            ->add('email', EmailType::class, [
+                'label' => 'form.email'
+            ])
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'first_options' => ['label' => 'form.password'],

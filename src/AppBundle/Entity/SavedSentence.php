@@ -19,6 +19,12 @@ class SavedSentence
      */
     private $sentence;
 
+    public function __construct(SavedLesson $savedLesson, Sentence $sentence)
+    {
+        $this->savedLesson = $savedLesson;
+        $this->sentence = $sentence;
+    }
+
     /**
      * @return int
      */

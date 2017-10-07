@@ -21,7 +21,7 @@ class AjaxLessonController extends BaseController
     {
         $categorySlug = $request->query->get('categorySlug');
 
-        $category = $this->getDoctrine()->getRepository('AppBundle:Category')
+        $category = $this->getDoctrine()->getRepository('Category.orm.yml')
             ->findOneBy(['slug' => $categorySlug]);
 
         if (!$category) {
@@ -53,7 +53,7 @@ class AjaxLessonController extends BaseController
             }
         }
 
-        return $this->render('AppBundle:lesson/_list.html.twig', [
+        return $this->render('AppBundle::lesson/_list.html.twig', [
             'page' => $page,
             'category' => $category,
             'lessons' => $lessons

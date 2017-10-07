@@ -61,7 +61,7 @@ doctrine:
     orm:
         auto_generate_proxy_classes: '%kernel.debug%'
         naming_strategy: doctrine.orm.naming_strategy.underscore
-        auto_mapping: true
+        auto_mapping: false
         mappings:
             AppBundle:
                 type: yml
@@ -86,8 +86,7 @@ fos_user:
     firewall_name: main
     user_class: AppBundle\Entity\User
     from_email:
-        address: "%mailer_user%"
-        sender_name: "%mailer_user%"
-    registration:
-        form:
-            validation_groups: [Default, RegistrationAppBundle]
+        address: '%mailer_user%'
+        sender_name: khoahuy.com
+    resetting:
+        retry_ttl: 60

@@ -11,7 +11,7 @@ AppBundle\Entity\SavedLesson:
     manyToOne:
         user:
             targetEntity: User
-            inversedBy: progress
+            inversedBy: savedLessons
         lesson:
             targetEntity: Lesson
     oneToMany:

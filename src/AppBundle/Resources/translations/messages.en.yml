@@ -1,15 +1,34 @@
 form:
     login: Login
     register: Sign up
-    username: Username
+    change_password: Change password
+    resetting: Reset password
+    forget_password: Forgot password?
+    username: Nickname hoặc Email
+    email: Email
     password: Password
     repeat_password: Repeat Password
+    remember_me: Remember me
+    submit: Submit
     submit_login: Login
     submit_register: Register
+    submit_change_password: Change
+    submit_reset_password: Reset
 
 authentication:
-    failed: Authentication failed.
+    havent_had_an_account: Haven't had an account? Click here to register.
+    failed: Invalid Credentials.
+
+registration:
+    username: Username
+    had_account_already: Had an account already? Login here.
+    welcome: Welcome %user%, let's practice!!!!
 
 email:
     registration:
-        title:
+        title: khoahuy.com | Successful Registration
+        subject: Hi, %user%. Congratulations! You are now a member of khoahuy.com. Thank you and Welcome! Let's start learning now!
+        welcome: Welcome %user%!
+
+resetting:
+    check_email: An email with reset password link has been sent to %email%. Please check and follow instructions to reset your password.

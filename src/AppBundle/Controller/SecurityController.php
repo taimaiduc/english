@@ -6,7 +6,6 @@ use AppBundle\Form\LoginForm;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends Controller
 {
@@ -15,6 +14,10 @@ class SecurityController extends Controller
      */
     public function loginAction(Request $request)
     {
+        if (null !== $this->getUser()) {
+            return $this->redirectToRoute('lessons_list');
+        }
+
         $authUtils = $this->get('security.authentication_utils');
 
         // get the login error if there is one
@@ -28,7 +31,7 @@ class SecurityController extends Controller
             '_referer' => $request->headers->get('referer')
         ]);
 
-        return $this->render('AppBundle:security/login.html.twig', array(
+        return $this->render('AppBundle::security/login.html.twig', array(
             'form'  => $form->createView(),
             'error' => $error,
         ));
@@ -40,5 +43,18 @@ class SecurityController extends Controller
     public function logoutAction()
     {
         throw new \Exception('This should not be reached');
+    }
+
+    public function checkEmailAction(Request $request)
+    {
+        $email = $request->query->get('email');
+
+        if (!$email) {
+            return $this->redirectToRoute('lessons_list');
+        }
+
+        return $this->render('@FOSUser/Resetting/check_email.html.twig', [
+            'email' => $email
+        ]);
     }
 }

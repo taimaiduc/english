@@ -1,17 +1,12 @@
-{% extends 'AppBundle:layout.html.twig' %}
+{% extends 'AppBundle::layout.html.twig' %}
 
 {% block content %}
 <div class="row">
     <div class="col-sm-6">
-        <h3>{{ 'form.login'|trans() }}</h3>
-
-        <div>
-            {% for flashMessage in app.session.flashbag.get('error') %}
-                <div class="alert alert-danger">{{ flashMessage }}</div>
-            {% endfor %}
-        </div>
-
+        <h3>{{ 'form.login'|trans }}</h3>
         {{ form(form) }}
+        <p><a href="{{ path('fos_user_resetting_request') }}">{{ 'form.forget_password'|trans }}</a></p>
+        <p><a href="{{ path('user_register') }}">{{ 'authentication.havent_had_an_account'|trans }}</a></p>
     </div>
 </div>
 {% endblock %}
