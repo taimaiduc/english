@@ -80,6 +80,22 @@ class Sentence
     }
 
     /**
+     * @return string
+     */
+    public function getJsonContent()
+    {
+        return $this->json_content;
+    }
+
+    /**
+     * @param string $json_content
+     */
+    public function setJsonContent($json_content)
+    {
+        $this->json_content = $json_content;
+    }
+
+    /**
      * @return int
      */
     public function getPoint()

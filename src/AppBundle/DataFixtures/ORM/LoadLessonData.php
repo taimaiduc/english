@@ -37,7 +37,9 @@ class LoadLessonData implements FixtureInterface
                     $sentencesPoint += $sentencePoint;
                     $sentence = new Sentence();
                     $sentence->setLesson($lesson);
-                    $sentence->setContent($sentenceContent);
+                    $sentenceContent = $this->toJsonContent($sentenceContent);
+                    $sentence->setContent($sentenceContent['niceContent']);
+                    $sentence->setJsonContent($sentenceContent['jsonContent']);
                     $sentence->setPoint($sentencePoint);
                     $sentence->setPosition($sentencePos);
                     $manager->persist($sentence);
@@ -60,8 +62,9 @@ class LoadLessonData implements FixtureInterface
 
     private function toJsonContent($content)
     {
+        $niceContent = explode(' ', $content);
         $content = strtolower($content);
-        $content = preg_replace('/[^\w\s-_#|]*/g', '', $content);
+        $content = preg_replace('/[^\w\s-_#|]*/', '', $content);
         $content = explode(' ', $content);
 
         foreach ($content as $key => $word) {
@@ -73,12 +76,24 @@ class LoadLessonData implements FixtureInterface
                 foreach ($word as $k => $w) {
                     if (strpos($w, ' ')) {
                         $w = explode(' ', $w);
+                        $word[$k] = $w;
                         $content[$key][$k] = $w;
                     }
                 }
             }
         }
 
-        return $content;
+        foreach ($niceContent as $key => $word) {
+            if (strpos($word, '|')) {
+                $word = str_replace('_', ' ', $word);
+                $word = explode('|', $word);
+                $niceContent[$key] = $word[0];
+            }
+        }
+
+        return [
+            'niceContent' => implode(' ', $niceContent),
+            'jsonContent' => $content
+        ];
     }
 }
