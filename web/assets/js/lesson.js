@@ -44,16 +44,36 @@ $(document).ready(function () {
             return doneSentences === $sentences.length;
         };
 
+        const focusToWrongWord = function (wrongWordPos) {
+            let times = 0,
+                pos = 0;
+
+            while (times <= wrongWordPos && pos !== -1) {
+                pos = $inputs[sentenceIndex].value.indexOf(' ', pos+1);
+                times++;
+            }
+
+            $inputs[sentenceIndex].setSelectionRange(pos, pos);
+        };
+
         const checkAnswer = function () {
+            $inputs[sentenceIndex].value = $inputs[sentenceIndex].value.trim().replace(/\s\s+/g, ' ');
             const input = generalizeSentence($inputs[sentenceIndex].value);
             const answer = generalizeSentence($answers[sentenceIndex].innerHTML);
             let result = $answers[sentenceIndex].innerHTML.split(' ');
             let answerCorrect = true;
-            
+
             for (let i = 0; i < answer.length; i++) {
-                if (answer[i] !== input[i]){
+                if (!answerCorrect) {
+                    result[i] = '*'.repeat(result[i].length);
+                    continue;
+                }
+
+                if (answer[i] !== input[i] && answerCorrect){
                     result[i] = "<span class='text-danger'>"+result[i]+"</span>";
                     answerCorrect = false;
+
+                    focusToWrongWord(i);
                 }
             }
 

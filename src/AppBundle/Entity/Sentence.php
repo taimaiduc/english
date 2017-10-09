@@ -20,6 +20,11 @@ class Sentence
     private $content;
 
     /**
+     * @var string
+     */
+    protected $json_content;
+
+    /**
      * @var int
      */
     private $point;

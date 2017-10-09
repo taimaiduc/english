@@ -57,4 +57,28 @@ class LoadLessonData implements FixtureInterface
 
         $manager->flush();
     }
+
+    private function toJsonContent($content)
+    {
+        $content = strtolower($content);
+        $content = preg_replace('/[^\w\s-_#|]*/g', '', $content);
+        $content = explode(' ', $content);
+
+        foreach ($content as $key => $word) {
+            if (strpos($word, '|')) {
+                $word = str_replace('_', ' ', $word);
+                $word = explode('|', $word);
+                $content[$key] = $word;
+
+                foreach ($word as $k => $w) {
+                    if (strpos($w, ' ')) {
+                        $w = explode(' ', $w);
+                        $content[$key][$k] = $w;
+                    }
+                }
+            }
+        }
+
+        return $content;
+    }
 }

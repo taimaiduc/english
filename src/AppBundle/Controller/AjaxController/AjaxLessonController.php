@@ -21,7 +21,7 @@ class AjaxLessonController extends BaseController
     {
         $categorySlug = $request->query->get('categorySlug');
 
-        $category = $this->getDoctrine()->getRepository('Category.orm.yml')
+        $category = $this->getDoctrine()->getRepository('AppBundle:Category')
             ->findOneBy(['slug' => $categorySlug]);
 
         if (!$category) {

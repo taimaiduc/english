@@ -9,6 +9,8 @@ AppBundle\Entity\Sentence:
     fields:
         content:
             type: string
+        json_content:
+            type: json_array
         point:
             type: smallint
             options:
