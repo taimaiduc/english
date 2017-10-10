@@ -35,6 +35,11 @@ class Sentence
     private $position;
 
     /**
+     * @var string
+     */
+    private $audioPath;
+
+    /**
      * @var bool
      */
     private $wasSaved;
@@ -125,6 +130,22 @@ class Sentence
     public function setPosition($position)
     {
         $this->position = $position;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAudioPath()
+    {
+        return $this->audioPath;
+    }
+
+    /**
+     * @param string $audioPath
+     */
+    public function setAudioPath($audioPath)
+    {
+        $this->audioPath = $audioPath;
     }
 
     /**

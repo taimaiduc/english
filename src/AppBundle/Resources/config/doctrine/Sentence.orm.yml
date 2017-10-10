@@ -21,6 +21,8 @@ AppBundle\Entity\Sentence:
             options:
                 unsigned: true
                 default: 0
+        audioPath:
+            type: string
     manyToOne:
         lesson:
             targetEntity: Lesson

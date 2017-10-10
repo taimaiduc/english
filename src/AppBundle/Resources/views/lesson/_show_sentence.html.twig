@@ -1,11 +1,13 @@
 <div class="well sentences-wrapper js-sentences-wrapper">
     {% for sentence in lesson.sentences %}
         <div class="js-sentence{{ sentence.wasSaved ? ' saved done' : '' }}"
-             data-sentence-id="{{ sentence.id }}">
+             data-sentence-id="{{ sentence.id }}"
+             data-sentence-nice-answer="{{ sentence.wasSaved ? '' : sentence.content }}"
+             data-sentence-json-answer="{{ sentence.wasSaved ? '' : sentence.jsonContent|json_encode }}">
             <button class="btn btn-default js-play-audio-btn" type="button">
                 <i class="glyphicon glyphicon-volume-up"></i>
                 <audio class="hidden">
-                    <source src="{{ asset('/assets/mp3/'~lesson.category.slug~'/'~lesson.position~'/'~sentence.position~'.mp3') }}">
+                    <source src="{{ asset(sentence.audioPath) }}">
                 </audio>
             </button>
 
@@ -14,7 +16,6 @@
                        placeholder="{{ sentence.position ~ '.' }}"
                        tabindex="{{ sentence.position }}"
                        value="{{ sentence.wasSaved ? sentence.content : sentence.content }}">
-                <p class="text-left hidden js-answer">{{ sentence.wasSaved ? '' : sentence.content }}</p>
                 <p class="text-left result js-result"></p>
             </div>
 

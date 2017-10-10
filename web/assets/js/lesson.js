@@ -57,7 +57,58 @@ $(document).ready(function () {
         };
 
         const checkAnswer = function () {
-            $inputs[sentenceIndex].value = $inputs[sentenceIndex].value.trim().replace(/\s\s+/g, ' ');
+            const $currentSentence = $($sentences[sentenceIndex]);
+            const currentInput = $inputs[sentenceIndex];
+            currentInput.value = currentInput.value.trim().replace(/\s\s+/g, ' ');
+            const userInput = generalizeSentence(currentInput.value);
+            const ourAnswer = JSON.parse($currentSentence.attr('data-sentence-json-answer'));
+            let userInputIndex = 0;
+            let wrongWordPos = 0;
+            console.log(userInput);
+            console.log(ourAnswer);
+
+            // userInput = ["joe", "has", "2500", "in", "the", "bank"];
+            // ourAnswer = ["joe", "has", Array(3), "in", "the", "bank"]
+            // ourAnswer[2] = [[Array(3), Array(2), "2500"]]
+            // ourAnswer[2][0] = ["twenty-five", "hundred", "dollars"]
+            // ourAnswer[2][1] = ["2500", "dollars"]
+            // ourAnswer[2][2] = "2500"
+
+            for (let i = 0; i < ourAnswer.length; i++) { // loops 6 times
+                // ourAnswer[0] and ourAnswer[1] === string, jsut compare 2 strings
+                if (typeof ourAnswer[i] === 'string' && ourAnswer[i] !== userInput[i]) {
+                    wrongWordPos = i; // if there's a wrong word, stop looping
+                    break;
+                } else if (Array.isArray(ourAnswer[i])) {
+                    // ourAnswer[2] is an array, loop it (3 times).
+                    for (let j = 0; j < ourAnswer[i].length; j++) {
+                        if (Array.isArray(ourAnswer[i][j])) {
+                            // ourAnswer[2][0] and ourAnswer[2][1] are arrays
+                            const wordCount = ourAnswer[i][j].length;
+                            let correctWord = 0;
+                            for (let k = 0; k < wordCount; k++) {
+                                if (userInput[i+k] !== ourAnswer[i][j][k]) {
+                                    correctWord = 0;
+                                    continue;
+                                } else {
+                                    correctWord++;
+                                    if (wordCount === correctWord) {
+                                        break;
+                                    }
+                                }
+                                console.log(userInput[i+k], ourAnswer[i][j][k]);
+                            }
+
+                            console.log(wordCount === correctWord);
+
+                        } else {
+                            // ourAnswer[2][2] is a string
+                        }
+                    }
+                }
+            }
+
+            return;
             const input = generalizeSentence($inputs[sentenceIndex].value);
             const answer = generalizeSentence($answers[sentenceIndex].innerHTML);
             let result = $answers[sentenceIndex].innerHTML.split(' ');
@@ -174,14 +225,14 @@ $(document).ready(function () {
             if ($sentence.hasClass('done')) {
                 return;
             }
-
-            if (checkAnswer()) {
+            checkAnswer();
+            /*if (checkAnswer()) {
                 $sentence.addClass('done');
                 $(this).find('i')
                     .removeClass('glyphicon-send')
                     .addClass('glyphicon-check');
                 doneSentences++;
-            }
+            }*/
 
             if (isLessonDone()) {
                 if (userLoggedIn) {

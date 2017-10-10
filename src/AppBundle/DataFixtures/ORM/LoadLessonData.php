@@ -42,6 +42,7 @@ class LoadLessonData implements FixtureInterface
                     $sentence->setJsonContent($sentenceContent['jsonContent']);
                     $sentence->setPoint($sentencePoint);
                     $sentence->setPosition($sentencePos);
+                    $sentence->setAudioPath('/assets/mp3/' . $categoryData['slug'] . '/' . $lessonPos . '/' . $sentencePos . '.mp3');
                     $manager->persist($sentence);
 
                     $sentencePos++;
@@ -62,38 +63,48 @@ class LoadLessonData implements FixtureInterface
 
     private function toJsonContent($content)
     {
-        $niceContent = explode(' ', $content);
-        $content = strtolower($content);
-        $content = preg_replace('/[^\w\s-_#|]*/', '', $content);
-        $content = explode(' ', $content);
+        if (substr_count($content, '|')) {
+            $niceContent = explode(' ', $content);
+            foreach ($niceContent as $pos => $word) {
+                if (substr_count($word, '|')) {
+                    $word = explode('|', $word);
+                    $niceContent[$pos] = str_replace('_', ' ', $word[0]);
+                }
+            }
+            $niceContent = implode(' ', $niceContent);
+        } else {
+            $niceContent = $content;
+        }
 
-        foreach ($content as $key => $word) {
+        $jsonContent = strtolower($content);
+        $jsonContent = preg_replace('/[^\w\s-_#|]*/', '', $jsonContent);
+        $jsonContent = explode(' ', $jsonContent);
+        foreach ($jsonContent as $key => $word) {
             if (strpos($word, '|')) {
+                $jsonContent[$key] = [];
+
                 $word = str_replace('_', ' ', $word);
                 $word = explode('|', $word);
-                $content[$key] = $word;
+                usort($word, function ($a, $b){
+                    $wordCountA = substr_count($a, ' ');
+                    $wordCountB = substr_count($b, ' ');
+
+                    return $wordCountB - $wordCountA;
+                });
 
                 foreach ($word as $k => $w) {
-                    if (strpos($w, ' ')) {
+                    if (substr_count ($w, ' ')) {
                         $w = explode(' ', $w);
-                        $word[$k] = $w;
-                        $content[$key][$k] = $w;
                     }
+
+                    $jsonContent[$key][$k] = $w;
                 }
             }
         }
 
-        foreach ($niceContent as $key => $word) {
-            if (strpos($word, '|')) {
-                $word = str_replace('_', ' ', $word);
-                $word = explode('|', $word);
-                $niceContent[$key] = $word[0];
-            }
-        }
-
         return [
-            'niceContent' => implode(' ', $niceContent),
-            'jsonContent' => $content
+            'niceContent' => $niceContent,
+            'jsonContent' => $jsonContent
         ];
     }
 }
