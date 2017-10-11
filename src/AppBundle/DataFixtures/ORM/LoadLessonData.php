@@ -77,7 +77,8 @@ class LoadLessonData implements FixtureInterface
         }
 
         $jsonContent = strtolower($content);
-        $jsonContent = preg_replace('/[^\w\s-_#|]*/', '', $jsonContent);
+        $jsonContent = preg_replace('/[^\w\s-_|]*/', '', $jsonContent);
+        $jsonContent = str_replace(' - ', ' ', $jsonContent);
         $jsonContent = explode(' ', $jsonContent);
         foreach ($jsonContent as $key => $word) {
             if (strpos($word, '|')) {

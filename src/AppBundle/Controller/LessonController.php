@@ -61,7 +61,7 @@ class LessonController extends BaseController
      * @param $categorySlug
      * @param $position
      * @return Response
-     * @Route("/lessons/{categorySlug}/{position}", name="lessons_show")
+     * @Route("/{categorySlug}/{position}", name="lessons_show")
      */
     public function showAction(Request $request, $categorySlug, $position)
     {

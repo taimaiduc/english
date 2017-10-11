@@ -1,168 +1,22 @@
 {% extends 'AppBundle::layout.html.twig' %}
-{% import 'AppBundle::macros/breadcrumb.html.twig' as breadCrumb %}
 
 {% block content %}
-<div class="row">
-    <div class="col-sm-4 col-md-3">
-        {% include 'AppBundle::lesson/_show_nav.html.twig' %}
+    <div class="row">
+        <div class="col-sm-4 col-md-3">
+            {% include 'AppBundle::lesson/_show_nav.html.twig' %}
+        </div>
+        <div class="col-sm-8 col-md-9">
+            <p class="shortcut-help text-muted" data-toggle="modal" data-target="#shortcutModal">
+                Phím tắt <i class="glyphicon glyphicon-question-sign"></i>
+            </p>
+            {% include 'AppBundle::lesson/_show_sentence.html.twig' %}
+        </div>
     </div>
-    <div class="col-sm-8 col-md-9">
-        <p class="shortcut-help text-muted" data-toggle="modal" data-target="#shortcutModal">Phím tắt <i class="glyphicon glyphicon-question-sign"></i></p>
-
-        {% include 'AppBundle::lesson/_show_sentence.html.twig' %}
-    </div>
-</div>
-
-{% include 'AppBundle::lesson/_show_help.html.twig' %}
-{% include 'AppBundle::block/_modal_auth.html.twig' %}
-
+    {% include 'AppBundle::lesson/_show_help.html.twig' %}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.js"></script>
-    <script src="{{ asset('assets/js/lesson.js') }}"></script>
-<!--
-    <script>
-        function updateUserStats() {
-            return $.ajax({
-                url: '',
-                method: 'post',
-                data: JSON.stringify(getUserAnswersData())
-            })
-                .then(function (data) {
-                    if (isLessonDone()) {
-                        removeSaveProgressButton();
-                    }
-
-                    $('input.done:not(.saved)').addClass('saved');
-                    renderTodayProgress(data.todayProgress.point, data.todayProgress.percentage);
-
-                    swal({
-                        type: 'success',
-                        showCloseButton: true,
-                        showConfirmButton: false,
-                        html: getAlertContent(),
-                    });
-                })
-                .catch(function (error) {
-                    if (error.status === 403) {
-                        showLoginForm();
-                    }
-                })
-            ;
-        }
-
-        function getLessonId() {
-            return '{{ lesson.id }}';
-        }
-
-        function getUserAnswersData() {
-            let data = {
-                lessonId: getLessonId(),
-                isLessonDone: isLessonDone(),
-                doneSentences: null
-            };
-
-            {# if the lesson is done, we dont need to send all the sentence indexes,
-            we only send them when the lesson is not done #}
-            if (!isLessonDone()) {
-                data.doneSentences = getDoneSentences();
-            }
-
-            return data;
-        }
-
-        function showLoginForm() {
-            let $form = $('#js-modal-body-login');
-
-            if ($form.is(':empty')) {
-                $.ajax({
-                    url: ""
-                }).then(function (data) {
-                    $form.html(data);
-                    toggleAuthForms($form);
-                    getAuthModal().modal('show');
-                });
-            } else {
-                toggleAuthForms($form);
-                getAuthModal().modal('show');
-            }
-
-
-        }
-
-        function showRegistrationForm() {
-            let $form = $('#js-modal-body-register');
-
-            if ($form.is(':empty')) {
-                $.ajax({
-                    url: "",
-                    method: 'get'
-                }).then(function (data) {
-                    $form.html(data);
-                    toggleAuthForms($form);
-                });
-            } else {
-                toggleAuthForms($form);
-            }
-        }
-
-        function toggleAuthForms($form) {
-            $('#authModal').find('.modal-body').addClass('hidden');
-
-            $form.removeClass('hidden');
-        }
-
-        function mapErrorsToForm($form, errors) {
-            let html = '';
-
-            $.each(errors, function (field, message) {
-                if (typeof message === 'object') {
-                    $.each(message, function (childField, childMessage) {
-                        message = childMessage;
-                    })
-                }
-                html += '<div class=\"alert alert-danger\">'+message+'</div>';
-            });
-
-            $form.find('.js-modal-form-error').html(html);
-        }
-
-        function updateLoggedInNavBar() {
-            if ($('#js-navbar-logged-in').hasClass('hidden')) {
-                $('.navbar-right').toggleClass('hidden');
-            }
-        }
-    </script>
-
-    <script>
-        $(document).ready(function(){
-            setDoneSentences(getSavedSentenceIndexes());
-
-            $authModal.on('submit', 'form', function (e) {
-                e.preventDefault();
-                let $self = $(this);
-
-                ajaxSubmitForm($self)
-                    .then(function () {
-                        updateUserStats();
-                        $authModal.modal('hide');
-                        updateLoggedInNavBar();
-                        createCookie('logged_in', 1, 1);
-                    })
-                    .catch(function (jqXHR) {
-                        mapErrorsToForm($self, jqXHR.responseJSON);
-                    });
-            });
-        });
-    </script>
--->
-{% endblock %}
-
-{% block css %}
-    {{ parent() }}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/sweetalert2/6.6.2/sweetalert2.min.css">
     <script>
         window.App = {
             userLoggedIn: {{ app.user ? 1 : 0 }},
@@ -170,4 +24,5 @@
             completeLessonUrl: '{{ path('ajax_user_complete_lesson', {'lesson': lesson.id}) }}'
         };
     </script>
+    <script src="{{ asset('assets/js/lesson.js') }}"></script>
 {% endblock %}

@@ -1,9 +1,8 @@
 $(document).ready(function () {
-    (function () {
+    (function (window, $) {
         const $sentences        = $('.js-sentence');
         const $audios           = $sentences.find('audio');
         const $inputs           = $sentences.find('.js-input');
-        const $answers          = $sentences.find('.js-answer');
         const $results          = $sentences.find('.js-result');
         const $audioBtns        = $sentences.find('.js-play-audio-btn');
         const $checkBtns        = $sentences.find('.js-check-answer-btn');
@@ -35,8 +34,8 @@ $(document).ready(function () {
                 .trim()
                 .toLowerCase()
                 .replace(/[^\w\s-]*/g, '')
-                .replace(/ - /g, '')
-                .replace(/  /g, ' ')
+                .replace(/ - /g, ' ')
+                .replace(/\s\s+/g, ' ')
                 .split(' ');
         };
 
@@ -44,113 +43,136 @@ $(document).ready(function () {
             return doneSentences === $sentences.length;
         };
 
-        const focusToWrongWord = function (wrongWordPos) {
-            let times = 0,
-                pos = 0;
+        const focusToWrongWord = function (wordPosition) {
+            if (wordPosition === 0) {
+                return;
+            }
+            $inputs[sentenceIndex].value += ' ';
 
-            while (times <= wrongWordPos && pos !== -1) {
-                pos = $inputs[sentenceIndex].value.indexOf(' ', pos+1);
-                times++;
+            // find the position of the space after the wrong word
+            let spacePosStart = 0;
+            let spacePosEnd = 0;
+            for (let i = 0; i <= wordPosition; i++) {
+                const newSpacePos = $inputs[sentenceIndex].value.indexOf(' ', spacePosEnd+1);
+                if (newSpacePos > spacePosEnd) {
+                    spacePosStart = spacePosEnd;
+                    spacePosEnd = newSpacePos;
+                }
             }
 
-            $inputs[sentenceIndex].setSelectionRange(pos, pos);
+
+            // and move the cursor to that position
+            $inputs[sentenceIndex].value  = $inputs[sentenceIndex].value.trim();
+            $inputs[sentenceIndex].setSelectionRange(spacePosStart+1, spacePosEnd);
         };
 
-        const checkAnswer = function () {
-            const $currentSentence = $($sentences[sentenceIndex]);
-            const currentInput = $inputs[sentenceIndex];
-            currentInput.value = currentInput.value.trim().replace(/\s\s+/g, ' ');
-            const userInput = generalizeSentence(currentInput.value);
-            const ourAnswer = JSON.parse($currentSentence.attr('data-sentence-json-answer'));
-            let userInputIndex = 0;
-            let wrongWordPos = 0;
-            console.log(userInput);
-            console.log(ourAnswer);
+        const highlightWrongWord = function (wordPosition) {
+            const answer = $sentences[sentenceIndex]
+                .getAttribute('data-sentence-nice-answer')
+                .replace(/' - '/g, '').split(' ');
 
-            // userInput = ["joe", "has", "2500", "in", "the", "bank"];
-            // ourAnswer = ["joe", "has", Array(3), "in", "the", "bank"]
-            // ourAnswer[2] = [[Array(3), Array(2), "2500"]]
-            // ourAnswer[2][0] = ["twenty-five", "hundred", "dollars"]
-            // ourAnswer[2][1] = ["2500", "dollars"]
-            // ourAnswer[2][2] = "2500"
+            for (let i = 0; i < answer.length; i++) {
+                if (i === wordPosition) {
+                    answer[i] = '<span class="text-danger">'+answer[i]+'</span>';
+                } else if (i > wordPosition) {
+                    answer[i] = '*'.repeat(4);
+                }
+            }
 
-            for (let i = 0; i < ourAnswer.length; i++) { // loops 6 times
-                // ourAnswer[0] and ourAnswer[1] === string, jsut compare 2 strings
-                if (typeof ourAnswer[i] === 'string' && ourAnswer[i] !== userInput[i]) {
-                    wrongWordPos = i; // if there's a wrong word, stop looping
+            $results[sentenceIndex].innerHTML = answer.join(' ');
+        };
+
+        const isUserInputCorrect = function () {
+            $inputs[sentenceIndex].value = $inputs[sentenceIndex].value.replace(/\s\s+/g, ' ');
+
+            const inputArr = generalizeSentence($inputs[sentenceIndex].value);
+            const answerArr = JSON.parse($sentences[sentenceIndex].getAttribute('data-sentence-json-answer'));
+
+            let inputWrongWordPos = -1;
+            let answerWrongWordPos = -1;
+            let inputIndex = -1;
+
+            for (let i = 0; i < answerArr.length; i++) {
+                if (inputWrongWordPos > -1) {
                     break;
-                } else if (Array.isArray(ourAnswer[i])) {
-                    // ourAnswer[2] is an array, loop it (3 times).
-                    for (let j = 0; j < ourAnswer[i].length; j++) {
-                        if (Array.isArray(ourAnswer[i][j])) {
-                            // ourAnswer[2][0] and ourAnswer[2][1] are arrays
-                            const wordCount = ourAnswer[i][j].length;
-                            let correctWord = 0;
-                            for (let k = 0; k < wordCount; k++) {
-                                if (userInput[i+k] !== ourAnswer[i][j][k]) {
-                                    correctWord = 0;
-                                    continue;
+                } else {
+                    inputIndex++;
+                }
+
+                if (typeof answerArr[i] === 'string') {
+                    if (answerArr[i] !== inputArr[inputIndex]) {
+                        answerWrongWordPos = i;
+                        inputWrongWordPos = inputIndex;
+                    }
+                }
+
+                else if (Array.isArray(answerArr[i])) {
+                    let isCorrect = false;
+                    let correctWordCount = 0;
+                    let lastCorrectWordPos = 0;
+
+                    for (let j = 0; j < answerArr[i].length; j++) {
+                        if (isCorrect) {
+                            break;
+                        }
+
+                        if (typeof answerArr[i][j] === 'string') {
+                            if (answerArr[i][j] === inputArr[inputIndex]) {
+                                isCorrect = true;
+                            }
+                        }
+
+                        else if (Array.isArray(answerArr[i][j])) {
+                            for (let k = 0; k < answerArr[i][j].length; k++) {
+                                if (answerArr[i][j][k] === inputArr[inputIndex+k]) {
+                                    correctWordCount++;
                                 } else {
-                                    correctWord++;
-                                    if (wordCount === correctWord) {
-                                        break;
+                                    if (correctWordCount > lastCorrectWordPos) {
+                                        lastCorrectWordPos = correctWordCount;
                                     }
+                                    correctWordCount = 0;
+                                    break;
                                 }
-                                console.log(userInput[i+k], ourAnswer[i][j][k]);
                             }
 
-                            console.log(wordCount === correctWord);
-
-                        } else {
-                            // ourAnswer[2][2] is a string
+                            if (correctWordCount === answerArr[i][j].length) {
+                                isCorrect = true;
+                                inputIndex += correctWordCount - 1;
+                            }
                         }
+                    }
+
+                    if (!isCorrect) {
+                        inputWrongWordPos = inputIndex + correctWordCount + lastCorrectWordPos;
+                        answerWrongWordPos = inputIndex + correctWordCount;
                     }
                 }
             }
 
-            return;
-            const input = generalizeSentence($inputs[sentenceIndex].value);
-            const answer = generalizeSentence($answers[sentenceIndex].innerHTML);
-            let result = $answers[sentenceIndex].innerHTML.split(' ');
-            let answerCorrect = true;
-
-            for (let i = 0; i < answer.length; i++) {
-                if (!answerCorrect) {
-                    result[i] = '*'.repeat(result[i].length);
-                    continue;
-                }
-
-                if (answer[i] !== input[i] && answerCorrect){
-                    result[i] = "<span class='text-danger'>"+result[i]+"</span>";
-                    answerCorrect = false;
-
-                    focusToWrongWord(i);
-                }
-            }
-
-            if (input.length > answer.length) {
-                result[result.length - 1] = "<span class='text-danger'>"+result[result.length - 1]+"</span>";
-                answerCorrect = false;
-            }
-
-            if (!answerCorrect) {
-                $results[sentenceIndex].innerHTML = result.join(' ');
-                return false;
-            } else {
-                $inputs[sentenceIndex].value = $answers[sentenceIndex].innerHTML;
-
-                $results[sentenceIndex].outerHTML = '';
-                $answers[sentenceIndex].outerHTML = '';
-                delete $results[sentenceIndex];
-                delete $answers[sentenceIndex];
-
-                sentencesToSave.push(
-                    $sentences[sentenceIndex]
-                        .getAttribute('data-sentence-id')
-                );
-
+            if (inputWrongWordPos === -1) {
                 return true;
             }
+
+            return {
+                'inputWrongWordPos': inputWrongWordPos,
+                'answerWrongWordPos': answerWrongWordPos
+            };
+        };
+
+        const inputCorrectHandler = function () {
+            const currentSentence = $sentences[sentenceIndex];
+
+            $inputs[sentenceIndex].value = currentSentence.getAttribute('data-sentence-nice-answer');
+            sentencesToSave.push(currentSentence.getAttribute('data-sentence-id'));
+            $results[sentenceIndex].innerHTML = '';
+            currentSentence.className = currentSentence.className + ' done';
+            $checkBtns[sentenceIndex].innerHTML = '<i class="glyphicon glyphicon-ok"></i>';
+            doneSentences++;
+        };
+
+        const inputIncorrectHandler = function (result) {
+            focusToWrongWord(result.inputWrongWordPos);
+            highlightWrongWord(result.answerWrongWordPos);
         };
 
         const updateUserProgress = function () {
@@ -167,7 +189,7 @@ $(document).ready(function () {
             }
 
             return $.post(args)
-                .done(function () {
+                .done(function (data) {
                     sentencesToSave.length = 0;
                     $updateUserBtns.find('.success-sign')
                         .fadeIn().delay(2000).fadeOut(500);
@@ -225,14 +247,13 @@ $(document).ready(function () {
             if ($sentence.hasClass('done')) {
                 return;
             }
-            checkAnswer();
-            /*if (checkAnswer()) {
-                $sentence.addClass('done');
-                $(this).find('i')
-                    .removeClass('glyphicon-send')
-                    .addClass('glyphicon-check');
-                doneSentences++;
-            }*/
+
+            const result = isUserInputCorrect();
+            if (result === true) {
+                inputCorrectHandler();
+            } else {
+                inputIncorrectHandler(result);
+            }
 
             if (isLessonDone()) {
                 if (userLoggedIn) {
@@ -269,5 +290,5 @@ $(document).ready(function () {
                 return false;
             }
         });
-    })();
+    })(window, $);
 });
