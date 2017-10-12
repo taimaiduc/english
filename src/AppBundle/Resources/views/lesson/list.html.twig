@@ -1,36 +1,36 @@
 {% extends 'AppBundle::layout.html.twig' %}
 
 {% block content %}
-<div class="row">
-    <div class=" col-sm-12 col-md-10">
-        <ul class="nav nav-tabs" role="tablist">
-            {% for category in categories if category.lessons|length > 0 %}
-                <li role="presentation" class="{% if loop.index == 1 %}active{% endif %}"><a href="#{{ category.slug }}" aria-controls="{{ category.slug }}" role="tab" data-toggle="tab"><b>{{ category.name }}</b></a></li>
-            {% endfor %}
-        </ul>
+    <div class="row">
+        <div class=" col-sm-12 col-md-10">
+            <ul class="nav nav-tabs" role="tablist">
+                {% for category in categories if category.lessons|length > 0 %}
+                    <li role="presentation" class="{% if loop.index == 1 %}active{% endif %}"><a href="#{{ category.slug }}" aria-controls="{{ category.slug }}" role="tab" data-toggle="tab"><b>{{ category.name }}</b></a></li>
+                {% endfor %}
+            </ul>
 
-        <div class="tab-content">
-            {% for category in categories if category.lessons|length > 0 %}
-                <div class="row tab-pane {% if loop.index == 1 %}active{% endif %}" id="{{ category.slug }}">
-                    <div class="js-lesson-list-wrapper" data-category-slug="{{ category.slug }}">
-                        {% include 'AppBundle::lesson/_list.html.twig' with {'category': category, 'lessons': category.lessons} %}
-                    </div>
+            <div class="tab-content">
+                {% for category in categories if category.lessons|length > 0 %}
+                    <div class="row tab-pane {% if loop.index == 1 %}active{% endif %}" id="{{ category.slug }}">
+                        <div class="js-lesson-list-wrapper" data-category-slug="{{ category.slug }}">
+                            {% include 'AppBundle::lesson/_list.html.twig' with {'category': category, 'lessons': category.lessons} %}
+                        </div>
 
-                    <div class="col-xs-12">
-                        <ul class="pagination">
-                            {% for pageNum in 1..category.pager.nbPages %}
-                                <li class="{% if pageNum == category.pager.currentPage %}active{% endif %}">
-                                    <a href="#" class="page" data-category-slug="{{ category.slug }}">{{ pageNum }}</a>
-                                </li>
-                            {% endfor %}
-                        </ul>
+                        <div class="col-xs-12">
+                            <ul class="pagination">
+                                {% for pageNum in 1..category.pager.nbPages %}
+                                    <li class="{% if pageNum == category.pager.currentPage %}active{% endif %}">
+                                        <a href="#" class="page" data-category-slug="{{ category.slug }}">{{ pageNum }}</a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            </div>
+            <hr>
         </div>
-        <hr>
     </div>
-</div>
 {% endblock %}
 
 {% block javascripts %}

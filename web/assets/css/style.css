@@ -182,7 +182,12 @@ body > .container {
 
 .done input, .done .btn {
     color: green;
-    border-color: green;
+    outline: none;
+    border-color: green !important;
+}
+
+.done .check-btn-icon {
+    display: none;
 }
 
 .shortcut-help {

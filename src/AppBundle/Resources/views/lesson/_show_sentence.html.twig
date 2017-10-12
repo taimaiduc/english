@@ -15,12 +15,12 @@
                 <input class="form-control js-input"
                        placeholder="{{ sentence.position ~ '.' }}"
                        tabindex="{{ sentence.position }}"
-                       value="{{ sentence.wasSaved ? sentence.content : sentence.content }}">
+                       value="{{ sentence.wasSaved ? sentence.content : '' }}">
                 <p class="text-left result js-result"></p>
             </div>
 
             <button class="btn btn-default js-check-answer-btn" type="button">
-                <i class="glyphicon glyphicon-{{ sentence.wasSaved ? 'check' : 'send' }} text-mute"></i>
+                <i class="glyphicon glyphicon-{{ sentence.wasSaved ? 'ok' : 'send' }} check-btn-icon"></i>
             </button>
         </div>
     {% endfor %}
