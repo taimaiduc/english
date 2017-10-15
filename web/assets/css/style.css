@@ -172,7 +172,8 @@ body > .container {
 
 }
 
-.sentences-wrapper .result {
+.sentences-wrapper .result,
+.sentences-wrapper .answer {
     margin-bottom: 0;
 }
 
@@ -180,14 +181,11 @@ body > .container {
     color: red;
 }
 
-.done input, .done .btn {
+.done input,
+.done .btn {
     color: green;
     outline: none;
     border-color: green !important;
-}
-
-.done .check-btn-icon {
-    display: none;
 }
 
 .shortcut-help {
