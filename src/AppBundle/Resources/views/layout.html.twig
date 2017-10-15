@@ -2,33 +2,24 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
-
+        <title>khoahuy.com - {% block title %}Welcome!{% endblock %}</title>
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
         <meta name="viewport" content="initial-scale=1">
-
-        {% block css %}
-            <link rel="stylesheet" href="{{ asset('assets/css/bootstrap.css') }}">
-            <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
-        {% endblock %}
-
+        <link rel="stylesheet", href="{{ asset('assets/layout.css') }}">
+        {% block css %}{% endblock %}
     </head>
     <body>
-        {% block nav %}
-            {% include 'AppBundle::block/nav.html.twig' %}
-        {% endblock %}
+        {% include 'AppBundle::block/nav.html.twig' %}
 
         <div class="container">
-
             {% include 'AppBundle:block:message.html.twig' %}
             {% block content %}{% endblock %}
         </div>
 
-        {% block auth %}
-        {% endblock %}
+        {% block auth %}{% endblock %}
 
-        {% block javascripts %}
-            {% include 'AppBundle::block/js.html.twig' %}
-        {% endblock %}
+        <script src="{{ asset('assets/manifest.js') }}"></script>
+        <script src="{{ asset('assets/layout.js') }}"></script>
+        {% block javascripts %}{% endblock %}
     </body>
 </html>

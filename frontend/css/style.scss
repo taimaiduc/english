@@ -1,0 +1,267 @@
+@import "./_bootstrap.scss";
+
+body > .container {
+    margin-top: 70px;
+}
+
+.result {
+    padding: 0 12px;
+}
+
+.btn-link:focus {
+    outline: none;
+}
+
+.progress p{
+    position: absolute;
+    width: 93%;
+    border-radius: 20%;
+    padding: 0 5px;
+}
+
+.category-name {
+    .toggle-lessons {
+        margin-top: 5px;
+        margin-left: 20px;
+        cursor: pointer;
+        -moz-transition: transform 0.5s;
+        -webkit-transition: transform 0.5s;
+        transition: transform 0.5s;
+    }
+}
+
+.flip {
+    transform: rotate(-180deg);
+}
+
+.saved .lesson-name {
+    color: grey;
+}
+
+.star {
+    display: none;
+}
+
+.saved .star, .done .star {
+    display: block;
+    position: absolute;
+    right: 5px;
+    top: 7px;
+    z-index: 100;
+    font-weight: bold;
+    color: black;
+}
+
+.done {
+    .star {
+        display: block;
+    }
+
+    .star-1 {
+        color: blue;
+    }
+
+    .star-2 {
+        color: green;
+    }
+
+    .star-3 {
+        color: yellow;
+    }
+
+    .star-4 {
+        color: red;
+    }
+
+    .star-5 {
+        -webkit-animation: color-change 2s infinite;
+        -moz-animation: color-change 2s infinite;
+        -o-animation: color-change 2s infinite;
+        -ms-animation: color-change 2s infinite;
+        animation: color-change 2s infinite;
+    }
+}
+
+@-webkit-keyframes color-change {
+    0% { color: red}
+    50% {color: yellow;}
+    100% { color: red; }
+}
+@-moz-keyframes color-change {
+    0% { color: red}
+    50% {color: yellow;}
+    100% { color: red; }
+}
+@-ms-keyframes color-change {
+    0% { color: red}
+    50% {color: yellow;}
+    100% { color: red; }
+}
+@-o-keyframes color-change {
+    0% { color: red}
+    50% {color: yellow;}
+    100% { color: red; }
+}
+@keyframes color-change {
+    0% { color: red}
+    50% {color: yellow;}
+    100% { color: red; }
+}
+
+
+.lesson-name {
+    margin-top: 0;
+}
+
+.nav-tabs {
+    margin-bottom: 15px;
+}
+
+.list-group-item {
+    padding: 5px 15px 5px 5px;
+    white-space: nowrap;
+
+    a {
+        display: block;
+        width: 100%;
+        margin-right: 5px;
+        overflow: hidden;
+        -webkit-mask-image: -webkit-linear-gradient(left, rgba(0, 0, 0, 1) 93%, rgba(0, 0, 0, 0) 100%);
+
+        &:hover{
+            color: blue;
+            font-weight: 600;
+            text-decoration: none;
+        }
+    }
+}
+
+.pagination {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.form-group {
+    a {
+        &:hover {
+            text-decoration: none;
+        }
+    }
+}
+
+.sentences-wrapper {
+    padding: 20px 10px 15px 20px;
+    max-height: 410px;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    > div {
+        clear: both;
+        margin-bottom: 15px;
+        overflow: hidden;
+    }
+
+    button{
+        float: left;
+        width: 40px;
+        height: 35px;
+        padding: 5px;
+    }
+
+    .input-answer-wrapper{
+        float: left;
+        display: inline-block;
+        margin: 0 10px;
+        width: calc(100% - 100px);
+
+    }
+
+    .result, .answer {
+        margin-bottom: 0;
+    }
+
+    span.text-danger {
+        color: red;
+    }
+}
+
+.done {
+    input, .btn {
+        color: green;
+        outline: none;
+        border-color: green !important;
+    }
+}
+
+.shortcut-help {
+    position: absolute;
+    top: -20px;
+    right: 25px;
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.text-bold {
+    font-weight: bold;
+}
+
+.pagination li a {
+    margin-bottom: 5px;
+}
+
+.tooltip-wrapper {
+    cursor: not-allowed;
+}
+
+.tooltip-wrapper .btn[disabled] {
+    /* don't let button block mouse events from reaching wrapper */
+    pointer-events: none;
+}
+
+.glyphicon-refresh.spinning {
+  transform-origin: 48% 50%;
+}
+
+.btn {
+  white-space: normal;
+}
+
+@media(min-width: 768px) {
+}
+
+@media(max-width: 768px) {
+  .lesson-wrapper .col-sm-3 {
+      padding-left: 0;
+  }
+
+  .lesson-wrapper .col-sm-9 {
+      padding-right: 0;
+  }
+}
+
+.glyphicon-spin {
+  -webkit-animation: spin 1000ms infinite linear;
+  animation: spin 1000ms infinite linear;
+}
+@-webkit-keyframes spin {
+  0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+  }
+  100% {
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg);
+  }
+}
+@keyframes spin {
+  0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+  }
+  100% {
+      -webkit-transform: rotate(359deg);
+      transform: rotate(359deg);
+  }
+}

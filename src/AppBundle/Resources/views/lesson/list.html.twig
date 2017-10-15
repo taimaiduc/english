@@ -34,11 +34,10 @@
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
     <script>
         window.App = {
             ajaxListUrl: '{{ path('ajax_lesson_list') }}'
         };
     </script>
-    <script src="{{ asset('assets/js/list.js') }}"></script>
+    <script src="{{ asset('assets/lesson_list.js') }}"></script>
 {% endblock %}
