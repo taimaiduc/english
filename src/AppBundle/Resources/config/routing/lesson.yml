@@ -1,0 +1,7 @@
+app.lesson.list:
+    path: /lessons
+    defaults: { _controller: AppBundle:Lesson:list }
+
+app.lesson.show:
+    path: /lessons/{slug}
+    defaults: { _controller: AppBundle:Lesson:show }

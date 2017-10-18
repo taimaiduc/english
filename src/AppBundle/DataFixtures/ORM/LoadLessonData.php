@@ -29,6 +29,7 @@ class LoadLessonData implements FixtureInterface
                 $lesson->setCategory($category);
                 $lesson->setIsActive(true);
                 $lesson->setPosition($lessonPos);
+                $lesson->setSlug($category->getSlug().'-'.$lessonPos);
 
                 $sentencePos = 1;
                 $sentencesPoint = 0;

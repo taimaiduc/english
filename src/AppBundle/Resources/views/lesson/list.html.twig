@@ -36,7 +36,7 @@
 {% block javascripts %}
     <script>
         window.App = {
-            ajaxListUrl: '{{ path('ajax_lesson_list') }}'
+            ajaxListUrl: '{{ path('app.ajax.lesson.list') }}'
         };
     </script>
     <script src="{{ asset('assets/lesson_list.js') }}"></script>

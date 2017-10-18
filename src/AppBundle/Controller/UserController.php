@@ -4,7 +4,6 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\User;
 use AppBundle\Form\RegistrationForm;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,9 +11,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 class UserController extends Controller
 {
-    /**
-     * @Route("/user/progress", name="user_progress")
-     */
     public function showAction()
     {
         /** @var User $user */
@@ -41,12 +37,6 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * @Route("/register", name="user_register")
-     *
-     * @param Request $request
-     * @return Response
-     */
     public function registerAction(Request $request)
     {
         if (null !== $this->getUser()) {

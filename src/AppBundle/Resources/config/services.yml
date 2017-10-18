@@ -1,8 +1,3 @@
-# Learn more about services, parameters and containers at
-# http://symfony.com/doc/current/service_container.html
-parameters:
-    #parameter_name: value
-
 services:
     app.security.login_form_authenticator:
         class: AppBundle\Security\LoginFormAuthenticator

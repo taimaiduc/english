@@ -6,10 +6,6 @@
         {% for lesson in lessons %}
             {% set times = lesson.numberOfTimesDone %}
 
-            {% if times > 5 %}
-                {% set times = 5 %}
-            {% endif %}
-
             {% if times and lesson.wasSaved %}
                 {% set class = 'star-' ~ times %}
                 {% set title = 'Đang làm lần ' ~ (times + 1) ~ '.' %}
@@ -24,8 +20,12 @@
                 {% set class = '' %}
             {% endif %}
 
+            {% if times > 5 %}
+                {% set class = 'star-5' %}
+            {% endif %}
+
             <li class="{{ times ? 'done ' : '' }}{{ lesson.wasSaved ? 'saved ' : '' }}list-group-item text-left">
-                <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.position}) }}"
+                <a href="{{ path('app.lesson.show', {'slug': lesson.slug}) }}"
                     title="{{ lesson.name }}"
                     class="lesson-name">
                     <span class="label label-info ">{{ lesson.position }}</span>

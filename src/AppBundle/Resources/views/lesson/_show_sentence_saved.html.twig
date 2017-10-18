@@ -1,0 +1,12 @@
+<div class="js-sentence done">
+    {% include '@App/lesson/_show_sentence_audio.html.twig' %}
+    <div class="input-answer-wrapper">
+        <input class="form-control js-input"
+               placeholder="{{ sentence.position ~ '.' }}"
+               tabindex="{{ sentence.position }}"
+               value="{{ sentence.content }}">
+    </div>
+    <button class="btn btn-default" type="button">
+        <i class="glyphicon glyphicon-ok"></i>
+    </button>
+</div>

@@ -3,19 +3,15 @@
 namespace AppBundle\Controller;
 
 use AppBundle\Form\LoginForm;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
 
 class SecurityController extends Controller
 {
-    /**
-     * @Route("/login", name="security_login")
-     */
     public function loginAction(Request $request)
     {
         if (null !== $this->getUser()) {
-            return $this->redirectToRoute('lessons_list');
+            return $this->redirectToRoute('app.lesson.list');
         }
 
         $authUtils = $this->get('security.authentication_utils');
@@ -37,9 +33,6 @@ class SecurityController extends Controller
         ));
     }
 
-    /**
-     * @Route("/logout", name="security_logout")
-     */
     public function logoutAction()
     {
         throw new \Exception('This should not be reached');

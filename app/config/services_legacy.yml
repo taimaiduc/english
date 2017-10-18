@@ -1,0 +1,12 @@
+services:
+    Doctrine\ORM\EntityManager:
+        alias: doctrine.orm.default_entity_manager
+        public: false
+
+    Symfony\Component\Security\Core\Encoder\UserPasswordEncoder:
+        alias: security.user_password_encoder.generic
+        public: false
+
+    Symfony\Bundle\TwigBundle\TwigEngine:
+        alias: templating.engine.twig
+        public: false

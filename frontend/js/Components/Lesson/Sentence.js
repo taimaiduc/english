@@ -70,16 +70,16 @@ class Sentence {
         this.checkBtn.setDone();
         this.result.remove();
         this.answer.remove();
+        this.isDone = true;
+
+        if (this.lesson.user) {
+            this.lesson.user.completeSentence(this.id);
+        }
 
         delete(this.id);
         delete(this.checkBtn);
         delete(this.answer);
         delete(this.result);
-
-        this.isDone = true;
-        if (this.lesson.user) {
-            this.lesson.user.completeSentence(this.id);
-        }
     }
 
     scrollSentence() {

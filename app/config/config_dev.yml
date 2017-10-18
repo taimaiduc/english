@@ -11,6 +11,10 @@ web_profiler:
     toolbar: true
     intercept_redirects: false
 
+twig:
+    globals:
+        dev_env: true
+
 monolog:
     handlers:
         main:

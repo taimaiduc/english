@@ -1,0 +1,5 @@
+app.ajax.lesson:
+    resource: '@AppBundle/Resources/config/routing/ajax/lesson.yml'
+
+app.ajax.user:
+    resource: '@AppBundle/Resources/config/routing/ajax/user.yml'

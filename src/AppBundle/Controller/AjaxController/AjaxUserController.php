@@ -9,7 +9,6 @@ use AppBundle\Entity\SavedLesson;
 use AppBundle\Entity\SavedSentence;
 use AppBundle\Entity\User;
 use Doctrine\Common\Persistence\ObjectManager;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,8 +17,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 class AjaxUserController extends Controller
 {
     /**
-     * @Route("/ajax/user/saveLesson/{lesson}", name="ajax_user_save_lesson")
-     *
      * @param Lesson $lesson
      * @param Request $request
      * @return JsonResponse
@@ -75,8 +72,6 @@ class AjaxUserController extends Controller
     }
 
     /**
-     * @Route("/ajax/user/completeLesson/{lesson}", name="ajax_user_complete_lesson")
-     *
      * @param Lesson $lesson
      * @return JsonResponse
      */

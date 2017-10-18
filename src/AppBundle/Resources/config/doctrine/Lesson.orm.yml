@@ -24,6 +24,8 @@ AppBundle\Entity\Lesson:
             type: boolean
             options:
                 default: true
+        slug:
+            type: string
     oneToMany:
         sentences:
             targetEntity: Sentence

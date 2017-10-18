@@ -1,11 +1,11 @@
-guidance:
+app.static.guidance:
     path: /guidance
     defaults:
         _controller: FrameworkBundle:Template:template
         template:    static/guidance.html.twig
 
-speaking:
+app.static.speaking:
     path: /speaking
     defaults:
-            _controller: FrameworkBundle:Template:template
-            template:    static/speaking.html.twig
+        _controller: FrameworkBundle:Template:template
+        template:    static/speaking.html.twig
