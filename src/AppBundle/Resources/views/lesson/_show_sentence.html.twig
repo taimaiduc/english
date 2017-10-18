@@ -1,31 +1,50 @@
 <div class="well sentences-wrapper js-sentences-wrapper">
     {% for sentence in lesson.sentences %}
-        <div class="js-sentence{{ sentence.wasSaved ? ' done' : '' }}"
-             {% if not sentence.wasSaved %}
-             data-id="{{ sentence.id }}"
-             data-json-answer="{{ sentence.wasSaved ? '' : sentence.jsonContent|json_encode }}"
-             {% endif %}>
-            <button class="btn btn-default js-audio-btn" type="button">
-                <i class="glyphicon glyphicon-volume-up"></i>
-                <audio class="hidden js-audio">
-                    <source src="{{ asset(sentence.audioPath) }}">
-                </audio>
-            </button>
+        {% if sentence.wasSaved %}
+            <div class="js-sentence done">
+                <button class="btn btn-default js-audio-btn" type="button">
+                    <i class="glyphicon glyphicon-volume-up"></i>
+                    <audio class="hidden js-audio" preload="none">
+                        <source src="{{ asset(sentence.audioPath) }}">
+                    </audio>
+                </button>
 
-            <div class="input-answer-wrapper">
-                <input class="form-control js-input"
-                       placeholder="{{ sentence.position ~ '.' }}"
-                       tabindex="{{ sentence.position }}"
-                       value="{{ sentence.wasSaved ? sentence.content : sentence.content }}">
-                {% if not sentence.wasSaved %}
-                    <p class="text-left result js-result"></p>
-                    <p class="text-left answer hidden js-answer">{{ sentence.content }}</p>
-                {% endif %}
+                <div class="input-answer-wrapper">
+                    <input class="form-control js-input"
+                           placeholder="{{ sentence.position ~ '.' }}"
+                           tabindex="{{ sentence.position }}"
+                           value="{{ sentence.content }}">
+                </div>
+
+                <button class="btn btn-default js-check-answer-btn" type="button">
+                    <i class="glyphicon glyphicon-ok"></i>
+                </button>
             </div>
+        {% else %}
+            <div class="js-sentence"
+                 data-id="{{ sentence.id }}">
+                <button class="btn btn-default js-audio-btn" type="button">
+                    <i class="glyphicon glyphicon-volume-up"></i>
+                    <audio class="hidden js-audio" preload="none">
+                        <source src="{{ asset(sentence.audioPath) }}">
+                    </audio>
+                </button>
 
-            <button class="btn btn-default js-check-answer-btn" type="button">
-                <i class="glyphicon glyphicon-{{ sentence.wasSaved ? 'ok' : 'send' }}"></i>
-            </button>
-        </div>
+                <div class="input-answer-wrapper">
+                    <input class="form-control js-input"
+                           placeholder="{{ sentence.position ~ '.' }}"
+                           tabindex="{{ sentence.position }}"
+                           value="">
+                        <p class="text-left result js-result"></p>
+                        <p class="text-left answer hidden js-answer"
+                           data-json-answer="{{ sentence.jsonContent|json_encode }}">
+                            {{ sentence.content }}
+                        </p>
+                </div>
+                <button class="btn btn-default js-check-answer-btn" type="button">
+                    <i class="glyphicon glyphicon-send"></i>
+                </button>
+            </div>
+        {% endif %}
     {% endfor %}
 </div>

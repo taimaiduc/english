@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script type="text/javascript" src="../../jquery.js"></script>
+        <link type="text/css" rel="stylesheet" src="normalize.css"></link>
+		<style>
+			* {padding: 0; margin: 0}
+			html, body {height: 100%; color: #333;}
+			a {text-decoration: none;}
+			header {background: #f6f7f8; width: 100%; margin-bottom: 2px; position: fixed; top: 0;border-bottom: 5px solid white; z-index: 2;}
+			.wrapper {background: #f6f7f8;width: 730px; padding: 5px 10px; margin: 0 auto; overflow: hidden;}
+			header .logo {float: left; line-height: 1; padding-right: 30px;}
+			header .logo a{ color: #333333;}
+			header .logo a:hover{ color: black;}
+			header .nav ul {list-style: none; float: left;padding: 5px 0; margin: 5px 0px;}
+			header .nav ul li {float: left;}
+			header .nav ul li a {padding: 10px 10px; color: #737373; font-size: 17px; margin: 0;}
+			header .nav ul li a:hover {color: #000; border-bottom: 2px solid black;}
+			
+			section {margin-top: 60px}
+			section .wrapper { width: 720px; margin: 5px auto; overflow: hidden; padding: 10px 0;}
+			section .note{text-align: center;}
+			section ul {list-style: none; height: 50px; margin: 25px 15px;}
+			section ul li {float: left;}
+            section ul li:nth-child(1) {width: 60px}
+			section ul li:nth-child(2) {width:578px}
+			section ul li input[type='text'] {width: 99%;height:26px; font-size: 14px; font-family: Tahoma, Geneva, sans-serif}
+			section ul li:nth-child(2) p {padding-left: 2px; color: grey; font-size: 14px; }
+            section ul li:nth-child(1) p {float: left; font-size: 14px;color: grey;}
+			section .eng {display:none;}
+			section button {height: 30px; width: 45px; }
+			section audio {width: 35px; float: right; }
+		</style>
+	</head>
+
+  <body>
+		<header>
+			<div class="wrapper">
+				<div class="logo">
+					<h1><a href="#">freedictations.com</a></h1>
+				</div>
+				
+				<div class="nav">
+					<ul>
+						<li><a href="#">Hướng dẫn</a></li>
+						<li><a href="#">Luyện nghe</a></li>
+						<li><a href="#">Link hay</a></li>
+						<li><a href="#">Diễn đàn</a></li>
+						<li><a href="#">Đóng góp</a></li>
+					</ul>
+				</div>
+			</div>
+		</header>
+	<section>
+		
+	<div class="wrapper">
+	<p class="note">HOTKEY: Replay = CTRL + SHIFT; Check = ENTER; Next sentence = TAB</p>
+	<p class="note"><small>**tat unikey truoc khi bat dau</small><p>
+        <script>
+            var result = [
+			"Jessica's First Day of School",
+		"Today is Jessica's first day of kindergarten. ",
+		"Jessica and her parents walk to school. ",
+		"Jessica's Mom walks with her to her classroom. ",
+		"Jessica meets her teacher. ",
+		"His name is Mr. Parker. ",
+		"The school bell rings at 8.45 A.M.. ",
+		"Jessica hugs and kisses her Mom goodbye. ",
+		"Jessica's Mom says ‘I love you.’ ",
+		"At 9.00 A.M., Jessica stands for the National anthem. ",
+		"Mr. Parker calls out children's names. ",
+		"Each child yells back ‘here!’ ",
+		"Mr. Parker teaches them about letters. ",
+		"Mr. Parker teaches them about numbers. ",
+		"At 10:15 A.M. the students have recess. ",
+		"Recess is fun. ",
+		"The students get to play and eat. ",
+		"At 10:30 A.M.",
+		"the students go to gym class. ",
+		"At 11:15 A.M.",
+		"the students return to Mr. Parker's classroom. ",
+		"Mr. Parker tells the students to sit on the carpet. ",
+		"Mr. Parker reads the students a story. ",
+		"Mr. Parker teaches the students a song. ",
+		"The lunch bell rings. ",
+		"Jessica's first day of school is over. "
+
+			];
+            for(var i = 1; i <= result.length; i++){
+                document.write("<ul>");
+                document.write("<li>");
+                document.write("<audio controls><source src='"+i+".mp3' type='audio/mp3' /></audio>");
+                document.write("<p>"+i+"</p>");
+                document.write("</li>");
+                document.write("<li>");
+                document.write("<input type='text' />");
+                document.write("<p class='eng'>"+result[i-1]+"</p>");
+                document.write("</li>");
+                document.write("<li>");
+                document.write("<button class='playbutton'>Check</button>");
+                document.write("</li>");
+                document.write("</ul>");
+            }
+        </script>
+	
+	</div>
+	</section>
+	<script>
+	$(document).ready(function(){
+		$("li:nth-child(3) button").click(function(){
+			$(this).parent().parent().find('li:nth-child(2) p').toggleClass("eng");
+		});
+		
+		$('ul li input').keydown(function (e) {
+			if(e.keyCode == 13) {
+			$(this).parent().parent().find('li:nth-child(2) p').toggleClass("eng");
+			}
+		});
+		
+		$('ul li input').keydown(function (e) {
+			if(event.ctrlKey && event.shiftKey) {
+			$(this).parent().parent().find('li:nth-child(1) audio').get(0).paused ? $(this).parent().parent().find('li:nth-child(1) audio').get(0).play() : $(this).parent().parent().find('li:nth-child(1) audio').get(0).pause();
+			}
+		});
+		
+		$(function() {
+			$('ul li input').keydown(function(e){
+				var keyCode = e.keyCode || e.which; 
+				//alert(keyCode);
+				  var inputs = $(this).closest('div').find('input[type="text"]');
+				  var idx = inputs.index(this);
+						if(keyCode === 9){              
+					if (idx == inputs.length - 1) {
+						inputs[0].select()
+					} else {
+						inputs[idx + 1].focus();
+						inputs[idx + 1].select();
+					}
+					return false;
+				  }
+			});
+		});
+	
+	});
+	</script>
+  </body>
+</html>

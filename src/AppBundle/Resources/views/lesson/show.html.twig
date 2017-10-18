@@ -16,7 +16,6 @@
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
     <script>
         window.App = {
             userLoggedIn: {{ app.user ? 1 : 0 }},
@@ -24,7 +23,5 @@
             completeLessonUrl: '{{ path('ajax_user_complete_lesson', {'lesson': lesson.id}) }}'
         };
     </script>
-    <script src="{{ asset('assets/js/User.js') }}"></script>
-    <script src="{{ asset('assets/js/Sentence.js') }}"></script>
-    <script src="{{ asset('assets/js/App.js') }}"></script>
+    <script src="{{ asset('assets/lesson_show.js') }}"></script>
 {% endblock %}
