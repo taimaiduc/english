@@ -17,12 +17,12 @@
                 {% endif %}
                 {% if lesson.previousLesson %}
                     <div class="{{ class }} form-group">
-                        <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.previousLesson.position}) }}" class="text-muted js-previous-lesson-link"><button class="btn btn-block">Bài {{ lesson.previousLesson.position }}</button></a>
+                        <a href="{{ path('app.lesson.show', {'slug': lesson.previousLesson.slug}) }}" class="text-muted js-previous-lesson-link"><button class="btn btn-block">Bài {{ lesson.previousLesson.position }}</button></a>
                     </div>
                 {% endif %}
                 {% if lesson.nextLesson %}
                     <div class="{{ class }} form-group">
-                        <a href="{{ path('lessons_show', {'categorySlug': lesson.category.slug, 'position': lesson.nextLesson.position }) }}" class="text-muted js-next-lesson-link"><button class="btn btn-block">Bài {{ lesson.nextLesson.position }}</button></a>
+                        <a href="{{ path('app.lesson.show', {'slug': lesson.nextLesson.slug}) }}" class="text-muted js-next-lesson-link"><button class="btn btn-block">Bài {{ lesson.nextLesson.position }}</button></a>
                     </div>
                 {% endif %}
             </div>

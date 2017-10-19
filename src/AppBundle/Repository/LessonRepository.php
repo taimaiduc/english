@@ -11,6 +11,18 @@ use Doctrine\ORM\EntityRepository;
 
 class LessonRepository extends EntityRepository
 {
+    public function findOneByCategorySlugAndPosition($categorySlug, $position)
+    {
+        return $this->createQueryBuilder('lesson')
+            ->leftJoin('lesson.category', 'category')
+            ->andWhere('category.slug = :slug')
+            ->setParameter('slug', $categorySlug)
+            ->andWhere('lesson.position = :position')
+            ->setParameter('position', $position)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     public function countAllLessonInOneCategory(Category $category)
     {
         return $this->createQueryBuilder('lesson')

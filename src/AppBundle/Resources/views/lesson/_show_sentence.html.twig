@@ -1,50 +1,9 @@
 <div class="well sentences-wrapper js-sentences-wrapper">
     {% for sentence in lesson.sentences %}
         {% if sentence.wasSaved %}
-            <div class="js-sentence done">
-                <button class="btn btn-default js-audio-btn" type="button">
-                    <i class="glyphicon glyphicon-volume-up"></i>
-                    <audio class="hidden js-audio" preload="none">
-                        <source src="{{ asset(sentence.audioPath) }}">
-                    </audio>
-                </button>
-
-                <div class="input-answer-wrapper">
-                    <input class="form-control js-input"
-                           placeholder="{{ sentence.position ~ '.' }}"
-                           tabindex="{{ sentence.position }}"
-                           value="{{ sentence.content }}">
-                </div>
-
-                <button class="btn btn-default js-check-answer-btn" type="button">
-                    <i class="glyphicon glyphicon-ok"></i>
-                </button>
-            </div>
+            {% include '@App/lesson/_show_sentence_saved.html.twig' %}
         {% else %}
-            <div class="js-sentence"
-                 data-id="{{ sentence.id }}">
-                <button class="btn btn-default js-audio-btn" type="button">
-                    <i class="glyphicon glyphicon-volume-up"></i>
-                    <audio class="hidden js-audio" preload="none">
-                        <source src="{{ asset(sentence.audioPath) }}">
-                    </audio>
-                </button>
-
-                <div class="input-answer-wrapper">
-                    <input class="form-control js-input"
-                           placeholder="{{ sentence.position ~ '.' }}"
-                           tabindex="{{ sentence.position }}"
-                           value="">
-                        <p class="text-left result js-result"></p>
-                        <p class="text-left answer hidden js-answer"
-                           data-json-answer="{{ sentence.jsonContent|json_encode }}">
-                            {{ sentence.content }}
-                        </p>
-                </div>
-                <button class="btn btn-default js-check-answer-btn" type="button">
-                    <i class="glyphicon glyphicon-send"></i>
-                </button>
-            </div>
+            {% include '@App/lesson/_show_sentence_notsaved.html.twig' %}
         {% endif %}
     {% endfor %}
 </div>

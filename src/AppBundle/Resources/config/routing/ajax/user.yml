@@ -1,0 +1,7 @@
+app.ajax.user.complete_lesson:
+    path: /ajax/user/completeLesson/{lesson}
+    defaults: { _controller: AppBundle:AjaxController/AjaxUser:ajaxCompleteLesson }
+
+app.ajax.user.save_lesson:
+    path: /ajax/user/completeLesson/{lesson}
+    defaults: { _controller: AppBundle:AjaxController/AjaxUser:ajaxSaveLesson }

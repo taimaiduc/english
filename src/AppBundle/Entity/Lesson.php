@@ -40,6 +40,11 @@ class Lesson
     private $isActive = true;
 
     /**
+     * @var string
+     */
+    private $slug;
+
+    /**
      * @var Lesson
      */
     private $previousLesson;
@@ -163,6 +168,22 @@ class Lesson
     public function setIsActive($isActive)
     {
         $this->isActive = $isActive;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug()
+    {
+        return $this->slug;
+    }
+
+    /**
+     * @param string $slug
+     */
+    public function setSlug($slug)
+    {
+        $this->slug = $slug;
     }
 
     /**

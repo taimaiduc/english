@@ -1,0 +1,24 @@
+app.homepage:
+    path: /
+    defaults: { _controller: 'AppBundle:Lesson:list' }
+
+app.leader:
+    resource: '@AppBundle/Resources/config/routing/leader.yml'
+
+app.lesson:
+    resource: '@AppBundle/Resources/config/routing/lesson.yml'
+
+app.security:
+    resource: '@AppBundle/Resources/config/routing/security.yml'
+
+app.user:
+    resource: '@AppBundle/Resources/config/routing/user.yml'
+
+app.static:
+    resource: '@AppBundle/Resources/config/routing/static.yml'
+
+app.fos:
+    resource: '@AppBundle/Resources/config/routing/fos.yml'
+
+app.ajax:
+    resource: '@AppBundle/Resources/config/routing/ajax/all.yml'

@@ -13,7 +13,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a href="{{ path('lessons_list') }}" class="navbar-brand">
+                    <a href="{{ path('app.lesson.list') }}" class="navbar-brand">
                         <b class=" text-info">
                             <span class="glyphicon glyphicon-education"></span>
                             {{ app.request.host|replace({'www.': ''}) }}
@@ -24,13 +24,13 @@
                 <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                     <ul class="nav navbar-nav">
                         <li>
-                            <a href="{{ path('lessons_list') }}">
+                            <a href="{{ path('app.lesson.list') }}">
                                 <i class="glyphicon glyphicon-headphones"></i>
                                 Luyện nghe
                             </a>
                         </li>
                         <li>
-                            <a href="{{ path('leader_list') }}">
+                            <a href="{{ path('app.leader.list') }}">
                                 <i class="glyphicon glyphicon-th-list"></i> Xếp hạng
                             </a>
                         </li>
@@ -48,7 +48,7 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a href="{{ path('user_progress') }}">
+                                        <a href="{{ path('app.user.show') }}">
                                             Thống kê
                                         </a>
                                     </li>
@@ -58,20 +58,20 @@
                                         </a>
                                     </li>
                                     <li role="separator" class="divider"></li>
-                                    <li><a href="{{ path('security_logout') }}">Thoát</a></li>
+                                    <li><a href="{{ path('app.security.logout') }}">Thoát</a></li>
                                 </ul>
                             </li>
                         </ul>
                     {% else %}
                         <ul class="nav navbar-nav navbar-right js-navbar-not-logged-in">
                             <li>
-                                <a href="{{ path('security_login') }}" class="js-auth-btn">
+                                <a href="{{ path('app.security.login') }}" class="js-auth-btn">
                                     <i class="glyphicon glyphicon-log-in"></i>
                                     Đăng nhập
                                 </a>
                             </li>
                             <li>
-                                <a href="{{ path('user_register') }}" class="js-auth-btn">
+                                <a href="{{ path('app.user.register') }}" class="js-auth-btn">
                                     <i class="glyphicon glyphicon-edit"></i>
                                     Đăng kí
                                 </a>

@@ -1,0 +1,3 @@
+app.leader.list:
+    path: /leaders
+    defaults: { _controller: AppBundle:Leader:index }

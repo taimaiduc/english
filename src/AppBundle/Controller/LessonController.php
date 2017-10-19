@@ -4,17 +4,12 @@ namespace AppBundle\Controller;
 
 use AppBundle\Entity\Category;
 use AppBundle\Entity\Lesson;
-use AppBundle\Entity\SavedSentence;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class LessonController extends BaseController
 {
-    /**
-     * @Route("/", name="lessons_list")
-     */
     public function listAction()
     {
         /** @var Category[] $categories */
@@ -58,24 +53,16 @@ class LessonController extends BaseController
     }
 
     /**
-     * @param $categorySlug
-     * @param $position
+     * @param Request $request
+     * @param $slug
      * @return Response
-     * @Route("/{categorySlug}/{position}", name="lessons_show")
      */
-    public function showAction(Request $request, $categorySlug, $position)
+    public function showAction(Request $request, $slug)
     {
-        /** @var Category $category */
-        $category = $this->getDoctrine()->getRepository('AppBundle:Category')
-            ->findOneBy(['slug' => $categorySlug]);
-
-        if (!$category) {
-            throw new NotFoundHttpException();
-        }
 
         /** @var Lesson $lesson */
         $lessonRepo = $this->getDoctrine()->getRepository('AppBundle:Lesson');
-        $lesson = $lessonRepo->findOneBy(['category' => $category, 'position' => $position]);
+        $lesson = $lessonRepo->findOneBy(['slug' => $slug]);
 
         if (!$lesson) {
             throw new NotFoundHttpException();
@@ -109,12 +96,9 @@ class LessonController extends BaseController
         return $this->render('AppBundle::lesson/show.html.twig', $data);
     }
 
-    /**
-     * @Route("/test")
-     */
     public function testAction()
     {
-        $mailer = $this->get('mailer');
+        $mailer = $this->get('swiftmailer.mailer.abstract');
         $message = (new \Swift_Message('Hello Email'))
             ->setFrom('send@example.com')
             ->setTo('khoa-huy.nguyen@ekino.com')

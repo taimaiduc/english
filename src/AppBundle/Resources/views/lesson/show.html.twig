@@ -19,8 +19,8 @@
     <script>
         window.App = {
             userLoggedIn: {{ app.user ? 1 : 0 }},
-            saveLessonUrl: '{{ path('ajax_user_save_lesson', {'lesson': lesson.id}) }}',
-            completeLessonUrl: '{{ path('ajax_user_complete_lesson', {'lesson': lesson.id}) }}'
+            saveLessonUrl: '{{ path('app.ajax.user.save_lesson', {'lesson': lesson.id}) }}',
+            completeLessonUrl: '{{ path('app.ajax.user.complete_lesson', {'lesson': lesson.id}) }}'
         };
     </script>
     <script src="{{ asset('assets/lesson_show.js') }}"></script>

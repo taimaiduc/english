@@ -1,0 +1,3 @@
+app.ajax.lesson.list:
+    path: /ajax/lesson/list
+    defaults: { _controller: AppBundle:AjaxController/AjaxLesson:ajaxLessonList }
