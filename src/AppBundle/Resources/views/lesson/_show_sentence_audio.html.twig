@@ -1,6 +1,6 @@
 <button class="btn btn-default js-audio-btn" type="button">
     <i class="glyphicon glyphicon-volume-up"></i>
-    <audio class="hidden js-audio" preload="none">
+    <audio class="hidden js-audio" {% if audioLoaded == 0 %}{% set audioLoaded = audioLoaded + 1 %}a{% else %}preload="none"{% endif %}>
         <source src="{{ asset(sentence.audioPath) }}">
     </audio>
 </button>

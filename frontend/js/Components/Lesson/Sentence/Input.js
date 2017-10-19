@@ -56,7 +56,11 @@ class Input {
 
         start += wordIndex === 0 ? 0 : 1;
 
-        this.$input[0].setSelectionRange(start, end);
+        if (start > end) {
+            this.$input.val(inputVal);
+        } else {
+            this.$input[0].setSelectionRange(start, end);
+        }
     }
 
     onKeydownHandler(e) {
@@ -74,6 +78,10 @@ class Input {
 
         if (e.ctrlKey && keyCode === 32) { // Ctrl + Space
             this.sentence.audio.play();
+        }
+
+        else if (keyCode === 32 && this.sentence.result.isShown) {
+            this.sentence.result.hide();
         }
 
         else if (keyCode === 40) { // Down

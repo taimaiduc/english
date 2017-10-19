@@ -1,4 +1,5 @@
 <div class="well sentences-wrapper js-sentences-wrapper">
+    {% set audioLoaded = 0 %}
     {% for sentence in lesson.sentences %}
         {% if sentence.wasSaved %}
             {% include '@App/lesson/_show_sentence_saved.html.twig' %}
